@@ -1,0 +1,89 @@
+﻿@page "/Select"
+@inject FirebaseData DB
+@inject FirebaseAuth Auth
+@inject FirebaseMessaging Messaging
+@inject NavigationManager Navigation
+
+<div class="d-flex flex-column w-100">
+	<div class ="d-flex flex-column gap-5 PbtASystemContainer Outer" style="padding:10px;">
+		<div class="PhoneMenuHeader">
+			@foreach(Circles circle in Enum.GetValues(typeof(Circles)))
+			{
+				@if(circle != Circles.NotSet)
+				{
+					<div class="PhoneMenuHeaderButton @((DB.CurrentCircle == circle)?"PhoneMenuHeaderButtonSelected":"")"
+							@onclick=@(()=>{CircleSelected(circle);})>
+							@circle.ToString()
+					</div>
+				}
+			}
+		</div>
+		@foreach(var faction in DB.AllFactions.Where(x=>x.Circle == DB.CurrentCircle))
+		{
+			<div class="PhoneMenuFactionBox">
+				<div class="PhoneMenuFactionHeader" @onclick=@(async ()=>{ Navigation.NavigateTo($"/Faction/{faction.ID.ToString()}");})>
+					<div>
+					@faction.Name
+					</div>
+					<div class="PhoneAddButton" @onclick=@(async ()=>{ await CreatePlayerAtFaction(faction);}) @onclick:stopPropagation=true>
+						+
+					</div>
+				</div>
+				@foreach (var ch in DB.GetMembersOfFaction(faction))
+				{
+					<div class="PhoneMenuItemButton @IsSelected(ch)" @onclick=@(()=>{Navigation.NavigateTo($"/Character/{ch.ID.ToString()}");})>
+						@ch.Name
+					</div>
+				}
+			</div>
+		}
+		<div class="PhoneAddFactionButton" @onclick=CreateFaction @onclick:stopPropagation=true>
+			Añadir nueva facción
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter] public EventCallback<Character> CharacterSelected { get; set; }
+	[Parameter] public EventCallback<Faction> FactionSelected { get; set; }
+	[Parameter] public EventCallback ForceUpdate { get; set; }
+
+	protected async override void OnAfterRender(bool firstRender)
+	{
+		if(firstRender)
+		{
+			DB.ForceUIUpdate -= StateChanged;
+			DB.ForceUIUpdate += StateChanged;
+			DB.CharacterChanged += CharacterChanged;
+		}
+	}
+
+	private string IsSelected(Character ch)
+	{
+		if (DB.CurrentCharacter == ch)
+			return "Selected";
+		return "";
+	}
+
+	private void CharacterChanged(object? sender, Character ch) => StateHasChanged();
+	private void StateChanged(object? sender, EventArgs e) => StateHasChanged();
+
+	private void CircleSelected(Circles circle)
+	{
+		DB.CurrentCircle = circle;
+	}
+
+	async Task CreatePlayerAtFaction(Faction fac)
+	{
+		var ch = await DB.CreatePlayerAtFaction(fac);
+		await CharacterSelected.InvokeAsync(ch);
+		Navigation.NavigateTo($"/Character/{ch.ID}");
+	}
+
+	async Task CreateFaction()
+	{
+		await DB.CreateNewFactionAtSelectedCircle();
+		StateHasChanged();
+	}
+}

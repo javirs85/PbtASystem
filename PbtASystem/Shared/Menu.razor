@@ -1,0 +1,76 @@
+﻿
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link @GetActive("")" 
+                   data-bs-toggle="collapse" 
+                    data-bs-target="#navbarNavAltMarkup" 
+                    aria-current="page"
+                    style="cursor:pointer"
+                   @onclick=@(()=>{NavigationManager.NavigateTo("/");})
+                    href="/Meta">
+                    Meta
+                </a>
+                <a class="nav-link  @GetActive("Jugar")"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#navbarNavAltMarkup"
+                     aria-current="page"
+                     style="cursor:pointer"
+                @onclick=@(()=>{NavigationManager.NavigateTo("/Meta");})>
+                    Jugar
+                </a>
+                <a class="nav-link  @GetActive("Select")"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#navbarNavAltMarkup"
+                     aria-current="page"
+                     style="cursor:pointer"
+                @onclick=GoToCampaign>
+                    Campaña
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code{
+
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] FirebaseData Data { get; set; }
+
+    protected override void OnInitialized() => NavigationManager.LocationChanged += (s, e) => StateHasChanged();
+
+    private void GoToCampaign()
+    {
+        if(Data.PlayerCharacter.Circle != Circles.NotSet)
+        {
+            NavigationManager.NavigateTo("/Character/"+Data.PlayerCharacter.ID.ToString());
+        }
+        else
+            NavigationManager.NavigateTo("/Select");
+    }
+    void Back()
+    {
+        
+    }
+
+    bool IsActive(string href)
+    {
+
+        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).ToLower();
+        if(href == "Select")
+        {
+            return relativePath.StartsWith("select".ToLower()) ||
+                    relativePath.StartsWith("campaña".ToLower()) ||
+                    relativePath.StartsWith("character".ToLower());
+        }
+        return relativePath.StartsWith(href.ToLower());
+    }
+
+    string GetActive(string href) => IsActive(href) ? "active" : "";
+}

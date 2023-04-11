@@ -1,0 +1,118 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+}
+
+.Visible {
+    display: block;
+    width: 100%;
+    height: 100vh;
+    background: #00000082;
+    position: fixed;
+    z-index: 10;
+    overflow-y: scroll;
+    background: var(--Darker);
+}
+
+.Hidden{
+    display: none;
+}
+
+.Content {
+    background: #1C1E20;
+    color: white;
+    padding: 2em;
+    display:flex;
+    flex-direction:column;
+    align-items: flex-start;
+}
+
+.CharacterButton {
+    cursor: pointer;
+    border-radius: 1em;
+    background: #24262B;
+    margin: 0.1em;
+    padding: 1em;
+    width: 300px;
+}
+    .CharacterButton:hover {
+        background: #2E3138;
+    }
+.PCCharacter {
+    border: 1px solid #ff00008f;
+}
+
+.FactionTittle {
+    font-size: 1.5em;
+    border-bottom: 0.1em solid #7577a9;
+    line-height: 0.95em;
+    margin-bottom: 0.2em;
+}
+
+.MenuButton {
+    background: #24262B;
+    color: white;
+    cursor: pointer;
+    border-radius:1em;
+    padding:1em;
+    width:25%;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+}
+    .MenuButton:hover {
+        background: #2E3138;
+    }
+
+.ExitButton {
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color:white;
+    cursor:pointer;
+}
+
+.ActiveMenuButton {
+    border-radius: 0 0 1em 1em;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    padding: 1em;
+    width: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.Mortalis {
+    background: #355247;
+}
+.Night {
+    background: #4f5c81;
+}
+.Power {
+    background: #642a2a;
+}
+.Wild {
+    background: #4f1d50;
+}
+.MortalisBorder {
+    border-color: #355247;
+}
+
+.NightBorder {
+    border-color: #4f5c81;
+}
+
+.PowerBorder {
+    border-color: #642a2a;
+}
+
+.WildBorder {
+    border-color: #4f1d50;
+}
+
+.Darker {
+    background: #1C1E20;
+}

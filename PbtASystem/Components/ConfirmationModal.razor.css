@@ -1,0 +1,40 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+}
+
+.ShowModal {
+    visibility: visible;
+}
+.HideModal {
+    visibility: collapse;
+}
+
+.ModalBackDrop {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    background: #000000b8;
+    z-index: 20;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ModalContainer{
+    background: var(--Darker);
+    color:white;
+    padding:20px;
+    width:70%;
+}
+
+.ModalHeader{
+    font-weight:bold;
+    font-size:20px;
+}
+.ModalBody{
+    padding:39px;
+}

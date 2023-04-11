@@ -1,0 +1,88 @@
+﻿@page "/Faction/{IDString}"
+@inject IToastService Toaster;
+@inject FirebaseData Data;
+@inject FirebaseAuth Auth;
+@inject FirebaseMessaging Msgs;
+@inject HttpClient Http
+@inject ConfirmationModalService Confirm;
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<div class="PbtASystemContainer">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="d-none d-md-block col-4 col-xl-3">
+				<CharacterFactionSelector />
+			</div>
+			<div class="col">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xl-6">
+							<div class="Title">@Data.CurrentFaction.Name</div>
+							<div class="d-flex gap-2">
+								<div class="SubTitle">@Data.CurrentFaction.Kind (@Data.CurrentCircle.ToString())</div>
+								<div>@Data.CurrentFaction.Status</div>
+							</div>
+
+							<div class="Entry">
+								<div class="EntryTitlte">Trabajando en ...</div>
+								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.CurrentlyWorkingOn /> </div>
+							</div>
+							<div class="Entry">
+								<div class="EntryTitlte">Descripción</div>
+								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.Description /> </div>
+							</div>
+							<div class="Entry">
+								<div class="EntryTitlte">Assets</div>
+								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.Assets /> </div>
+							</div>
+							@if (Auth.IsMaster)
+							{
+								<div class="Entry">
+									<div class="EntryTitlte">Master seeds</div>
+									<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.MasterSeeds /> </div>
+								</div>
+							}
+							else
+							{
+								<div>Las notas para el master han sido deshabilitadas</div>
+							}
+
+						</div>
+						<div class="col-xl-6 ">
+							actions here
+						</div>
+					</div>
+				</div>
+			</div>		
+		</div>
+	</div>
+</div>
+
+
+@code {
+	[Parameter] public string IDString { get; set; } = "";
+
+	protected async override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+		{
+			if (await Data.CheckIfNeedToLoad()) StateHasChanged();
+			await Msgs.CheckIfReConnnectionNeeded();
+
+
+			if (Auth.ConnectedUserName == Data.Chronicle.MasterPlayerID)
+				Auth.IsMaster = true;
+		}
+	}
+
+	protected async override void OnParametersSet()
+	{
+		await Connectors.SetConnectors(JS, Data, Auth);
+
+		Guid ID = new Guid(IDString);
+		Data.CurrentFaction = Data.GetFaction(ID);
+
+		StateHasChanged();
+	}
+}

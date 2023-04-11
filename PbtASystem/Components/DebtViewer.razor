@@ -1,0 +1,78 @@
+﻿<div class="PbtASystemContainer DebtContainer">
+	<div class="FirstColumn d-flex flex-column">
+		<div class="TheOther" @onclick=ChooseCharacter>@TheOtherName</div>
+		<div class="Amount d-flex justify-content-center" @onclick=AddOneToDebt>@Debt.Amount</div>
+	</div>
+	<div class="DebtMain flex-grow-1" @onclick=@(()=>{Navigation.NavigateTo($"/DebEdit/{Debt.ID}");})>
+		@Debt.Reason
+	</div>
+	<div class="ClossingButton" @onclick=RemoveOneDebt>
+		<i class="bi bi-x-lg"/>
+	</div>
+</div>
+
+@code {
+	[Inject] IToastService Toaster { get; set; }
+	[Inject] FirebaseData Data { get; set; }
+	[Inject] CharacterSelectionService Selector { get; set; }
+	[Inject] ConfirmationModalService Confirmator { get; set; }
+	[Inject] NavigationManager Navigation { get; set; }
+
+	public enum PayingMode {ToPay, ToBePaid};
+
+	[Parameter] public Debt Debt { get; set; } = new();
+	[Parameter] public PayingMode Mode { get; set; } = PayingMode.ToPay;
+	[Parameter] public EventCallback ForceUpdateUI { get;set; }
+
+	string TheOtherName
+	{
+		get
+		{
+			if(Mode == PayingMode.ToPay){
+				var nova = Data.AllCharacters.Find(x => x.Name.Contains("Nova"));
+				var ch = Data.GetCharacterByID(Debt.ReceivingID);
+				if (ch.Name.Contains("Character not found"))
+					return $"NO: {ch.ID.ToString()}";
+				else
+					return Data.GetCharacterByID(Debt.ReceivingID).Name;
+			}
+			else
+				return Data.GetCharacterByID(Debt.PayingID).Name;
+		}
+	}
+
+	private async Task ChooseCharacter()
+	{
+		var ch = await Selector.SelectViaSelector();
+		if (Mode == PayingMode.ToPay)
+			Debt.ReceivingID = ch.ID;
+		else
+			Debt.PayingID = ch.ID;
+
+		await Data.StoreDebt(Debt);
+		//await Data.ForceDataRefresh();
+		StateHasChanged();
+	}
+	private async Task AddOneToDebt()
+	{
+		Debt.Amount++;
+		await Data.StoreDebt(Debt);
+		//await Data.ForceDataRefresh();
+		StateHasChanged();
+	}
+
+	private async Task RemoveOneDebt()
+	{
+		Debt.Amount--;
+		if (Debt.Amount <= 0)
+		{
+			await Data.DeleteDebt(Debt);
+		}
+		else
+			await Data.StoreDebt(Debt);
+
+		//await Data.ForceDataRefresh();
+		StateHasChanged();
+		await ForceUpdateUI.InvokeAsync();
+	}
+}

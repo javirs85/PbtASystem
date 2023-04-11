@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "firebase@9.18.0",
+      "destination": "wwwroot/firebase/",
+      "files": [
+        "firebase-app.js",
+        "firebase-messaging-compat.js",
+        "firebase-messaging-compat.js.map",
+        "firebase-messaging-compat.min.js",
+        "firebase-messaging-sw.js",
+        "firebase-messaging-sw.js.map",
+        "firebase-messaging-sw.min.js",
+        "firebase-messaging.js",
+        "firebase-messaging.js.map",
+        "firebase-messaging.min.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap@5.2.3",
+      "destination": "wwwroot/bootstrap/"
+    }
+  ]
+}

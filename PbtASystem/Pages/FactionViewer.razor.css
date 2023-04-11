@@ -1,0 +1,29 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+}
+
+.Title{
+    font-size:2em;
+    margin-bottom:-10px;
+}
+.SubTitle{
+    font-size:1.5em;
+    opacity:0.5;
+    margin-bottom:20px;
+}
+
+.Entry{
+    margin:20px 0px;
+    border-left: 1px solid gray;
+    padding-left: 10px;
+}
+.EntryTitlte{
+
+}
+.EntryBody{
+    padding-left: 20px;
+    opacity:0.8;
+}

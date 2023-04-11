@@ -1,0 +1,59 @@
+﻿@using Blazored.Toast
+@using PbtASystem.Pages
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@implements IDisposable
+
+
+<BlazoredToasts />
+<CharacterSelector/>
+<ConfirmationModal/>
+
+<div class="page d-flex flex-column w-100">
+    <Menu/>
+    @Body
+</div>
+
+@code{
+
+	IJSObjectReference FirebaseJSRef;
+	[Inject] IJSRuntime JS { get; set; }
+	[Inject] FirebaseData Data { get; set; }
+	[Inject] FirebaseAuth Auth { get; set; }
+	[Inject] FirebaseMessaging Messaging { get; set; }
+	[Inject] IToastService Toaster { get; set; }
+	[Inject] Blazored.LocalStorage.ILocalStorageService LocaStorageManager { get; set; }
+	[Inject] CharacterSelectionService CharacterSelector { get; set; }
+	[Inject] NavigationManager NavigationManager { get; set; }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+
+			Data.DataIsReady += NavigateToRootAndDisconnect;
+			Auth.UserChanged += (o, name) =>
+			{
+				StateHasChanged();
+			};
+		}
+	}
+
+	private bool AlreadySetUp = false;
+
+	protected async override Task OnParametersSetAsync()
+	{
+		await Connectors.SetConnectors(JS, Data, Auth);
+	}
+
+	private void NavigateToRootAndDisconnect(object? sender, EventArgs e)
+	{
+		// NavigationManager.NavigateTo("/");
+	}
+
+	public void Dispose()
+	{
+		Auth.Dispose();
+		Data.Dispose();
+	}
+}
+

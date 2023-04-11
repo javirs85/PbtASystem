@@ -1,0 +1,100 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+}
+
+.ImageButton {
+    background: #ffffff6e;
+    border-radius: 50%;
+    padding: 10px;
+    aspect-ratio: 1/1;
+    margin-top: 5px;
+    cursor:pointer;
+    width:44px;
+    height:44px;
+    display:grid;
+    place-items:center;
+}
+
+.DebtsColmns{
+
+}
+.DebtsColmnsPhone {
+    width: 97vw;
+    margin-left: -40px;
+}
+
+.ImageButton:hover {
+    background: white;
+}
+.ImageButton:hover .bi{
+    font-size:1.1em;
+    margin-top:-1px;
+}
+.BackButton{
+    color:black;
+}
+
+.AddDebtButton {
+    opacity: 0.5;
+    aspect-ratio: 1/1;
+    cursor:pointer;
+}
+    .AddDebtButton:hover{
+        opacity:1;
+    }
+
+    .Edit {
+        color: #0c500c;
+    }
+
+.Delete {
+    color: #850e0e;
+}
+
+.ImageCanvas {
+    background-repeat: no-repeat;
+    aspect-ratio: 1 / 1;
+    background-size: contain;
+    position: relative;
+}
+
+.ImageCanvas img {
+    width: 100%;
+}
+
+    .ImageCanvas .UpperButtons {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0 5px;
+    }
+
+.CharacterEntryBox{
+    border-left:1px solid  gray;
+    padding-left: 0.5em;
+    margin-left: -0.5em;
+}
+.CharacterEntryHeader{
+    font-size:1.1em;
+}
+.CharacterEntryBody{
+    opacity:0.7;
+    padding-left:0.5em;
+}
+
+.NameDiv {
+    background: #0000008e;
+    color: white;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    font-size: 1.5em;
+    font-weight: bold;
+}

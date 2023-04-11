@@ -1,0 +1,83 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+}
+
+.BackPanel {
+    background: var(--Darker);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    overflow-y: scroll;
+}
+.FAB {
+    display: flex;
+    gap: 0.5em;
+    margin: 0 0.5em;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.PanelButton {
+    font-size: 3em;
+    opacity: 0.5;
+    cursor: pointer;
+}
+    .PanelButton:hover {
+        opacity: 1;
+    }
+
+.DataBox {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+}
+    .DataBox .DataHeader {
+    }
+    .DataBox .DataBody {
+        min-width: 350px;
+    }
+    .DataBody textarea{
+        width: 100%;
+    }
+
+.DataBoxSmall{
+    display:flex;
+    align-items: center;
+    gap:10px;
+    margin-bottom:5px;
+}
+    .DataBoxSmall .DataHeader {
+        min-width: 65px;
+        text-align: right;
+    }
+    .DataBoxSmall .DataBody {
+        width:160px;
+        background: green;
+    }
+.DataBody input{
+    background:red;
+}
+
+.BlackIinput {
+    background: var(--Middle);
+    color: white;
+    border: none;
+}
+
+.BlackTextarea {
+    background: var(--Middle);
+    color: white;
+    border: none;
+}

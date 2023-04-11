@@ -1,0 +1,107 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+}
+
+.Outer{
+    background: var(--Darker);
+    color:white;
+    width:100%;
+}
+
+.PhoneMenuHeader {
+    background: #1C1E20;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 5px;
+    gap: 5px;
+}
+
+.PhoneMenuHeaderButton {
+    width: 25%;
+    height: 40px;
+    background: #303236;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.PhoneMenuHeaderButtonSelected {
+    background: white;
+    color: black;
+}
+
+.PhoneMenuFactionBox {
+    border-radius: 10px;
+    background: #303236;
+    overflow: hidden;
+}
+
+.PhoneMenuFactionHeader {
+    background-color: #3b3e46;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    cursor: pointer;
+}
+    .PhoneMenuFactionHeader:hover {
+        background: #2a2c30;
+    }
+
+.PhoneMenuItemButton {
+    padding: 15px;
+    padding-left: 20px;
+    cursor: pointer;
+}
+    .PhoneMenuItemButton:last-child {
+        border-radius: 0 0 10px 10px;
+    }
+
+    .PhoneMenuItemButton.Selected {
+        font-size: 1.2em;
+        color: #6ec3ff;
+    }
+        .PhoneMenuItemButton.Selected:before {
+            content: "— ";
+        }
+        .PhoneMenuItemButton.Selected:after {
+            content: " —";
+        }
+    .PhoneMenuItemButton:hover {
+        background: #282b2e;
+    }
+
+.PhoneAddButton {
+    font-weight: 300;
+    font-size: 30px;
+    opacity: 0.5;
+    cursor: pointer;
+    line-height: 21px;
+}
+
+.PhoneAddButton:hover {
+    opacity: 1;
+}
+
+.PhoneAddFactionButton {
+    color: green;
+    border: 1px solid green;
+    border-radius: 20px;
+    padding: 5px 15px;
+    opacity: 0.7;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .PhoneAddFactionButton:hover {
+        opacity: 1;
+    }

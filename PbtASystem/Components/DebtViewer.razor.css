@@ -1,0 +1,45 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+}
+
+.DebtContainer {
+    background: var(--Middle);
+    display: flex;
+    gap: 10px;
+    border-radius: 5px;
+}
+.FirstColumn{
+    min-width:25%;
+}
+.TheOther {
+    background: var(--Lighter);
+    margin: 5px;
+    padding: 5px 10px;
+    display:flex;
+    justify-content:center;
+    cursor: pointer;
+    border-radius:5px;
+}
+    .TheOther:hover {
+        background: #5e5a5a;
+    }
+
+.ClossingButton{
+    color:red;
+    margin:5px;
+    padding: 5px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+.ClossingButton:hover{
+    opacity:1;
+}
+
+.Amount{
+    cursor:pointer;
+}
+    .Amount:hover {
+        background: #5e5a5a;
+    }

@@ -1,0 +1,90 @@
+﻿@page "/DebEdit/{DebID}"
+
+@using System.Text.Json
+@inject IToastService Toaster
+@inject FirebaseData Data
+@inject CharacterSelectionService Selector
+@inject NavigationManager Navigation
+
+<div class="FAB">
+	<i class="bi bi-x-square PanelButton red" @onclick=Cancel />
+	<i class="bi bi-check-square PanelButton green" @onclick=Submit />
+</div>
+<div class="PbtASystemContainer fullpage">
+	<div class="floatingContainer">
+		<div class="TheOther mb-4" @onclick=ChangeDude>@DudeName</div>		
+		<EditForm Model="Debt" OnSubmit="Submit">
+			<div class="opacity-50">Motivo:</div>
+			<InputTextArea style="width:100%; background:black; color:white; border:none; padding:5px;"  rows="5" @bind-Value=Debt.Reason/>
+			<div class="opacity-50">cantidad:</div>
+			<div class="d-flex align-items-center gap-2">
+				<i class="bi bi-dash-square PanelButton" @onclick=Minus/>
+				<div class="flex-grow-1">
+					<InputNumber style="width:100%;text-align: center; font-size: 1.5em; background:black; color:white; border:none; padding:5px;" @bind-Value=Debt.Amount />
+				</div>
+				<i class="bi bi-plus-square PanelButton" @onclick=Plus/>
+			</div>
+		</EditForm>
+	</div>
+</div>
+
+@code {
+	[Parameter] public string DebID { get; set; } = "";
+	[Parameter] public string CharID { get; set; } = "";
+	public Debt Debt { get; set; } = new();
+	DebtViewer.PayingMode Mode = DebtViewer.PayingMode.ToBePaid;
+	private Debt Original { get; set; } = new();
+
+	protected override void OnParametersSet()
+	{
+		Debt = Data.AllDebts.Find(x => x.ID == new Guid(DebID));
+		SetMode();
+		BackUp();
+		base.OnParametersSet();
+	}
+
+	private void Minus()
+	{
+		if (Debt.Amount > 0) Debt.Amount--;
+	}
+	private void Plus() => Debt.Amount++;
+
+	string DudeName = "";
+
+	private void SetMode()
+	{
+		if (Debt.PayingID == Data.CurrentCharacter.ID)
+			Mode = DebtViewer.PayingMode.ToPay;
+		else
+			Mode = DebtViewer.PayingMode.ToBePaid;
+
+		if (Mode == DebtViewer.PayingMode.ToPay)
+			DudeName = Data.GetCharacterByID(Debt.ReceivingID).Name;
+		else
+			DudeName = Data.GetCharacterByID(Debt.PayingID).Name;
+	}
+	private void BackUp()
+	{
+		Original = JsonSerializer.Deserialize<Debt>(JsonSerializer.Serialize(Debt));
+	}
+
+	private async Task ChangeDude()
+	{
+		if (Mode == DebtViewer.PayingMode.ToPay)
+			Debt.ReceivingID = (await Selector.SelectViaSelector()).ID;
+		else
+			Debt.PayingID = (await Selector.SelectViaSelector()).ID;
+	}
+
+	private void Cancel()
+	{
+		Debt = Original;
+		Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");
+	}
+
+	private async Task Submit()
+	{
+		await Data.StoreDebt(Debt);
+		Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");
+	}
+}

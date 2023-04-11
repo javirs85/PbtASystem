@@ -1,0 +1,122 @@
+﻿@page "/"
+@using System.ComponentModel.DataAnnotations;
+@inject FirebaseData Data
+@inject FirebaseAuth Auth
+@inject FirebaseMessaging Messaging
+
+@if(Auth.IsUserConnected)
+{
+	<div class="d-flex flex-column w-100">
+		<div>Selected character: @Data.PlayerCharacter.Name</div>
+		<div>Loged in player: @Auth.ConnectedUserName</div>
+		<div class="btn btn-primary" @onclick=Data.ForceDataRefresh>Force Update</div>
+		<div class="btn btn-primary" @onclick=Data.ClearDefaultCharacter>Forget default character</div>
+		<div class="btn btn-primary" @onclick=Auth.TryLogout>LogOut</div>
+		<div class="btn btn-primary" @onclick=TestMessage>TestMessg</div>
+		<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
+	</div>
+}
+else
+{
+	<div class="d-flex flex-column w-100">
+		<div>Selected character: @Data.PlayerCharacter.Name</div>
+		<div>Loged in player: @Auth.ConnectedUserName</div>
+		<div class="btn btn-primary" @onclick=Auth.TryLogin>Login</div>
+		<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
+		<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>
+		@if (isDefaultIDSet)
+		{
+			<div class="btn btn-primary" @onclick=Auth.LoginWithoutLogin>Start without login</div>
+		}
+		else
+		{
+			<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Choose character</div>
+		}
+	</div>
+
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					
+					<EditForm Model="Model">
+						<!-- Email input -->
+						<div class="d-flex flex-column mb-3">
+							<label class="text-secondary" for="form2Example1">Email address</label>
+							<InputText id="form2Example1" placeholder="mail@mail.com" type="mail" @bind-Value=Model.Mail />
+						</div>
+
+						<!-- Password input -->
+						<div class="d-flex flex-column">
+							<label class="text-secondary" for="form2Example2">Password</label>
+							<InputText type="password" placeholder="pass" @bind-Value=Model.Pass />
+						</div>
+					</EditForm>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=ConfirmModal>Save changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+
+@code {
+	enum Mode {createLogin, DoLogin};
+	Mode CurrentMode = Mode.createLogin;
+
+	private class LoginModel
+	{
+		[Required]
+		[StringLength(10, ErrorMessage = "El nombre es demasiado largo")]
+		public string Mail = "";
+
+		[Required]
+		[StringLength(10,MinimumLength =4, ErrorMessage = "El nombre es demasiado largo")]
+		public string Pass = "";	
+	}
+	LoginModel Model = new();
+
+	private async Task ConfirmModal()
+	{
+		if (CurrentMode == Mode.createLogin)
+			await Auth.CreateUserPass(Model.Mail, Model.Pass);
+		else
+			await Auth.LoginUserPass(Model.Mail, Model.Pass);
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if(firstRender)
+		{
+			Auth.UserChanged -= Update;
+			Auth.UserChanged += Update;
+		}		
+	}
+	private void Update(object? sender, string s) => StateHasChanged();
+	private void Update(object? sender, Character s) => StateHasChanged();
+
+	bool isDefaultIDSet = false;
+
+	private async Task TestMessage()
+	{
+		await Messaging.SendTestMessage();
+	}
+
+
+	private async Task AllowPlayerToChooseCharacter()
+	{
+		await Auth.AllowPlayerToChooseCharacter();
+		isDefaultIDSet = await Data.IsDefaultCharacterIDSet();
+
+		if(Auth.IsConnectedViaGoogle)
+		{
+			await Data.StoreMapPlayerCharacter(Auth.ConnectedUserName, Data.PlayerCharacter.ID);
+		}
+
+		StateHasChanged();
+	}
+}

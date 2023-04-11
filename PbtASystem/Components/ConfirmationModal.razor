@@ -1,0 +1,52 @@
+﻿<div class="ModalBackDrop PbtASystemContainer @Visibility" @onclick=DismissClicked>
+	<div class="ModalContainer" @onclick:stopPropagation=true>
+		<div class="d-flex flex-column">
+			<div class="ModalHeader">@Controller.HeaderText</div>
+			<div class="ModalBody">@Controller.BodyText</div>
+			<div class="ModalButtons d-flex w-100 gap-2 justify-content-end">
+				<button class="btn btn-secondary" @onclick=DismissClicked>Cancelar</button>
+				<button class="btn btn-primary" @onclick=ConfirmClicked>@Controller.ButtonText</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@code {
+	[Inject] IToastService Toaster { get; set; }
+	[Inject] ConfirmationModalService Controller { get; set; }
+
+	TaskCompletionSource<bool> tcs = new();
+
+	string Visibility = "HideModal";
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		Controller.OpenConfirmationModal -= Open;
+		Controller.CloseConfirmationModal -= Close;
+
+		Controller.OpenConfirmationModal += Open;
+		Controller.CloseConfirmationModal += Close;
+	}
+
+	private void Open(object? sender, EventArgs e)
+	{
+		Visibility = "ShowModal";
+		StateHasChanged();
+	}
+
+	private void Close(object? sender, EventArgs e)
+	{
+		Visibility = "HideModal";
+		StateHasChanged();
+	}
+
+	private void ConfirmClicked()
+	{
+		Controller.Confirm();
+	}
+	private void DismissClicked()
+	{
+		Controller.Dismiss();
+    }
+}

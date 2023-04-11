@@ -1,0 +1,7 @@
+﻿.Visible{
+    visibility: visible;
+}
+
+.Hidden{
+    visibility: collapse;
+}

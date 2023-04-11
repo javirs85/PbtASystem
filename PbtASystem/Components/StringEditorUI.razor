@@ -1,0 +1,49 @@
+﻿<div class="ModalBackDrop PbtASystemContainer @Visibility" @onclick=DismissClicked>
+	<div class="ModalContainer" @onclick:stopPropagation=true>
+		<div class="d-flex flex-column">
+			<div class="ModalHeader">@Header</div>
+			<div class="ModalBody">
+				<textarea @oninput="HandleOnChange">@data</textarea>
+			</div>
+			<div class="ModalButtons d-flex w-100 gap-2 justify-content-end">
+				<button class="btn btn-secondary" @onclick=DismissClicked>Cancelar</button>
+				<button class="btn btn-primary" @onclick=ConfirmClicked>Confirmar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private string data;
+	[Parameter] public string ChildData { get; set; } = "";
+	[Parameter] public string Header { get; set; } = "";
+	[Parameter] public EventCallback<string> ChildDataChanged { get; set; }
+
+	string Visibility = "";
+
+	private void ConfirmClicked(){}
+	private void DismissClicked() { }
+
+	public void Show() => Visibility = "Visible";
+	public void Hide() => Visibility = "Hidden";
+
+	public void Show(string headerText, string Variable)
+	{
+		Header = headerText;
+		ChildData = Variable;
+	} 
+
+	private async Task HandleOnChange(ChangeEventArgs args)
+	{
+		data = args.Value.ToString();
+
+		await ChildDataChanged.InvokeAsync(data);
+	}
+
+	protected override void OnParametersSet()
+	{
+		data = ChildData;
+
+		base.OnParametersSet();
+	}
+}

@@ -1,0 +1,22 @@
+﻿@using System.Web
+@using System.Text.RegularExpressions;
+
+@((MarkupString)encoded)
+
+@code {
+    [Parameter]
+    public string Value { get; set; } = default!;
+
+    private string encoded
+    {
+        get
+        {
+            var linebreaks = Regex.Replace(HttpUtility.HtmlEncode(Value), "\r?\n|\r", "<br />");
+
+            linebreaks = linebreaks.Replace("**", "</b>");
+            linebreaks = linebreaks.Replace("*", "<b>");
+
+            return linebreaks;
+        }
+    }
+}
