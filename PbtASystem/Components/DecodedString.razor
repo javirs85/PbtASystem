@@ -1,7 +1,9 @@
 ﻿@using System.Web
 @using System.Text.RegularExpressions;
 
+<p style="padding:0; margin:0;">
 @((MarkupString)encoded)
+</p>
 
 @code {
     [Parameter]
@@ -11,12 +13,15 @@
     {
         get
         {
-            var linebreaks = Regex.Replace(HttpUtility.HtmlEncode(Value), "\r?\n|\r", "<br />");
+            var encodedValue = HttpUtility.HtmlEncode(Value);
+            encodedValue = encodedValue.Replace("\r\n", "<br />");
+            encodedValue = encodedValue.Replace("\r", "<br />");
+            encodedValue = encodedValue.Replace("\n", "<br />");
+            encodedValue = encodedValue.Replace("**", "</b>");
+            encodedValue = encodedValue.Replace("*", "<b>");
 
-            linebreaks = linebreaks.Replace("**", "</b>");
-            linebreaks = linebreaks.Replace("*", "<b>");
 
-            return linebreaks;
+            return encodedValue;
         }
     }
 }

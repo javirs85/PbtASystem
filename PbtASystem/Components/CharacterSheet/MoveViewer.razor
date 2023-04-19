@@ -1,0 +1,235 @@
+﻿@inject FirebaseData Data
+@inject USMovesService Moves
+@inject IToastService Toaster
+
+<div class="PbtASystemContainer @(IsSelected?"IsSelected":"Innactive") @(IsSelectionMode?"ShowFull":"")" 
+	@onclick=PointerDown
+	@oncontextmenu=Edit 
+	@oncontextmenu:preventDefault=true 
+	@oncontextmenu:stopPropagation=true>
+	<div class="Box">
+		<div class="TextContainer">
+			<div class="TextTitle">@Move.Tittle</div>
+			@if (Move.HasRoll())
+			{
+				<div class="RollDetails">(@Move.Roll.ToUI().ToLower()@rollNumber)</div>
+			}			
+		</div>
+		<div class="ImagesContainer">
+			<img src="/imgs/Icons/UpgradedArrow.png" class="@(Move.IsImproved?"":"Hidden")" />
+			<img src="/imgs/Icons/TicksCircleIcon.png" class="@(Move.TicksCircle?"":"Hidden")"/>
+			@if (!IsSelectionMode)
+			{
+				<img class="DiceButton" src="/imgs/Icons/Dice.png" />
+			}
+			else
+			{
+				@if(Data.CurrentPlayerSheet.SelectedArchetypeMoves.Contains(Move.ID) || 
+					Data.CurrentPlayerSheet.SelectedCorruptionMoves.Contains(Move.ID))
+				{
+					<img src="/imgs/Icons/Remove.svg" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);}) />
+				}
+				else
+				{
+					<img src="/imgs/Icons/Add.svg" style="opacity: 0.75;" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);})/>
+				}
+			}
+		</div>
+	</div>
+	<div class="MoveBody flex-column">
+		@if (Move.ID == USMoveIDs.B_LiberarPoder)
+		{
+			<DecodedString Value="@Move.PreCondition.MainText" />
+
+			<div class="LIOContainer">
+			@foreach(var lio in Move.PreCondition.Options)
+			{
+				<div class="LIOBox">
+					@lio
+				</div>
+			}
+			</div>
+
+			<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
+				<div class="px-2"><img src="/imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
+				<div class="AdvancedMainText">
+					<DecodedString Value="@Move.AvancedConsequences.MainText" />
+					@if (Move.AvancedConsequences.Options != null)
+					{
+						<ul class="mt-1">
+							@foreach (var item in Move.AvancedConsequences.Options)
+							{
+								<li><DecodedString Value="@item" /></li>
+							}
+
+						</ul>
+					}
+				</div>
+			</div>
+
+		}
+		else
+		{
+			<DecodedString Value="@Move.PreCondition.MainText"/>		
+			@if (Move.PreCondition.Options != null)
+			{
+				<ul class="mt-1">
+					@foreach (var item in Move.PreCondition.Options)
+					{
+						<li><DecodedString Value="@item"/></li>
+					}
+
+				</ul>
+			}
+			@if (Move.ConsequencesOn6 != null){
+				<DecodedString Value="@Move.ConsequencesOn6.MainText" />
+				@if (Move.ConsequencesOn6.Options != null)
+				{
+					<ul class="mt-1">
+						@foreach (var item in Move.ConsequencesOn6.Options)
+						{
+							<li><DecodedString Value="@item" /></li>
+						}
+
+					</ul>
+				}
+			}		
+			@if (Move.ConsequencesOn79 != null)
+			{
+				<DecodedString Value="@Move.ConsequencesOn79.MainText" />
+				@if (Move.ConsequencesOn79.Options != null)
+				{
+					<ul class="mt-1">
+						@foreach (var item in Move.ConsequencesOn79.Options)
+						{
+							<li><DecodedString Value="@item" /></li>
+						}
+
+					</ul>
+				}
+			}
+			@if (Move.ConsequencesOn10 != null)
+			{
+				<DecodedString Value="@Move.ConsequencesOn10.MainText" />
+				@if (Move.ConsequencesOn10.Options != null)
+				{
+					<ul class="mt-1">
+						@foreach (var item in Move.ConsequencesOn10.Options)
+						{
+							<li><DecodedString Value="@item" /></li>
+						}
+
+					</ul>
+				}
+			}
+
+			@if (Move.TypeOfMovement == USMove.MovementTypes.BasicMovements)
+			{
+				<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
+					<div class="px-2"><img src="/imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
+					<div class="AdvancedMainText">
+						<DecodedString Value="@Move.AvancedConsequences.MainText" />
+						@if (Move.AvancedConsequences.Options != null)
+						{
+							<ul class="mt-1">
+								@foreach (var item in Move.AvancedConsequences.Options)
+								{
+									<li><DecodedString Value="@item" /></li>
+								}
+
+							</ul>
+						}
+					</div>
+				</div>
+			}
+		}
+		
+	</div>
+</div>
+
+<div class="FullScreenModal @(IsShowingFullScreenModal?"":"HideModal")" @onclick=CloseFullScreenModal>
+	<div class="ModalBody">
+		<p>Ahora mismo @Move.Tittle está <span style="font-weight:bold; text-decoration:underline;">@(Move.IsImproved ? "Avanzado" : "Normal")</span></p>
+		<p class="mt-4 mb-1">Como dejamos el movimientp?</p>
+		<div class="d-flex gap-2">
+			<button class="btn btn-outline-light" @onclick=MakeMoveNOTAdvanced @onclick:stopPropagation=true>Movimineto normal</button>
+			<button class="btn btn-outline-light" @onclick=MakeMoveAdvanced @onclick:stopPropagation=true>
+				<img src="/imgs/Icons/UpgradedArrow.png"/> Avanzado
+				</button>
+		</div>		
+	</div>
+</div>
+@code {
+	[Parameter] public USMoveIDs ID { get; set; }
+	[Parameter] public bool IsSelected { get; set; }
+	[Parameter] public EventCallback<USMove> Clicked { get; set; }
+	[Parameter] public bool IsSelectionMode { get; set; }
+	[Parameter] public EventCallback<USMove> SelectedInSelectionMode { get; set; }
+	USMove Move;
+
+	string rollNumber
+	{
+		get
+		{
+			if (Move.CanBeRolledAutomatically)
+			{
+				return " " + Data.CurrentPlayerSheet.GetAttribute(Move.Roll).ToString();
+			}
+			else
+				return "";
+		}
+	}
+
+	public void Select()
+	{
+		IsSelected = true;
+	}
+	public void UnSelect() => IsSelected = false;
+
+
+	protected override void OnParametersSet()
+	{
+		Move = Moves.AllMovements.Find(x => x.ID == ID);
+		if (Move is null)
+			Toaster.ShowError($"The move {ID} is not in the DB");
+
+		StateHasChanged();
+	}
+
+	private void PointerDown() => Clicked.InvokeAsync(Move);
+
+	public void Edit()
+	{
+		if (Move.TypeOfMovement == USMove.MovementTypes.BasicMovements)
+			OpenFullScreenModal();
+		else
+			Toaster.ShowInfo("Solo se pueden avanzar movimientos básicos.");
+	}
+
+	bool IsShowingFullScreenModal = false;
+	private void OpenFullScreenModal() => IsShowingFullScreenModal = true;
+	private void CloseFullScreenModal() => IsShowingFullScreenModal = false;
+
+	async Task MakeMoveAdvanced()
+	{
+		if (Move.IsImproved) CloseFullScreenModal();
+		else
+		{
+			Move.IsImproved = true;
+			Data.CurrentPlayerSheet.UpgradedMoves.Add(Move.ID);
+			await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
+			CloseFullScreenModal();
+		}
+	}
+	async Task MakeMoveNOTAdvanced()
+	{
+		if (!Move.IsImproved) CloseFullScreenModal();
+		else
+		{
+			Move.IsImproved = false;
+			Data.CurrentPlayerSheet.UpgradedMoves.Remove(Move.ID);
+			await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
+			CloseFullScreenModal();
+		}
+	}
+}

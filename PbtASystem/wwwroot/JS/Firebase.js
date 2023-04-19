@@ -19,9 +19,7 @@ import {
     addDoc,
     query,
     where,
-    orderBy,
-    limit,
-    onSnapshot,
+    getDoc,
     setDoc,
     updateDoc,
     doc,
@@ -196,6 +194,47 @@ export async function StoreChronicle(chronicle) {
         return true;
     } catch (e) {
         console.error("Error storing debt: ", e);
+        return false;
+    }
+}
+
+export async function CheckIfSheetExists(id) {
+    
+    try {
+        const docRef = doc(db, "CharacterSheets", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.log("Document data:", docSnap.data());
+            return true;
+        } else {
+            console.log("Sheet with ID " + id + " does not exists");
+            return false;
+        }
+    } catch (e) {
+        console.error("Error storing debt: ", e);
+        return false;
+    }
+}
+
+export async function StoreCharacterSheet(sheet) {
+    try {
+        await setDoc(doc(db, "CharacterSheets", sheet.id), sheet);
+        return true;
+    } catch (e) {
+        console.error("Error storing debt: ", e);
+        return false;
+    }
+}
+
+export async function GetCharacterSheetByID(id) {
+    try {
+        const col = collection(db, "CharacterSheets")
+        const q = query(col, where("id", "==", id));
+        const snapshot = await getDocs(q);
+        return snapshot.docs[0].data();
+    } catch (e) {
+        console.error("Error getting CharacterSheet: ", e);
         return false;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MQTTnet.Client;
+using PbtASystem.Services.Moves;
 using System.Text.Json.Serialization;
 
 namespace PbtASystem.PbtASupport;
@@ -21,7 +22,7 @@ public class Character
 	public bool IsNPC { get; set; } = true;
 	public string Name { get; set; } = "Nombre";
 	public string Details { get; set; } = "";
-	public string Kind { get; set; } = "Tipo";
+	public string Kind { get; set; } = "Noy set";
 	public Circles Circle { get; set; } = Circles.NotSet;
 	public Guid? FactionID { get; set; } = null;
 	public string Motivation { get; set; } = "motivacion";
@@ -150,4 +151,5 @@ public class MapPlayerCharacter
 {
 	public string PlayerID { get; set; } = "";
 	public Guid CharacterID { get; set; } = new();
+	public Guid? CharacterSheetID { get; set;} = new();
 }

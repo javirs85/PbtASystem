@@ -24,6 +24,21 @@
 								<div>@Data.CurrentFaction.Status</div>
 							</div>
 
+							<div class="d-flex flex-column">
+								<div class="d-flex gap-2">
+									Fuerza:@Data.CurrentFaction.Strength
+									<Track @bind-Value="@Data.CurrentFaction.StrengthTemp"/>
+								</div>
+								<div class="Explanation"> @Data.CurrentFaction.StrengthExplanation</div>
+							</div>
+							<div class="d-flex flex-column mt-3">
+								<div class="d-flex gap-2">
+									Tamaño:@Data.CurrentFaction.Size
+									<Track @bind-Value="@Data.CurrentFaction.SizeTemp" />
+								</div>
+								<div class="Explanation"> @Data.CurrentFaction.SizeExplanation</div>
+							</div>
+
 							<div class="Entry">
 								<div class="EntryTitlte">Trabajando en ...</div>
 								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.CurrentlyWorkingOn /> </div>

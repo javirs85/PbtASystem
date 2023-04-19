@@ -1,0 +1,21 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+}
+
+.Box{
+    width: 25px;
+    aspect-ratio: 1/1 !important;
+    border: 1px solid white;
+    cursor:pointer;
+    opacity: 0.8;
+}
+.Box:hover{
+    opacity: 1;
+}
+
+.BoxTicked{
+    background: white;
+}

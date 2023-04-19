@@ -14,4 +14,8 @@
     <PackageReference Include="MQTTnet" Version="4.1.4.563" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\imgs\Icons\" />
+  </ItemGroup>
+
 </Project>

@@ -26,7 +26,9 @@ public class FirebaseData : USBDbase
 			_playerCharacter = value;
 			CurrentCharacter = _playerCharacter;
 		} 
-	} 
+	}
+
+	public CharacterSheet CurrentPlayerSheet = new CharacterSheet();
 
 	public Chronicle Chronicle { get; set; } = new Chronicle();
 
@@ -174,16 +176,14 @@ public class FirebaseData : USBDbase
 	}
 	#endregion
 
+	public async Task<CharacterSheet> GetCharacterSheetByID(Guid id) => await Firebase.InvokeAsync<CharacterSheet>("GetCharacterSheetByID", id);
+	public async Task StoreCharacterSheet(CharacterSheet sheet) => await Firebase.InvokeVoidAsync("StoreCharacterSheet", sheet);
+	public async Task<bool> CheckIfSheetExists(Guid id) => await Firebase.InvokeAsync<bool>("CheckIfSheetExists", id);
 
-	public async Task StoreChronicle()
-	{
-		await Firebase.InvokeVoidAsync("StoreChronicle", Chronicle);
-	}
 
-	public async Task GetChronicle(Guid ID)
-	{
-		Chronicle  =  await Firebase.InvokeAsync<Chronicle>("GetChronicle", ID);
-	}
+
+	public async Task StoreChronicle() => await Firebase.InvokeVoidAsync("StoreChronicle", Chronicle);
+	public async Task GetChronicle(Guid ID) => Chronicle = await Firebase.InvokeAsync<Chronicle>("GetChronicle", ID);
 
 	internal void SetDefaultCharacterToCurrentPlayer(string connectedPlayerCode)
 	{

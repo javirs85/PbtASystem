@@ -1,0 +1,354 @@
+﻿@page "/Playing/{IDString}"
+@inject IToastService Toaster;
+@inject FirebaseData Data;
+@inject FirebaseAuth Auth;
+@inject FirebaseMessaging Msgs;
+@inject HttpClient Http
+@inject ConfirmationModalService Confirm;
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject USMovesService Moves
+
+@if (IsSheetReady)
+{
+	<div class="PbtASystemContainer">
+		<div class="DarkArea" style="background: black;">
+			<div class="d-flex StatsArea">
+				<div class="d-flex flex-column flex-grow-1">
+					<StatViewer Attr="USAttributes.Blood" />
+					<StatViewer Attr="USAttributes.Mortality" />
+				</div>
+				<div class="d-flex flex-column flex-grow-1">
+					<StatViewer Attr="USAttributes.Heart" />
+					<StatViewer Attr="USAttributes.Night" />
+					</div>
+				<div class="d-flex flex-column flex-grow-1">
+					<StatViewer Attr="USAttributes.Mind" />
+					<StatViewer Attr="USAttributes.Power" />
+					</div>
+				<div class="d-flex flex-column flex-grow-1">
+					<StatViewer Attr="USAttributes.Soul" />				
+					<StatViewer Attr="USAttributes.Veil" />
+				</div>
+			</div>
+			<div class="d-flex CorruptionArea gap-2">
+				<div style="opacity: 0.25;">CORRUPCIÓN</div>
+				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 1?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(1))/></div>
+				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 2?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(2)) /></div>
+				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 3?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(3)) /></div>
+				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 4?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(4)) /></div>
+				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 5?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(5)) /></div>
+			</div>
+			<div class="d-flex align-items-center justify-content-center DamageArea gap-2">
+				<div class="ArmorContainer">
+					<div>@Data.CurrentPlayerSheet.Armor</div>
+				</div>
+				<div style ="opacity: 0.25;"> DAÑO</div>
+				<div class="WoundsContainer Soft">
+					<div class="Wound SoftInner @(Data.CurrentPlayerSheet.Damage > 0?"WoundMark":"")" @onclick=@(_ => WoundClicked(1))></div>
+				</div>
+				<div class="WoundsContainer Mid">
+					<div class="Wound MidInner @(Data.CurrentPlayerSheet.Damage > 1?"WoundMark":"")" @onclick=@(_ => WoundClicked(2))></div>
+					<div class="Wound MidInner @(Data.CurrentPlayerSheet.Damage > 2?"WoundMark":"")" @onclick=@(_ => WoundClicked(3))></div>
+				</div>
+				<div class="WoundsContainer Hard">
+					<div class="Wound HardInner @(Data.CurrentPlayerSheet.Damage > 3?"WoundMark":"")" @onclick=@(_ => WoundClicked(4))></div>
+					<div class="Wound HardInner @(Data.CurrentPlayerSheet.Damage > 4?"WoundMark":"")" @onclick=@(_ => WoundClicked(5))></div>
+				</div>
+				<div class="KnifeButton">
+					<img src="/imgs/Icons/Knife.png"/>
+				</div>
+			</div>
+		</div>
+		<div class="MovesSelector">
+			<div class="MovesButton @(CurrentlyShowing == Sections.Basic?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Basic))>Básicos</div>
+			<div class="MovesButton @(CurrentlyShowing == Sections.Cricle?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Cricle))>Círculo</div>
+			<div class="MovesButton @(CurrentlyShowing == Sections.Book?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Book))>Libro</div>
+			<div class="MovesButton @(CurrentlyShowing == Sections.Corruption?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Corruption))>Corrup</div>
+			<div class="MovesButton @(CurrentlyShowing == Sections.Debt?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Debt))>Deuda</div>
+			<div class="MovesButton @(CurrentlyShowing == Sections.Drama?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Drama))>Drama</div>
+		</div>
+		<div class="MovesArea d-flex flex-column gap-2 p-2">
+			@foreach(var Mov in MovesOnScreen)
+			{
+				<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov))/>
+			}
+			@if(CurrentlyShowing == Sections.Book)
+			{
+				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForBooks>Cambiar movimientos de Arquetipo</button>
+			}
+			@if(CurrentlyShowing == Sections.Corruption)
+			{
+				<button class="btn btn-outline-light align-items-center">Cambiar movimientos de corrupción</button>
+			}
+		</div>
+		
+		<div class="ExtraActions d-flex flex-column">
+			<div class="ExtraButton">Detalles del @Data.CurrentPlayerSheet.Archetype.ToUI()</div>
+		</div>
+	</div>
+
+	<div class="FullScreenModal ModalTop @(IsShowingMoveSelector?"":"HideModal")" @onclick=CloseMovesSelector>
+		<div class="ModalBody w-100">
+			<div class="accordion accordion-flush w-100 DarkAccordion" @onclick:stopPropagation=true id="accordionFlushExample">
+				@foreach(var pack in MovesToChooseFrom)
+				{
+					<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(pack == SelectedPack?"":"DarkAccordionNotSelected")">
+						<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne">
+							<div data-bs-toggle="collapse" 
+								 data-bs-target="#flush-collapseOne-@pack.Tittle.Replace(' ', '_')"
+							     @onclick=@(_ =>{SelectedPack = pack;})>
+								@pack.Tittle
+							 </div>
+							
+						</h2>
+						<div id="flush-collapseOne-@pack.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(pack.Moves[0].Arquetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+							<div class="Darker d-flex flex-column flex-column gap-2">
+								@foreach (var mov in pack.Moves)
+								{
+									<MoveViewer ID="mov.ID" 
+										IsSelected=IsThisMoveSelected(mov) 
+										IsSelectionMode=true 
+										Clicked=@(_ => Select(mov)) 
+										SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})"/>
+								}
+							</div>
+						</div>
+						
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="d-flex flex-column align-items-center">
+
+		<div class="m-5">@ErrorMessage</div>
+
+		@if (Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
+		{
+			<button @onclick=CreateSheet class="btn btn-primary w-75 p-2">
+				<div class="d-flex flex-column align-content-center">
+					<div>Crear Ficha de personaje para</div>
+					<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
+					<div>controlada por @Auth.ConnectedUserName</div>				
+				</div>
+			</button>
+		}
+		else
+		{
+			<EditForm Model="Data.PlayerCharacter">
+				<label for="body">Elige un arquetipo para la ficha:</label>
+				<InputSelect @bind-Value=Data.CurrentPlayerSheet.Archetype>
+					@foreach(var arc in Enum.GetValues(typeof(AvailableArchetypes)))
+					{
+						@if((AvailableArchetypes)arc != AvailableArchetypes.All && (AvailableArchetypes)arc != AvailableArchetypes.NotSet)
+						{
+							<option value="@arc">@(((AvailableArchetypes)arc).ToUI())</option>
+						}
+					}
+				</InputSelect>
+			</EditForm>
+		}
+	</div>
+}
+
+
+@code {
+	[Parameter] public string IDString { get; set; } = "";
+	string NoSheetButtonText = "";
+	string ErrorMessage = "";
+	USMove? SelectedMovement = null;
+	private List<USMove> MovesOnScreen = new();
+	USMove LIO;
+
+	private bool IsSheetReady = false;
+
+	private enum Sections {Basic, Cricle, Book, Corruption, Debt, Drama};
+	private Sections CurrentlyShowing = Sections.Basic;
+
+	protected async override void OnParametersSet()
+	{
+		await Connectors.SetConnectors(JS, Data, Auth);
+
+		Guid ID = new Guid(IDString);
+		var character = Data.GetCharacterByID(ID);
+		var Map = Data.Chronicle.PlayerLinks.Find(x => x.CharacterID == ID);
+		if (Map is null)
+		{
+			ErrorMessage = $"{ID} is not in the maps of the chronicle";
+			return;
+		}
+		if(Map.CharacterSheetID is null || Map.CharacterSheetID == new Guid())
+		{
+			ErrorMessage = $"{character.Name} ({ID}) No tiene una ficha en esta crónica.";
+			return;
+		}
+		var SheetID = (Guid)Map.CharacterSheetID;
+
+		if (await Data.CheckIfSheetExists((SheetID)))
+		{
+			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID(SheetID);
+			IsSheetReady = true;
+		}
+		else
+			ErrorMessage = $"The character {IDString} has no Sheeet associated";
+
+		if(Data.CurrentPlayerSheet is null)
+		{
+			ErrorMessage = $"The character {IDString} has no Sheeet associated";
+			return;
+		}
+
+		SectionSelected(Sections.Basic);
+
+		StateHasChanged();
+	}
+
+	private async Task CorruptionClicked(int n)
+	{
+		if (n > Data.CurrentPlayerSheet.Corruption) Data.CurrentPlayerSheet.Corruption++;
+		else Data.CurrentPlayerSheet.Corruption--;
+	}
+
+	private async Task WoundClicked(int n)
+	{
+		if (n > Data.CurrentPlayerSheet.Damage) Data.CurrentPlayerSheet.Damage++;
+		else Data.CurrentPlayerSheet.Damage--;
+	}
+
+	private void SectionSelected(Sections section)
+	{
+		CurrentlyShowing = section;
+		MovesOnScreen.Clear();
+		if(section == Sections.Basic)
+		{
+			MovesOnScreen = Moves.AllMovements.Where(
+				x => 
+				x.TypeOfMovement == USMove.MovementTypes.BasicMovements
+			).ToList();
+			var lio = (USMove)Moves.GetMovement(USMoveIDs.B_LiberarPoder, Data.CurrentPlayerSheet.Archetype);
+
+			MovesOnScreen.Add(lio);
+
+			foreach(var upgraded in  Data.CurrentPlayerSheet.UpgradedMoves)
+			{
+				var m = MovesOnScreen.Find(x => x.ID == upgraded);
+				if (m is not null) m.IsImproved = true;
+			}
+
+		}
+		else if(section == Sections.Cricle)
+		{
+			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.FactionMovement).ToList();
+		}
+		else if (section == Sections.Debt)
+		{
+			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.DebtMovements).ToList();
+		}
+		else if (section == Sections.Debt)
+		{
+			MovesOnScreen = Moves.AllMovements.Where(x => 
+				x.TypeOfMovement == USMove.MovementTypes.DramaticMovement &&
+				x.Arquetipe == Data.CurrentPlayerSheet.Archetype
+			).ToList();
+		}
+		else if(section == Sections.Book)
+		{
+			MovesOnScreen.Clear();
+			foreach(var m in Data.CurrentPlayerSheet.SelectedArchetypeMoves)
+			{
+				MovesOnScreen.Add((USMove)Moves.GetMovement(m));
+			}
+		}
+	}
+
+	private void Select(USMove mov)
+	{
+		if (mov == SelectedMovement) 
+			SelectedMovement = null;
+		else
+			SelectedMovement = mov;
+	}
+
+	private bool IsThisMoveSelected(USMove mov) => SelectedMovement == mov;
+
+	private async Task CreateSheet()
+	{
+		Data.CurrentPlayerSheet.SelectedArchetypeMoves = Moves.GetInitialMovesIDsByArchetype(Data.CurrentPlayerSheet.Archetype);
+		Data.CurrentPlayerSheet.ID = Guid.NewGuid();
+		await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
+		Data.Chronicle.PlayerLinks.Find(x => x.PlayerID == Auth.ConnectedUserName).CharacterSheetID = Data.CurrentPlayerSheet.ID;
+		await Data.StoreChronicle();
+	}
+
+
+
+	private bool IsShowingMoveSelector = false;
+	private List<MovesPack> MovesToChooseFrom = new();
+	private MovesPack SelectedPack = new();
+
+	private class MovesPack
+	{
+		public string Tittle;
+		public List<USMove> Moves;
+	}
+
+	private void OpenMovesSelectorForBooks()
+	{
+		MovesToChooseFrom.Clear();
+
+		MovesPack pack = new();
+		pack.Tittle = Data.CurrentPlayerSheet.Archetype.ToUI();
+		pack.Moves = Moves.AllMovements.Where(x => x.Arquetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.ArquetipeMovement).ToList();
+		MovesToChooseFrom.Add(pack);
+		SelectedPack = pack;
+
+		foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)).Cast<AvailableArchetypes>())
+		{
+			if(arc != AvailableArchetypes.All && arc != AvailableArchetypes.NotSet && arc != Data.CurrentPlayerSheet.Archetype)
+			{
+				var debug = arc.ToUI();
+				MovesToChooseFrom.Add(new MovesPack
+					{
+						Tittle = arc.ToUI(),
+						Moves = Moves.AllMovements.Where(x=>x.TypeOfMovement == USMove.MovementTypes.ArquetipeMovement && x.Arquetipe == arc).ToList()
+					});
+			}
+		}
+
+		IsShowingMoveSelector = true;
+	}
+
+	private void CloseMovesSelector()
+	{
+		IsShowingMoveSelector = false;
+	}
+
+	private async Task ToggleMove(USMove mov)
+	{
+		var sheet = Data.CurrentPlayerSheet;
+
+		if (mov.TypeOfMovement == USMove.MovementTypes.ArquetipeMovement)
+		{
+			if (sheet.SelectedArchetypeMoves.Contains(mov.ID))
+				sheet.SelectedArchetypeMoves.Remove(mov.ID);
+			else
+				sheet.SelectedArchetypeMoves.Add(mov.ID);
+		}
+		else if (mov.TypeOfMovement == USMove.MovementTypes.CorruptionMovement)
+		{	
+			if (sheet.SelectedCorruptionMoves.Contains(mov.ID))
+				sheet.SelectedCorruptionMoves.Remove(mov.ID);
+			else
+				sheet.SelectedCorruptionMoves.Add(mov.ID);
+		}
+		await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
+
+		IsShowingMoveSelector = false;
+		SectionSelected(CurrentlyShowing);
+	}
+
+}

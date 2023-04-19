@@ -1,0 +1,35 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+    padding: 10px 8px;
+}
+
+.CircleTick {
+    background: #360B0B;
+}
+
+.StatViewer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0px;
+}
+
+.StatViewerCircle{
+    padding-top: 3px;
+    padding-bottom:8px;
+}
+
+.Balloon {
+    opacity: 0.5;
+    border: 1px solid white;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+}
+
+.FilledIn{
+    background: white;
+}

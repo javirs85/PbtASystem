@@ -1,28 +1,31 @@
-﻿
+﻿@inject FirebaseAuth Auth
+@inject FirebaseData Data
+@inject NavigationManager Navigation
+@inject IToastService Toaster
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="#">@Top</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-link @GetActive("")" 
+                <a class="nav-link @GetActive("Meta")" 
                    data-bs-toggle="collapse" 
                     data-bs-target="#navbarNavAltMarkup" 
                     aria-current="page"
                     style="cursor:pointer"
-                   @onclick=@(()=>{NavigationManager.NavigateTo("/");})
+                   @onclick=@(()=>{Navigation.NavigateTo("/");})
                     href="/Meta">
                     Meta
                 </a>
-                <a class="nav-link  @GetActive("Jugar")"
+                <a class="nav-link  @GetActive("Playing")"
                      data-bs-toggle="collapse"
                      data-bs-target="#navbarNavAltMarkup"
                      aria-current="page"
                      style="cursor:pointer"
-                @onclick=@(()=>{NavigationManager.NavigateTo("/Meta");})>
+                @onclick=GoToPlay>
                     Jugar
                 </a>
                 <a class="nav-link  @GetActive("Select")"
@@ -39,21 +42,43 @@
 </nav>
 
 @code{
-
-    [Inject] NavigationManager NavigationManager { get; set; }
-    [Inject] FirebaseData Data { get; set; }
-
-    protected override void OnInitialized() => NavigationManager.LocationChanged += (s, e) => StateHasChanged();
+    private string Top
+    {
+        get
+        {
+            if (IsActive("Playing")) return Data.CurrentCharacter.Name;
+            else
+            {
+                if (IsActive("Select")) return "Campaña";
+                else return "PbtASystem";
+            }
+        }
+    }
+    protected override void OnInitialized() => Navigation.LocationChanged += (s, e) => StateHasChanged();
 
     private void GoToCampaign()
     {
         if(Data.PlayerCharacter.Circle != Circles.NotSet)
         {
-            NavigationManager.NavigateTo("/Character/"+Data.PlayerCharacter.ID.ToString());
+            Navigation.NavigateTo("/Character/"+Data.PlayerCharacter.ID.ToString());
         }
         else
-            NavigationManager.NavigateTo("/Select");
+            Navigation.NavigateTo("/Select");
     }
+
+    private void GoToPlay()
+    {
+        if (Auth.ConnectedUserName is null || Auth.ConnectedUserName == "" || Auth.ConnectedUserName == "No user connected")
+            Toaster.ShowError("Es necesario hacer login para jugar");
+        else if (Data.PlayerCharacter is null || Data.PlayerCharacter.ID == new Guid())
+            Toaster.ShowError("Es necesario tener un personaje asignado");
+        else
+        {
+            Data.CurrentCharacter = Data.PlayerCharacter;
+            Navigation.NavigateTo($"/Playing/{Data.PlayerCharacter.ID}");
+        }
+    }
+
     void Back()
     {
         
@@ -62,7 +87,7 @@
     bool IsActive(string href)
     {
 
-        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).ToLower();
+        var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri).ToLower();
         if(href == "Select")
         {
             return relativePath.StartsWith("select".ToLower()) ||

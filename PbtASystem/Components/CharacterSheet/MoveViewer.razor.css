@@ -1,0 +1,163 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+    background: #25282C;
+    font-family: Roboto;
+    font-size: 16px;
+    cursor: pointer;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    height:100%;
+    /*
+    -moz-transition: all 1s ease;
+    -webkit-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+    */
+}
+
+.FullScreenModal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 250ms ease;
+}
+
+.HideModal {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ModalBody {
+    width: 75%;
+    display: flex;
+    background: var(--Middle);
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.ImagesContainer img {
+    aspect-ratio: 1 / 1;
+    width: 20px;
+    height: 20px;
+}
+
+.DiceButton{
+    width:28px !important;
+    height:28px !important;
+}
+
+.Box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+    padding: 5px;
+}
+
+.TextContainer {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    gap:5px;
+}
+
+.TextTitle {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.ImagesContainer {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.RollDetails {
+    white-space: nowrap;
+    overflow: hidden;
+    padding-right:5px;
+}
+
+.Innactive{
+    opacity:50%; 
+}
+.ShowFull{
+    opacity: 100%
+}
+.Innactive .DiceButton {
+    opacity: 0.25;
+}
+
+.Hidden{
+    display:none;
+}
+
+.IsSelected {
+    background: #30353A;
+    border: 1px solid #8D8D8D;
+}
+
+.MoveBody {    
+    padding-top:0;
+    font-size:14px;
+    font-weight: 200;
+    height: 0;
+    overflow: hidden;
+}
+.IsSelected .MoveBody {
+    display: flex;
+    padding: 10px;
+    height: auto;
+}
+
+.Advanced {
+    border-radius: 5px;
+    background: #182418;
+    display:flex;
+    align-items:center;
+    padding: 5px;
+    gap:5px;
+    margin-top:15px;
+}
+.AdvancedMainText{
+    flex-grow:1;
+}
+.AdvancedNOT{
+    opacity:0.5;
+    background: var(--Darker);
+}
+
+.LIOBox {
+    border: 1px solid gray;
+    padding: 5px;
+    margin: 5px;
+    background: black;
+}
+
+.LIOContainer {
+    padding: 10px;
+    padding-inline: 5px;
+}
+
+
+

@@ -1,0 +1,62 @@
+﻿@inject FirebaseData Data
+<div class="PbtASystemContainer StatViewer @(IsCircle?"StatViewerCircle":"") @(IsTick?"CircleTick":"")">
+	<div>@ValueString</div>
+	<div>@Attr.ToUI()</div>
+	@if (IsCircle)
+	{
+		<div class="d-flex gap-1">
+			<div class="Balloon @((Status>0)?"FilledIn":"")"></div>
+			<div class="Balloon @((Status>1)?"FilledIn":"")"></div>
+			<div class="Balloon @((Status>2)?"FilledIn":"")"></div>
+		</div>
+	}
+</div>
+@code {
+	[Parameter] public USAttributes Attr { get; set; }
+
+	protected override void OnParametersSet()
+	{
+		Value = Data.CurrentPlayerSheet.GetAttribute(Attr);
+		Status = Data.CurrentPlayerSheet.GetStatusInCircle(Attr);
+	}
+
+	private string ValueString
+	{
+		get
+		{
+			if (Value > 0) return "+" + Value.ToString();
+			else return Value.ToString();
+		}
+	}
+
+	private int Value = 0;
+	private int Status = 0;
+
+	private bool IsTick
+	{
+		get
+		{
+			if (!IsCircle) return false;
+			if (Attr == USAttributes.Mortality) return Data.CurrentPlayerSheet.IsMortalisTick;
+			if (Attr == USAttributes.Night) return Data.CurrentPlayerSheet.IsNightTick;
+			if (Attr == USAttributes.Power) return Data.CurrentPlayerSheet.IsPowerTick;
+			if (Attr == USAttributes.Veil) return Data.CurrentPlayerSheet.IsVeilTick;
+			else return false;
+		}
+	}
+
+	private bool IsCircle {
+		get
+		{
+			List<USAttributes> list = new List<USAttributes> 
+			{
+				USAttributes.Mortality,
+				USAttributes.Night,
+				USAttributes.Power,
+				USAttributes.Veil 
+			};
+
+			return list.Contains(Attr);
+		}	
+	}
+}
