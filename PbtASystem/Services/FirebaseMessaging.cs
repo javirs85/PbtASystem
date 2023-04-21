@@ -7,16 +7,18 @@ using System;
 using MQTTnet.Client;
 using MQTTnet;
 using System.Text.Json.Serialization;
+using PbtASystem.Services.Moves;
 
 namespace PbtASystem.Services;
 
 public class FirebaseMessaging
 {
     public event EventHandler<MQTTMessage> MessageReceived;
-    public FirebaseMessaging(IToastService _toaster, FirebaseData _data)
+    public FirebaseMessaging(IToastService _toaster, FirebaseData _data, USMovesService _moves)
     {
         Toaster = _toaster;
         Data = _data;
+        Moves = _moves;
     }
 
 	private Guid ClientID;
@@ -26,6 +28,7 @@ public class FirebaseMessaging
     IMqttClient? mqttClient;
     IToastService Toaster;
     FirebaseData Data;
+    USMovesService Moves;
     public bool isConnected => mqttClient?.IsConnected ?? false;
     private bool AlreadyConnecting = false;
 
@@ -128,7 +131,18 @@ public class FirebaseMessaging
     {
         string incomingMessage = System.Text.Encoding.Default.GetString(e.ApplicationMessage.Payload);
         var encodedMessage = System.Text.Json.JsonSerializer.Deserialize<MQTTMessage>(incomingMessage);
-        Toaster.ShowInfo(encodedMessage.SenderName + ": "+ encodedMessage.Message);
+
+        if(encodedMessage is RollMessage)
+        {
+            var roll = encodedMessage as RollMessage;
+
+            Toaster.ShowRollToast(roll.SenderName, Moves.GetMovement(roll.MoveID).Tittle, roll.Message, roll.RollValue);
+		}
+        else
+        {
+			Toaster.ShowInfo(encodedMessage.SenderName + ": " + encodedMessage.Message);
+		}
+
         MessageReceived?.Invoke(this, encodedMessage);
     }
 
@@ -188,7 +202,7 @@ public class RollMessage : MQTTMessage
 {
     public RollMessage() { Kind = MessageKind.MoveRoll; }
 
-    public Guid MoveID { get; set; } = new Guid();
+    public USMoveIDs MoveID { get; set; } = new();
 
     public int RollValue { get; set; }
 }

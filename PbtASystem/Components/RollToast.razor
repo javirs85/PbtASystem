@@ -1,0 +1,33 @@
+﻿@using Blazored.Toast;
+<div class="d-flex flex-column align-items-start gap-0 Outer @Color">
+	<div class="Upper p-2 ps-3">
+		<div class="Name">@Name</div>
+		<div class="MoveName">@MoveName</div>
+	</div>
+	<div class="d-flex flex-column align-items-center w-100">
+		<div class="RollText">@Text</div>
+		<div class="Result">@TotalRolledValue</div>
+	</div>
+
+	<div class="CloseButton" @onclick=ToastInstance.Close>
+	</div>
+</div>
+@code {
+	[Parameter] public string Name { get; set; } = "Not set";
+	[Parameter] public string Text { get; set; } = "Not set";
+	[Parameter] public string MoveName { get; set; } = "Not set";
+	[Parameter] public int TotalRolledValue { get; set; } = 0;
+
+	[CascadingParameter] private BlazoredToast ToastInstance { get; set; } = default!;
+
+	string Color
+	{
+		get
+		{
+			if (TotalRolledValue <= 6) return "Red";
+			else if (TotalRolledValue <= 9) return "Yellow";
+			else if (TotalRolledValue <= 12) return "Green";
+			else return "Golden";
+		}
+	}
+}

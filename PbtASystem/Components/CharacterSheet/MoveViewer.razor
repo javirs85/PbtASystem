@@ -1,4 +1,5 @@
 ﻿@inject FirebaseData Data
+@inject FirebaseMessaging Messaging
 @inject USMovesService Moves
 @inject IToastService Toaster
 
@@ -20,7 +21,10 @@
 			<img src="/imgs/Icons/TicksCircleIcon.png" class="@(Move.TicksCircle?"":"Hidden")"/>
 			@if (!IsSelectionMode)
 			{
-				<img class="DiceButton" src="/imgs/Icons/Dice.png" />
+				if(Move.HasRoll())
+				{
+					<img class="DiceButton" src="/imgs/Icons/Dice.svg" @onclick=@(async ()=>{await Roll();}) @onclick:stopPropagation=true/>
+				}	
 			}
 			else
 			{
@@ -80,20 +84,7 @@
 					}
 
 				</ul>
-			}
-			@if (Move.ConsequencesOn6 != null){
-				<DecodedString Value="@Move.ConsequencesOn6.MainText" />
-				@if (Move.ConsequencesOn6.Options != null)
-				{
-					<ul class="mt-1">
-						@foreach (var item in Move.ConsequencesOn6.Options)
-						{
-							<li><DecodedString Value="@item" /></li>
-						}
-
-					</ul>
-				}
-			}		
+			}	
 			@if (Move.ConsequencesOn79 != null)
 			{
 				<DecodedString Value="@Move.ConsequencesOn79.MainText" />
@@ -115,6 +106,21 @@
 				{
 					<ul class="mt-1">
 						@foreach (var item in Move.ConsequencesOn10.Options)
+						{
+							<li><DecodedString Value="@item" /></li>
+						}
+
+					</ul>
+				}
+			}
+
+			@if (Move.ConsequencesOn6 != null)
+			{
+				<DecodedString Value="@Move.ConsequencesOn6.MainText" />
+				@if (Move.ConsequencesOn6.Options != null)
+				{
+					<ul class="mt-1">
+						@foreach (var item in Move.ConsequencesOn6.Options)
 						{
 							<li><DecodedString Value="@item" /></li>
 						}
@@ -146,19 +152,53 @@
 		
 	</div>
 </div>
-
+<!--Advacnce movement modal-->
 <div class="FullScreenModal @(IsShowingFullScreenModal?"":"HideModal")" @onclick=CloseFullScreenModal>
 	<div class="ModalBody">
 		<p>Ahora mismo @Move.Tittle está <span style="font-weight:bold; text-decoration:underline;">@(Move.IsImproved ? "Avanzado" : "Normal")</span></p>
-		<p class="mt-4 mb-1">Como dejamos el movimientp?</p>
+		<p class="mt-4 mb-1">Como dejamos el movimiento?</p>
 		<div class="d-flex gap-2">
-			<button class="btn btn-outline-light" @onclick=MakeMoveNOTAdvanced @onclick:stopPropagation=true>Movimineto normal</button>
+			<button class="btn btn-outline-light" @onclick=MakeMoveNOTAdvanced @onclick:stopPropagation=true>Movimiento normal</button>
 			<button class="btn btn-outline-light" @onclick=MakeMoveAdvanced @onclick:stopPropagation=true>
 				<img src="/imgs/Icons/UpgradedArrow.png"/> Avanzado
 				</button>
 		</div>		
 	</div>
 </div>
+
+<!--ChooseCircle modal-->
+<div class="FullScreenModal @(IsShowingCircleSelectionModal?"":"HideModal")" @onclick=CloseCircleSelectionModal>
+	<div class="ModalBody">
+		<p>Elija círculo para tirar los dados</p>
+		<div class="d-flex gap-2">
+			<div class="d-flex flex-column gap-2">
+				<button class="btn btn-outline-light" style="width: 100px;"
+						@onclick=@(()=>{SelectCircle(USAttributes.Mortality);})
+						@onclick:stopPropagation=true>
+					Mortalis
+				</button>
+				<button class="btn btn-outline-light" style="width: 100px;"
+						@onclick=@(()=>{SelectCircle(USAttributes.Night);})
+						@onclick:stopPropagation=true>
+					Noche
+				</button>
+			</div>
+			<div class="d-flex flex-column gap-2">
+				<button class="btn btn-outline-light" style="width: 100px;"
+						@onclick=@(()=>{SelectCircle(USAttributes.Power);})
+						@onclick:stopPropagation=true>
+					Poder
+				</button>
+				<button class="btn btn-outline-light" style="width: 100px;"
+						@onclick=@(()=>{SelectCircle(USAttributes.Veil);})
+						@onclick:stopPropagation=true>
+					Velo
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 @code {
 	[Parameter] public USMoveIDs ID { get; set; }
 	[Parameter] public bool IsSelected { get; set; }
@@ -232,4 +272,51 @@
 			CloseFullScreenModal();
 		}
 	}
+
+	Random rnd = new();
+
+	async Task Roll()
+	{
+		int d1 = 1 + rnd.Next(5);	
+		int d2 = 1 + rnd.Next(5);
+		int bonus = 0;
+		string rollText = "";
+
+		if(Move.Roll == USAttributes.Circle)
+		{
+			OpenCircleSelectionModal();
+			var circle = await WaitForUserToChoseCircle();
+			CloseCircleSelectionModal();
+			bonus = Data.CurrentPlayerSheet.GetAttribute(circle);
+			rollText = circle.ToUI();
+		}
+		else
+		{
+			bonus = Data.CurrentPlayerSheet.GetAttribute(Move.Roll);
+			rollText = Move.Roll.ToUI();
+		}
+
+		int total = d1 + d2 + bonus;
+
+		await Messaging.SendMessage(new RollMessage
+			{
+				MoveID = Move.ID,
+				RollValue = total,
+				Message = $"{d1} + {d2} +{rollText}({bonus})"
+			});
+	}
+
+	bool IsShowingCircleSelectionModal = false;
+	void CloseCircleSelectionModal() => IsShowingCircleSelectionModal = false;
+	void OpenCircleSelectionModal() => IsShowingCircleSelectionModal = true;
+
+	USAttributes SelectedCircle = USAttributes.None;
+	TaskCompletionSource<USAttributes> tcs = new();
+	private Task<USAttributes> WaitForUserToChoseCircle()
+	{
+		tcs = new();
+		return tcs.Task;
+	}
+
+	void SelectCircle(USAttributes at) => tcs.SetResult(at);
 }

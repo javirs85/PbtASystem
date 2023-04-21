@@ -1,7 +1,9 @@
 ﻿@inject FirebaseData Data
-<div class="PbtASystemContainer StatViewer @(IsCircle?"StatViewerCircle":"") @(IsTick?"CircleTick":"")">
-	<div>@ValueString</div>
-	<div>@Attr.ToUI()</div>
+<div class="PbtASystemContainer StatViewer @(IsCircle?"StatViewerCircle":"") @(IsTick?"CircleTick":"")" 
+	@oncontextmenu=OpenFullScreenModal
+	@oncontextmenu:preventDefault=true>
+	<div class="prevent-select">@ValueString</div>
+	<div class="prevent-select">@Attr.ToUI()</div>
 	@if (IsCircle)
 	{
 		<div class="d-flex gap-1">
@@ -11,13 +13,39 @@
 		</div>
 	}
 </div>
+
+<div class="FullScreenModal @(IsShowingFullScreenModal?"":"HideModal")" @onclick=CloseFullScreenModal>
+	<div class="CloseButton"></div>
+	<div class="ModalBody" style="height: 300px; width:260px;" @onclick:stopPropagation=true>
+		<div class="d-flex flex-column align-items-center justify-content-start h-100">
+			<div class="pt-3" style="font-size:16px; font-weight:bold;">@Attr.ToUI()</div>
+			<div class="flex-grow-1 d-flex flex-column justify-content-center">
+				<div class="d-flex justify-content-center align-items-center gap-2">
+					<img src="/imgs/Icons/Down.svg" @onclick=AttrMinus/>
+					<div style="font-size: 30px; font-weight:bold;">@ValueString</div>
+					<img src="/imgs/Icons/Up.svg" @onclick=AttrPlus />
+				</div>
+				@if (IsCircle)
+				{
+					<div class="d-flex justify-content-center p-2 pb-3 gap-3">
+						<img src="/imgs/Icons/Big@(Status>0?"Filled":"Empty")Ball.svg" @onclick=@(async _ => await StatusClicked(1)) />
+						<img src="/imgs/Icons/Big@(Status>1?"Filled":"Empty")Ball.svg" @onclick=@(async _ => await StatusClicked(2)) />
+						<img src="/imgs/Icons/Big@(Status>2?"Filled":"Empty")Ball.svg" @onclick=@(async _ => await StatusClicked(3)) />
+					</div>
+					<button class="btn btn-outline-light" style="border-radius:50px;" @onclick=@(async _=>{await ToggleCircleTick();})>
+						@(IsTick ? "Desmarcar" : "Marcar") círculo
+					</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
 @code {
 	[Parameter] public USAttributes Attr { get; set; }
 
 	protected override void OnParametersSet()
 	{
-		Value = Data.CurrentPlayerSheet.GetAttribute(Attr);
-		Status = Data.CurrentPlayerSheet.GetStatusInCircle(Attr);
+		UpdateValues();
 	}
 
 	private string ValueString
@@ -28,6 +56,11 @@
 			else return Value.ToString();
 		}
 	}
+
+	bool IsShowingFullScreenModal = false;
+	void CloseFullScreenModal() => IsShowingFullScreenModal = false; 
+	void OpenFullScreenModal() => IsShowingFullScreenModal = true;
+
 
 	private int Value = 0;
 	private int Status = 0;
@@ -59,4 +92,58 @@
 			return list.Contains(Attr);
 		}	
 	}
+
+	async Task ToggleCircleTick()
+	{
+		CloseFullScreenModal();
+
+		if (Attr == USAttributes.Mortality)
+			Data.CurrentPlayerSheet.IsMortalisTick = !Data.CurrentPlayerSheet.IsMortalisTick;
+		if (Attr == USAttributes.Night)
+			Data.CurrentPlayerSheet.IsNightTick = !Data.CurrentPlayerSheet.IsNightTick;
+		if (Attr == USAttributes.Power)
+			Data.CurrentPlayerSheet.IsPowerTick = !Data.CurrentPlayerSheet.IsPowerTick;
+		if (Attr == USAttributes.Veil)
+			Data.CurrentPlayerSheet.IsVeilTick = !Data.CurrentPlayerSheet.IsVeilTick;
+
+		await Data.StoreCharacterSheet();
+	}
+
+	async Task AttrMinus()
+	{
+		var val = Data.CurrentPlayerSheet.GetAttribute(Attr);
+		Data.CurrentPlayerSheet.SetAttribute(Attr, val - 1);
+
+		await Data.StoreCharacterSheet();
+		UpdateValues();
+	}
+	async Task AttrPlus()
+	{
+		var val = Data.CurrentPlayerSheet.GetAttribute(Attr);
+		Data.CurrentPlayerSheet.SetAttribute(Attr, val + 1);
+
+		await Data.StoreCharacterSheet();
+		UpdateValues();
+	}
+
+	async Task StatusClicked(int n)
+	{
+		if (Status >= n)
+			Status--;
+		else
+			Status++;
+
+		Data.CurrentPlayerSheet.SetStatusInCircle(Attr, Status);
+
+		await Data.StoreCharacterSheet();
+		UpdateValues();
+	}
+
+
+	void UpdateValues()
+	{
+		Value = Data.CurrentPlayerSheet.GetAttribute(Attr);
+		Status = Data.CurrentPlayerSheet.GetStatusInCircle(Attr);
+	}
+
 }

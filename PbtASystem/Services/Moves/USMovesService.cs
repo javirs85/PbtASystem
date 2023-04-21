@@ -60,6 +60,7 @@ public class USMovesService : MovementsProviderBase
 		AllMovements.Add(new USMove(USMoveIDs.rawMortal, USAttributes.Mortality) { Tittle = "Mortalis" });
 		AllMovements.Add(new USMove(USMoveIDs.rawNight, USAttributes.Night) { Tittle = "Noche" });
 		AllMovements.Add(new USMove(USMoveIDs.rawPower, USAttributes.Power) { Tittle = "Poder" });
+		AllMovements.Add(new USMove(USMoveIDs.raw2d6, USAttributes.None) { Tittle = "2d6" });
 	}
 
 	public List<USMoveIDs> GetInitialMovesIDsByArchetype(AvailableArchetypes arch)
@@ -813,7 +814,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Veteran,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando traces un plan con alguien, tira con Mente. Si fallas la tirada, obtienes 1 punto, pero tu plan se desmorona en el peor momento. " +
+				MainText = "Cuando traces un plan con alguien, tira con Mente." +
 							"Mientras el plan se lleva a cabo, puedes gastar los puntos, uno por opción.",
 				Options = new List<string>
 					{
@@ -829,11 +830,15 @@ public class USMovesService : MovementsProviderBase
 			ConsequencesOn10 = new Consequences
 			{
 				MainText = " Con un +10, obtienes 3 puntos.",
+			},
+			ConsequencesOn6 = new Consequences
+			{
+				MainText = "Si fallas la tirada, obtienes 1 punto, pero tu plan se desmorona en el peor momento."
 			}
 		});
 		result.Add(new USMove(USMoveIDs.A_Vet_06, USAttributes.Mind)
 		{
-			Tittle = "Sacar la pistola en una pelea a navajazos",
+			Tittle = "Sacar la pistola en una pelea de navajas",
 			TypeOfMovement = USMove.MovementTypes.ArquetipeMovement,
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Veteran,
@@ -1785,7 +1790,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Hunter,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando rechaces cualquier ayuda y te metas en una situación peligrosa solo, puedes marcarte corrupción para avanzar lanzar un ataque y mantener la calma durante esa escena.",
+				MainText = "Cuando entres solo en una situación peligrosa, marca corrupción para adelantar todos tus movimientos y lleva +1 a Sangre por la escena.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Hun_02, USAttributes.None)
@@ -1796,18 +1801,18 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Hunter,
 			PreCondition = new Consequences
 			{
-				MainText = "Elige una Facción. Puedes marcarte corrupción para obtener armadura+1 contra esa Facción hasta el final de la escena.",
+				MainText = "Marca corrupción para ganar armadura+1 hasta el final de la escena.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Hun_03, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Sincronización perfecta",
+			Tittle = "Esperando ayuda",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Hunter,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para entrar en escena. Puedes marcártela una vez más para aparecer en una posición ventajosa.",
+				MainText = "Marca corrupción para que un equipo de apoyo de cazadores mortales llegue a la escena (3-daño pequeño 1-armadura entrenados) Marca una segunda corrupción para que aparezcan en una posición superior.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Hun_04, USAttributes.None)
@@ -1834,18 +1839,18 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Awaken,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando alguien que no sea mortal intente echarte una mano o fastidiarte, puedes marcarte corrupción para sumarle o restarle 3 a su tirada.",
+				MainText = "Marca corrupción para interponerte en el camino de alguien de otro Círculo como si hubieras sacado un 10+.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Awa_02, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Los ojos en la puerta",
+			Tittle = "Si no puedes con ellos…",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Awaken,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando estés en peligro por una causa sobrenatural, puedes marcarte corrupción para escapar de una situación como si hubieras sacado un 12+.",
+				MainText = "Coge una habilidad (Liberar tu poder) de un arquetipo de otro Círculo. Siempre que la sueltes y saques un 12+, marca una corrupción adicional.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Awa_03, USAttributes.None)
@@ -1856,18 +1861,18 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Awaken,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para negarte a pagarle una Deuda a alguien que no sea mortal como si hubieras sacado un 10+.",
+				MainText = "Puedes marcarte corrupción para negarte a pagarle una Deuda a alguien que no sea mortal como si hubieras sacado un 12+.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Awa_04, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Si no puedes con ellos",
+			Tittle = "Manos largas",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Awaken,
 			PreCondition = new Consequences
 			{
-				MainText = "Toma dos movimientos de Arquetipos no mortales. Siempre que uses estos movimientos, márcate corrupción.",
+				MainText = "Marca corrupción después de reunirte con un PNJ poderoso para revelar que le has quitado algo importante. Marca corrupción de nuevo para ocultar tu papel en el robo durante algún tiempo.",
 			}
 		});
 		return result;
@@ -1883,7 +1888,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Veteran,
 			PreCondition = new Consequences
 			{
-				MainText = "Coge un movimiento normal y un movimiento de corrupción de otro Arquetipo. Siempre que los uses, márcate corrupción.",
+				MainText = "Coge dos habilidades de 'Liberar tu poder' de otro arquetipo. Cuando uses estas habilidades no puedes elegir no marcar corrupción (con 10+)",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Vet_02, USAttributes.None)
@@ -1916,19 +1921,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Veteran,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando «trabajes en alguien» (vivo o muerto) en tu taller, márcate corrupción y tira con Mente. Con un 10+, haz 3 preguntas. Con un 7-9, haz 2 preguntas.",
-				Options = new List<string>
-					{
-						"¿Cuál es tu punto débil?",
-						"¿Qué escondes?",
-						"¿De qué tienes miedo?",
-						"¿Qué eres en realidad?",
-						"¿Qué estás planeando?"
-					}
-			},
-			ConsequencesOn79 = new Consequences
-			{
-				MainText = "Si fallas la tirada, haz 1 pregunta, pero alguien de su Facción se enterará de lo que has hecho."
+				MainText = "Cuando trabajas en tu taller con alguien (vivo o muerto) marca corrupción para hacer hasta dos preguntas sobre sus secretos o debilidades. Deben responder honestamente.",
 			}
 		});
 		return result;
@@ -1944,7 +1937,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Spectre,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para meterte en la mente de una persona falta de carácter (a discreción del Maestro de Ceremonias) que se encuentre en tu presencia y controlar sus movimientos y palabras durante un breve periodo de tiempo.",
+				MainText = "Marca corrupción para poseer mentalmente a una persona débil (a discreción del MC) en tu presencia; borra un trauma por cada experiencia humana \"normal\" -comer una comida, comprar ropa, etc.- que realices mientras controlas su cuerpo.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Spe_02, USAttributes.None)
@@ -1993,7 +1986,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Wolf,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para añadirle 2 cualidades más a tu transformación hasta el final de la sesión.",
+				MainText = "Marca corrupción cuando te transformes para seleccionar dos cualidades adicionales o eliminar dos debilidades existentes de su Transformación. Marca una segunda corrupción para hacer ambas cosas.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Wolf_02, USAttributes.None)
@@ -2004,18 +1997,18 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Wolf,
 			PreCondition = new Consequences
 			{
-				MainText = "Obtienes +1 a Sangre (máximo +4). Siempre que tires con Sangre y saques un 12+, márcate corrupción.",
+				MainText = "Obtienes +1 Sangre (máx. +4). Cada vez que tiras con Sangre y obtienes un 12+, marca corrupción.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Wolf_03, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Sol y luna",
+			Tittle = "Sabueso callejero",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Wolf,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para transformarte en tu forma lupina a voluntad.",
+				MainText = "Marca corrupción para transformarte en un coyote o un perro. Mientras estás en esta forma, puedes tirar con ESPÍRITU en lugar de mente para leer a alguien o engañarlo, distraerlo y engañarlo.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Wolf_04, USAttributes.None)
@@ -2026,7 +2019,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Wolf,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para conocer el origen del mayor peligro para tu territorio, aunque esté oculto con magia o engaños.",
+				MainText = "Marca corrupción para ubicar la fuente del mayor peligro para ti o alguien que selecciones dentro de tu territorio o centro de la ciudad, incluso si la amenaza se ha ocultado con magia o mentiras.",
 			}
 		});
 		return result;
@@ -2048,23 +2041,23 @@ public class USMovesService : MovementsProviderBase
 		result.Add(new USMove(USMoveIDs.C_Vamp_02, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Paladar adaptable",
+			Tittle = "Mantenlos dentro",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Vampire,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes alimentarte de cualquier criatura, no solo de humanos. Alimentarte de algo completamente diferente a un ser humano tendrá efectos secundarios inesperados.",
+				MainText = "Cuando cobres la última Deuda de alguien de tu Web, marca corrupción para conservar la Deuda y mantenerlos en tu Red.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Vamp_03, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "De vuelta al redil",
+			Tittle = "Fake news",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Vampire,
 			PreCondition = new Consequences
 			{
-				MainText = " Cuando le cobres la última Deuda a alguien de tu red, márcate corrupción para quedarte con la Deuda y mantenerlo en la red.",
+				MainText = "Cuando debilitas la posición de alguien mediante rumores falsos, marca corrupción para tirar con Corazón en lugar de Estatus. Si fallas, marca corrupción para que el rastro conduzca a un aliado, no a ti.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Vamp_04, USAttributes.None)
@@ -2075,7 +2068,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Vampire,
 			PreCondition = new Consequences
 			{
-				MainText = "Elige dos poderes feéricos. Márcate corrupción cada vez que uses uno de ellos.",
+				MainText = "Elige 2 Poderes de Hada; marca corrupción para usar uno sin coste adicional. Puedes realizar este avance de corrupción una segunda vez para obtener los Poderes de Hada restantes.",
 			}
 		});
 		return result;
@@ -2091,18 +2084,18 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Mage,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando lances un ataque con magia o energía psíquica, puedes marcarte corrupción para tirar con Espíritu en vez de Sangre durante el resto de la escena.",
+				MainText = "Cuando recurras a la violencia con energías mágicas o psíquicas, marca corrupción para tirar con Espíritu en lugar de Sangre.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Mage_02, USAttributes.None)
 		{
-			Tittle = "Sobre un caballo amarillento",
+			Tittle = "Sobre un caballo pálido",
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Mage,
 			PreCondition = new Consequences
 			{
-				MainText = "Márcate corrupción y di el nombre auténtico de un personaje no jugador que haya en escena para hacerle 3-daño (perforante).",
+				MainText = "Marca corrupción, 1 por 1, y pronuncia el verdadero nombre de un personaje en la escena para infligir hasta 3 daños (ap) en ellos; solo puedes apuntar a un personaje con este poder una vez por sesión.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Mage_03, USAttributes.None)
@@ -2162,13 +2155,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Oracle,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando estés cara a cara con alguien, puedes marcarte corrupción para lanzarle una maldición. Tira con Espíritu. Con un 10+, elige 2 opciones. Con un 7-9, elige 1 opción:",
-				Options = new List<string>
-					{
-						"La maldición dura mucho tiempo.",
-						"Tú no eres la obvia fuente de la maldición.",
-						"Los efectos de la maldición son potentes y evidentes."
-					}
+				MainText = "Marca corrupción para maldecir a una facción de la ciudad con una suerte terrible; tendrán -1 en curso en el siguiente turno de facción. Marca corrupción de nuevo para ocultar tu papel o asegurarte de que la maldición dure mucho tiempo.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Orac_04, USAttributes.None)
@@ -2179,7 +2166,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Oracle,
 			PreCondition = new Consequences
 			{
-				MainText = "Márcate corrupción para cruzar la vista con alguien y obligarlo a quedarse quieto mientras le sostengas la mirada.",
+				MainText = "Marca corrupción para clavar los ojos en alguien y obligarle a quedarse quieto mientras mantengas la mirada. Vuelve a marcar Corrupción para hacerles olvidar la experiencia.",
 			}
 		});
 		return result;
@@ -2195,7 +2182,7 @@ public class USMovesService : MovementsProviderBase
 			Arquetipe = AvailableArchetypes.Corrupted,
 			PreCondition = new Consequences
 			{
-				MainText = "Puedes marcarte corrupción para dejar caer el nombre de tu jefe demoníaco como si hubieras sacado un 10+. No hace falta que tu jefe esté en Deuda contigo para usar este movimiento.",
+				MainText = "Marca corrupción para hacer un movimiento de ciudad adicional cuando pasa el tiempo; si usas tu Estatus de Círculo para el movimiento, añade +1 a tu tirada.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Corrupt_02, USAttributes.None)
@@ -2239,9 +2226,9 @@ public class USMovesService : MovementsProviderBase
 		result.Add(new USMove(USMoveIDs.C_Fai_01, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Gach cumhacht",
+			Tittle = "Aire y oscuridad",
 			IsSelected = false,
-			Arquetipe = AvailableArchetypes.Corrupted,
+			Arquetipe = AvailableArchetypes.Fair,
 			PreCondition = new Consequences
 			{
 				MainText = "Obtienes los poderes feéricos restantes. Cuando uses Magia feérica, dejas de poder elegir sufrir daño.",
@@ -2250,12 +2237,12 @@ public class USMovesService : MovementsProviderBase
 		result.Add(new USMove(USMoveIDs.C_Fai_02, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Hábil negociador",
+			Tittle = "Negociador astuto",
 			IsSelected = false,
-			Arquetipe = AvailableArchetypes.Corrupted,
+			Arquetipe = AvailableArchetypes.Fair,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando saques un 10+ en negarte a pagar una Deuda, puedes marcarte corrupción para cancelar la Deuda original y reclamarle una Deuda a la persona a la que se la has negado.",
+				MainText = "Cuando te niegas a cumplir una Deuda, puedes marcar corrupción para sacar un 12+ en vez de tirar.",
 			}
 		});
 		result.Add(new USMove(USMoveIDs.C_Fai_03, USAttributes.None)
@@ -2263,7 +2250,7 @@ public class USMovesService : MovementsProviderBase
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
 			Tittle = "Gracia supranatural",
 			IsSelected = false,
-			Arquetipe = AvailableArchetypes.Corrupted,
+			Arquetipe = AvailableArchetypes.Fair,
 			PreCondition = new Consequences
 			{
 				MainText = "Obtienes +1 a Corazón (máximo +4). Siempre que tires con Corazón y saques un 12+, márcate corrupción.",
@@ -2274,10 +2261,10 @@ public class USMovesService : MovementsProviderBase
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
 			Tittle = "Todos tenemos una",
 			IsSelected = false,
-			Arquetipe = AvailableArchetypes.Corrupted,
+			Arquetipe = AvailableArchetypes.Fair,
 			PreCondition = new Consequences
 			{
-				MainText = "Toca a alguien y márcate corrupción para declarar que tiene la vulnerabilidad que elijas. Todo daño de esa fuente (fuego, acero, hierro, etcétera) se trata como +1 daño y perforante.",
+				MainText = "Toca a alguien y marca corrupción para maldecirlo con una vulnerabilidad elemental. Todo el daño de una fuente que selecciones (fuego, acero, hierro, etc.) se trata como +1 daño y ap.",
 			}
 		});
 		return result;
@@ -2288,7 +2275,7 @@ public class USMovesService : MovementsProviderBase
 		result.Add(new USMove(USMoveIDs.C_Imp_01, USAttributes.None)
 		{
 			TypeOfMovement = USMove.MovementTypes.CorruptionMovement,
-			Tittle = "Así es como gano",
+			Tittle = "Así es como gano yo",
 			IsSelected = false,
 			Arquetipe = AvailableArchetypes.Imp,
 			PreCondition = new Consequences

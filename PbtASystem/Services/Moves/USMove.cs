@@ -2,7 +2,7 @@
 {
 	public enum USMoveIDs
 	{
-		rawBlood, rawHeart, rawMind, rawSoul, rawMortal, rawNight, rawPower, rawVeil,
+		rawBlood, rawHeart, rawMind, rawSoul, rawMortal, rawNight, rawPower, rawVeil, raw2d6,
 		NotSet, B_Ataque, B_Escapar, B_Convencer, B_Calar, B_Confundir, B_distraer, B_KeepCalm, B_LiberarPoder, B_AyudarOFastidiar,
 		F_01, F_02, F_03, F_04, D_01, D_02, D_03, D_04, D_05,
 		A_Hunt_01, A_Hunt_02, A_Hunt_03, A_Hunt_04, A_Hunt_05, A_Hunt_06, A_Hunt_07,
@@ -60,7 +60,7 @@
 
 
 		public override bool HasRoll() => Roll != USAttributes.None ;
-		public bool CanBeRolledAutomatically => Roll != USAttributes.None && Roll != USAttributes.Circle;
+		public bool CanBeRolledAutomatically => Roll != USAttributes.None && Roll != USAttributes.Circle && Roll != USAttributes.Status;
 		public override string ToUI() => Roll.ToUI();
 	}
 }

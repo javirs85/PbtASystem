@@ -177,6 +177,7 @@ public class FirebaseData : USBDbase
 	#endregion
 
 	public async Task<CharacterSheet> GetCharacterSheetByID(Guid id) => await Firebase.InvokeAsync<CharacterSheet>("GetCharacterSheetByID", id);
+	public async Task StoreCharacterSheet() => await StoreCharacterSheet(CurrentPlayerSheet);
 	public async Task StoreCharacterSheet(CharacterSheet sheet) => await Firebase.InvokeVoidAsync("StoreCharacterSheet", sheet);
 	public async Task<bool> CheckIfSheetExists(Guid id) => await Firebase.InvokeAsync<bool>("CheckIfSheetExists", id);
 

@@ -2,7 +2,7 @@
 
 public enum USAttributes
 {
-	Blood, Heart, Mind, Soul, Mortality, Night, Power, Veil, Circle, None
+	Blood, Heart, Mind, Soul, Mortality, Night, Power, Veil, Circle, None, Status
 }
 
 public enum AvailableArchetypes
@@ -16,6 +16,8 @@ public enum LabelIDs
 	Sagrada, Recarga, Ruidosa, Toque, Toque_Cerca, Valiosa, daño1, daño2, daño3, daño4,
 	Silenciada, Grande, Semiautomatica, Antigua, Potente, ConMira, Bendita, Cabeza, Hoja, Famosa, Extensible, Encantada, Escondida
 };
+
+public enum KindsOfAdvance { Normal, Extra, Corruption };
 
 public class Label
 {

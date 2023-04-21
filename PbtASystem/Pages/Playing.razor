@@ -1,4 +1,5 @@
 ﻿@page "/Playing/{IDString}"
+@using Blazored.Toast;
 @inject IToastService Toaster;
 @inject FirebaseData Data;
 @inject FirebaseAuth Auth;
@@ -12,7 +13,7 @@
 @if (IsSheetReady)
 {
 	<div class="PbtASystemContainer">
-		<div class="DarkArea" style="background: black;">
+		<div class="DarkArea mb-2" style="background: black;">
 			<div class="d-flex StatsArea">
 				<div class="d-flex flex-column flex-grow-1">
 					<StatViewer Attr="USAttributes.Blood" />
@@ -40,7 +41,7 @@
 				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 5?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(5)) /></div>
 			</div>
 			<div class="d-flex align-items-center justify-content-center DamageArea gap-2">
-				<div class="ArmorContainer">
+				<div class="ArmorContainer" @onclick=ShowArmorEditor>
 					<div>@Data.CurrentPlayerSheet.Armor</div>
 				</div>
 				<div style ="opacity: 0.25;"> DAÑO</div>
@@ -56,7 +57,7 @@
 					<div class="Wound HardInner @(Data.CurrentPlayerSheet.Damage > 4?"WoundMark":"")" @onclick=@(_ => WoundClicked(5))></div>
 				</div>
 				<div class="KnifeButton">
-					<img src="/imgs/Icons/Knife.png"/>
+					<img src="/imgs/Icons/Knife.png" @onclick=ShowScarEditor/>
 				</div>
 			</div>
 		</div>
@@ -75,20 +76,27 @@
 			}
 			@if(CurrentlyShowing == Sections.Book)
 			{
-				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForBooks>Cambiar movimientos de Arquetipo</button>
+				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForBooks>Cambiar movimientos de Libreto</button>
 			}
 			@if(CurrentlyShowing == Sections.Corruption)
 			{
-				<button class="btn btn-outline-light align-items-center">Cambiar movimientos de corrupción</button>
+				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForCorruption>Cambiar movimientos de corrupción</button>
 			}
 		</div>
-		
-		<div class="ExtraActions d-flex flex-column">
-			<div class="ExtraButton">Detalles del @Data.CurrentPlayerSheet.Archetype.ToUI()</div>
+
+		<div class="ExtraActions d-flex flex-column align-items-center">
+			<button class="btn btn-outline-light align-items-center" @onclick=Roll2d6>2d6</button>
+			<button class="btn btn-outline-light align-items-center">Detalles del @Data.CurrentPlayerSheet.Archetype.ToUI()</button>
+			<button class="btn btn-outline-light align-items-center" @onclick=ShowCircleAdvances>Mejoras por Círculos</button>
+			<button class="btn btn-outline-light align-items-center" @onclick=ShowCorruptionAdvances>Mejoras por Corrupción</button>
 		</div>
 	</div>
 
-	<div class="FullScreenModal ModalTop @(IsShowingMoveSelector?"":"HideModal")" @onclick=CloseMovesSelector>
+	<!--Moda for electing moves to add-->
+	<div class="FullScreenModal ModalTop d-flex flex-column @(IsShowingMoveSelector?"":"HideModal")" @onclick=CloseMovesSelector>
+		<div class="w-100 d-flex justify-content-end p-2">
+			<img src="/imgs/Icons/Close.svg" style="cursor: pointer;"/>
+		</div>
 		<div class="ModalBody w-100">
 			<div class="accordion accordion-flush w-100 DarkAccordion" @onclick:stopPropagation=true id="accordionFlushExample">
 				@foreach(var pack in MovesToChooseFrom)
@@ -98,7 +106,7 @@
 							<div data-bs-toggle="collapse" 
 								 data-bs-target="#flush-collapseOne-@pack.Tittle.Replace(' ', '_')"
 							     @onclick=@(_ =>{SelectedPack = pack;})>
-								@pack.Tittle
+								 @pack.Tittle
 							 </div>
 							
 						</h2>
@@ -117,6 +125,98 @@
 						
 					</div>
 				}
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Armor editor -->
+	<div class="FullScreenModal d-flex flex-column justify-content-center @(IsShowingArmor?"":"HideModal")" @onclick=HideArmorEditor>
+		<div class="CloseButton"></div>
+		<div class="ModalBody Darker" style="height: 300px; width:260px; background:#1C1E20;" @onclick:stopPropagation=true>
+			<div class="d-flex flex-column align-items-center justify-content-start h-100">
+				<div class="pt-3" style="font-size:16px; font-weight:bold;">Armadura</div>
+				<div class="flex-grow-1 d-flex flex-column justify-content-center">
+					<div class="d-flex justify-content-center align-items-center gap-2">
+						<img src="/imgs/Icons/Down.svg" @onclick=ArmorMinus />
+						<div style="font-size: 30px; font-weight:bold;">@Data.CurrentPlayerSheet.Armor</div>
+						<img src="/imgs/Icons/Up.svg" @onclick=ArmorPlus />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Scars editor -->
+	<div class="FullScreenModal d-flex flex-column justify-content-center @(IsShowingScars?"":"HideModal")" @onclick=HideScarEditor>
+		<div class="CloseButton"></div>
+		<div class="ModalBody Darker" style="width:260px; background:#1C1E20;" @onclick:stopPropagation=true>
+			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
+				<div class="pt-3" style="font-size:16px; font-weight:bold;">Cicatrices</div>
+				<div class="flex-grow-1 d-flex flex-column w-100">
+					<button class="btn @(Data.CurrentPlayerSheet.IsBloodScarUsed?"btn-outline-light":"btn-light") align-items-center" @onclick=@(async () => {await ToggleScar(USAttributes.Blood);})>
+						@(Data.CurrentPlayerSheet.IsBloodScarUsed ? "Quitar " : "+ ")Rebentado<br />(@(Data.CurrentPlayerSheet.IsBloodScarUsed ? "+" : "-")1 sangre)
+					</button>
+					<button class="btn @(Data.CurrentPlayerSheet.IsHeartScarUsed?"btn-outline-light":"btn-light") align-items-center" @onclick=@(async _ => { await ToggleScar(USAttributes.Heart);})>
+						@(Data.CurrentPlayerSheet.IsHeartScarUsed ? "Quitar " : "+ ")Compungido<br />(@(Data.CurrentPlayerSheet.IsHeartScarUsed ? "+" : "-")1 corazón)
+					</button>
+					<button class="btn @(Data.CurrentPlayerSheet.IsMindScarUsed?"btn-outline-light":"btn-light") align-items-center" @onclick=@(async _ => { await ToggleScar(USAttributes.Mind);})>
+						@(Data.CurrentPlayerSheet.IsMindScarUsed ? "Quitar " : "+ ")Quebrado<br />(@(Data.CurrentPlayerSheet.IsMindScarUsed ? "+" : "-")1 mente)
+					</button>
+					<button class="btn @(Data.CurrentPlayerSheet.IsSoulScarUsed?"btn-outline-light":"btn-light") align-items-center" @onclick=@(async _ => { await ToggleScar(USAttributes.Soul);})>
+						@(Data.CurrentPlayerSheet.IsSoulScarUsed ? "Quitar " : "+ ")Roto<br />(@(Data.CurrentPlayerSheet.IsSoulScarUsed ? "+" : "-")1 espíritu)
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Circle Upgrades Modal -->
+	<div class="FullScreenModal d-flex flex-column justify-content-center @(IsShowingAdvances?"":"HideModal")" @onclick=HideCircleAdvances>
+		<div class="CloseButton"></div>
+		<div class="ModalBody Darker" style="width:90%; background:#1C1E20;" @onclick:stopPropagation=true>
+			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
+				<div class="flex-grow-1 d-flex flex-column w-100">
+					<div class="pt-3" style="font-size:16px; font-weight:bold; margin-left:-10px;">
+						Avances normales
+					</div>
+					@foreach(var advance in Data.CurrentPlayerSheet.AdvancesNormal)
+					{
+						<div @onclick=@(async _ => {await ToggleAdvance(advance, KindsOfAdvance.Normal);})>
+							<AdvanceViewer Advance=advance />
+						</div>
+					}
+				</div>
+				<div class="flex-grow-1 d-flex flex-column w-100">
+					<div class="pt-3 d-flex flex-column" style="font-size:16px; font-weight:bold; margin-left:-10px;">
+						<div>Avances extra</div>
+						<div style="font-weight: normal; font-size: 14px; margin-top: -7px; margin-bottom: 3px;">
+							(después de 5 normales)
+						</div>
+					</div>
+					@foreach (var advance in Data.CurrentPlayerSheet.AdvancesExtra)
+					{
+						<div @onclick=@(async _ => {await ToggleAdvance(advance, KindsOfAdvance.Extra);})>
+							<AdvanceViewer Advance=advance />
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Corruption Upgrades Modal -->
+	<div class="FullScreenModal d-flex flex-column justify-content-center @(IsShowingCorruptionAdvances?"":"HideModal")" @onclick=HideCorruptionAdvances>
+		<div class="CloseButton"></div>
+		<div class="ModalBody Darker" style="width: 80%; background: #1C1E20; padding: 15px;" @onclick:stopPropagation=true>
+			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
+				<div class="py-3 pb-5" style="font-size:16px; font-weight:bold;">Avances de corrupción</div>
+				<div class="flex-grow-1 d-flex flex-column w-100 gap-4">
+					@foreach (var advance in Data.CurrentPlayerSheet.AdvancesCorruptions)
+					{
+						<AdvanceViewer Advance=advance />
+					}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -172,6 +272,7 @@ else
 	protected async override void OnParametersSet()
 	{
 		await Connectors.SetConnectors(JS, Data, Auth);
+		await Msgs.CheckIfReConnnectionNeeded();
 
 		Guid ID = new Guid(IDString);
 		var character = Data.GetCharacterByID(ID);
@@ -223,24 +324,23 @@ else
 	{
 		CurrentlyShowing = section;
 		MovesOnScreen.Clear();
-		if(section == Sections.Basic)
+		if (section == Sections.Basic)
 		{
 			MovesOnScreen = Moves.AllMovements.Where(
-				x => 
+				x =>
 				x.TypeOfMovement == USMove.MovementTypes.BasicMovements
 			).ToList();
 			var lio = (USMove)Moves.GetMovement(USMoveIDs.B_LiberarPoder, Data.CurrentPlayerSheet.Archetype);
 
 			MovesOnScreen.Add(lio);
 
-			foreach(var upgraded in  Data.CurrentPlayerSheet.UpgradedMoves)
+			foreach (var upgraded in Data.CurrentPlayerSheet.UpgradedMoves)
 			{
 				var m = MovesOnScreen.Find(x => x.ID == upgraded);
 				if (m is not null) m.IsImproved = true;
 			}
-
 		}
-		else if(section == Sections.Cricle)
+		else if (section == Sections.Cricle)
 		{
 			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.FactionMovement).ToList();
 		}
@@ -248,17 +348,26 @@ else
 		{
 			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.DebtMovements).ToList();
 		}
-		else if (section == Sections.Debt)
+		else if (section == Sections.Drama)
 		{
-			MovesOnScreen = Moves.AllMovements.Where(x => 
+			MovesOnScreen = Moves.AllMovements.Where(x =>
 				x.TypeOfMovement == USMove.MovementTypes.DramaticMovement &&
 				x.Arquetipe == Data.CurrentPlayerSheet.Archetype
 			).ToList();
+			SelectedMovement = MovesOnScreen[0];
 		}
-		else if(section == Sections.Book)
+		else if (section == Sections.Book)
 		{
 			MovesOnScreen.Clear();
-			foreach(var m in Data.CurrentPlayerSheet.SelectedArchetypeMoves)
+			foreach (var m in Data.CurrentPlayerSheet.SelectedArchetypeMoves)
+			{
+				MovesOnScreen.Add((USMove)Moves.GetMovement(m));
+			}
+		}
+		else if (section == Sections.Corruption)
+		{
+			MovesOnScreen.Clear();
+			foreach (var m in Data.CurrentPlayerSheet.SelectedCorruptionMoves)
 			{
 				MovesOnScreen.Add((USMove)Moves.GetMovement(m));
 			}
@@ -287,6 +396,10 @@ else
 
 
 	private bool IsShowingMoveSelector = false;
+	private bool IsShowingArmor = false;
+	private bool IsShowingScars = false;
+	private bool IsShowingAdvances = false;
+	private bool IsShowingCorruptionAdvances = false;
 	private List<MovesPack> MovesToChooseFrom = new();
 	private MovesPack SelectedPack = new();
 
@@ -322,6 +435,36 @@ else
 		IsShowingMoveSelector = true;
 	}
 
+
+
+	private void OpenMovesSelectorForCorruption()
+	{
+		MovesToChooseFrom.Clear();
+
+		MovesPack pack = new();
+		pack.Tittle = Data.CurrentPlayerSheet.Archetype.ToUI();
+		pack.Moves = Moves.AllMovements.Where(x => x.Arquetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement).ToList();
+		MovesToChooseFrom.Add(pack);
+		SelectedPack = pack;
+
+		foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)).Cast<AvailableArchetypes>())
+		{
+			if (arc != AvailableArchetypes.All && arc != AvailableArchetypes.NotSet && arc != Data.CurrentPlayerSheet.Archetype)
+			{
+				var debug = arc.ToUI();
+				MovesToChooseFrom.Add(new MovesPack
+					{
+						Tittle = arc.ToUI(),
+						Moves = Moves.AllMovements.Where(x => 
+							x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement && 
+							x.Arquetipe == arc).ToList()
+					});
+			}
+		}
+
+		IsShowingMoveSelector = true;
+	}
+
 	private void CloseMovesSelector()
 	{
 		IsShowingMoveSelector = false;
@@ -349,6 +492,87 @@ else
 
 		IsShowingMoveSelector = false;
 		SectionSelected(CurrentlyShowing);
+	}
+
+	void ShowArmorEditor() => IsShowingArmor = true;
+	void HideArmorEditor() => IsShowingArmor = false;
+
+	void ShowScarEditor() => IsShowingScars = true;
+	void HideScarEditor() => IsShowingScars = false;
+
+	void ShowCircleAdvances() => IsShowingAdvances = true;
+	void HideCircleAdvances() => IsShowingAdvances = false;
+
+	void ShowCorruptionAdvances() => IsShowingCorruptionAdvances = true;
+	void HideCorruptionAdvances() => IsShowingCorruptionAdvances = false;
+
+	async Task ToggleScar(USAttributes attribute)
+	{
+		var now = Data.CurrentPlayerSheet.GetScar(attribute);
+		Data.CurrentPlayerSheet.SetScar(attribute, !now);
+
+		await Data.StoreCharacterSheet();
+		HideScarEditor();
+		Toaster.ShowInfo("Se ha marcado la cicatriz, se ha bajado el atributo y se han limpiado las heridas");
+	}
+
+	async Task ToggleAdvance(Advance adv, KindsOfAdvance kind)
+	{
+
+		if(kind == KindsOfAdvance.Normal)
+		{
+			adv.IsUsed = !adv.IsUsed;
+			Data.CurrentPlayerSheet.AdvancesNormalBools[adv.ID] = adv.IsUsed;
+		}
+		else if(kind == KindsOfAdvance.Extra)
+		{
+			int count = Data.CurrentPlayerSheet.AdvancesNormalBools.Count(x => x == true);
+			if (count < 5)
+				Toaster.ShowError("No puedes marcar un avance extra hasta que hayas hecho al menos 5 avances norales");
+			else
+			{
+				adv.IsUsed = !adv.IsUsed;
+				Data.CurrentPlayerSheet.AdvancesExtraBools[adv.ID] = adv.IsUsed;
+			}
+		}
+		else if(kind == KindsOfAdvance.Corruption)
+		{
+			adv.IsUsed = !adv.IsUsed;
+			Data.CurrentPlayerSheet.AdvancesCorruptionBools[adv.ID] = adv.IsUsed;
+		}
+
+		await Data.StoreCharacterSheet();
+	}
+	
+
+	async Task ArmorPlus()
+	{
+		Data.CurrentPlayerSheet.Armor ++;
+		await Data.StoreCharacterSheet();
+	}
+	async Task ArmorMinus()
+	{
+		Data.CurrentPlayerSheet.Armor--;
+		await Data.StoreCharacterSheet();
+	}
+
+	Random rnd = new();
+
+	async Task Roll2d6()
+	{
+		int d1 = 1 + rnd.Next(5);
+		int d2 = 1 + rnd.Next(5);
+		int bonus = 0;
+		string rollText = "";
+
+		int total = d1 + d2 + bonus;
+
+		await Msgs.SendMessage(new RollMessage
+			{
+				RollValue = total,
+				MoveID = USMoveIDs.raw2d6,
+				Message = $"{d1} + {d2}"
+			});
 	}
 
 }

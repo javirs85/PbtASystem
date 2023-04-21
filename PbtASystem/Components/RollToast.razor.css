@@ -1,0 +1,66 @@
+﻿.Red {
+    background: rgb(128,30,30);
+    background: linear-gradient(0deg, rgba(128,30,30,1) 0%, rgba(200,40,40,1) 100%);
+    border: 1px solid #EDA0A0;
+    color: white;
+}
+
+.Yellow {
+    background: rgb(156,83,30);
+    background: linear-gradient(0deg, rgba(156,83,30,1) 0%, rgba(227,118,16,1) 100%);
+    border: 1px solid #F0B47C;
+    color: white;
+}
+
+.Green {
+    background: rgb(24,72,35);
+    background: linear-gradient(0deg, rgba(24,72,35,1) 0%, rgba(19,118,41,1) 100%);
+    border: 1px solid #A0EDB1;
+    color:white;
+}
+
+.Golden {
+    background: rgb(231,142,104);
+    background: linear-gradient(0deg, rgba(231,142,104,1) 0%, rgba(249,198,68,1) 100%);
+    border: 1px solid #FAFF00;
+    color: black;
+}
+
+.Name{
+    font-weight:bold;
+    font-size: 20px;
+}
+.MoveName {
+    font-weight: 100;
+    opacity: 0.8;
+    font-size: 16px;
+    margin-top: -9px;
+}
+.RollText {
+    font-weight: normal;
+    font-size: 20px;
+}
+.Result {
+    font-weight: bold;
+    font-size: 32px;
+}
+.Outer{
+    margin-top:-6px;
+    height:150px;
+    position: relative;
+}
+.Upper{
+    display:flex;
+    flex-direction:column;
+    gap:-3px;
+}
+
+.CloseButton {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+    background-image: url('/imgs/Icons/Close.svg');
+    cursor: pointer;
+}

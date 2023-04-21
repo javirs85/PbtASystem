@@ -14,17 +14,23 @@
     background: var(--Darker);
 }
 
+.prevent-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
 .FullScreenModal {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 800;
     background-color: rgba(0,0,0,0.85);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: start;
     opacity: 1;
     pointer-events: all;
     transition: opacity 250ms ease;
@@ -44,11 +50,21 @@
     display: flex;
     background: black;
     padding: 30px;
+    padding-top: 0;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+.CloseButton {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+    background-image: url('/imgs/Icons/Close.svg');
+    cursor: pointer;
 }
 
 /*************************/
@@ -77,6 +93,7 @@
     opacity: 0.75;
     color: #ffffffb3;
     position: relative;
+    cursor:pointer;
 }
     .ArmorContainer div {
         position: relative;
@@ -162,9 +179,14 @@ button {
     margin: 10px;
 }
 
-.ExtraActions{
+.ExtraActions {
     padding: 20px;
 }
+.ExtraActions button{
+    border-radius:50px;
+    width: 70%;
+}
+
 .ExtraButton{
     background:var(--Lighter);
     cursor:pointer;

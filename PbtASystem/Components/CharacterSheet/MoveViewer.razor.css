@@ -75,9 +75,10 @@
 
 .TextContainer {
     display: flex;
+    align-items: center;
     flex-grow: 1;
     overflow: hidden;
-    gap:5px;
+    gap: 5px;
 }
 
 .TextTitle {
@@ -95,7 +96,10 @@
 .RollDetails {
     white-space: nowrap;
     overflow: hidden;
-    padding-right:5px;
+    padding-right: 5px;
+    opacity: 0.8;
+    font-size: 14px;
+    font-weight: 100;
 }
 
 .Innactive{
@@ -114,7 +118,7 @@
 
 .IsSelected {
     background: #30353A;
-    border: 1px solid #8D8D8D;
+    border: 1px solid #545454;
 }
 
 .MoveBody {    
@@ -148,7 +152,7 @@
 }
 
 .LIOBox {
-    border: 1px solid gray;
+    border: 1px solid #521010;
     padding: 5px;
     margin: 5px;
     background: black;
