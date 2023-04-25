@@ -4,65 +4,72 @@
 @inject FirebaseAuth Auth
 @inject FirebaseMessaging Messaging
 
-@if(Auth.IsUserConnected)
+@if (Auth.IsDoingInit)
 {
-	<div class="d-flex flex-column w-100">
-		<div>Selected character: @Data.PlayerCharacter.Name</div>
-		<div>Loged in player: @Auth.ConnectedUserName</div>
-		<div class="btn btn-primary" @onclick=Data.ForceDataRefresh>Force Update</div>
-		<div class="btn btn-primary" @onclick=Data.ClearDefaultCharacter>Forget default character</div>
-		<div class="btn btn-primary" @onclick=Auth.TryLogout>LogOut</div>
-		<div class="btn btn-primary" @onclick=TestMessage>TestMessg</div>
-		<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
+	<div class="InitializingCover w-100 h-100 d-flex align-items-center justify-content-center" style="position:fixed; top:0; left:0; right:0; bottom:auto;">
+		Inicializando ... 
 	</div>
 }
 else
-{
-	<div class="d-flex flex-column w-100">
-		<div>Selected character: @Data.PlayerCharacter.Name</div>
-		<div>Loged in player: @Auth.ConnectedUserName</div>
-		<div class="btn btn-primary" @onclick=Auth.TryLogin>Login</div>
-		<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
-		<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>
-		@if (isDefaultIDSet)
-		{
-			<div class="btn btn-primary" @onclick=Auth.LoginWithoutLogin>Start without login</div>
-		}
-		else
-		{
-			<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Choose character</div>
-		}
-	</div>
+{	
+	@if(Auth.IsUserConnected)
+	{
+		<div class="d-flex flex-column w-100">
+			<div>Selected character: @Data.PlayerCharacter.Name</div>
+			<div>Loged in player: @Auth.ConnectedUserName</div>
+			<div class="btn btn-primary" @onclick=Data.ForceDataRefresh>Force Update</div>
+			<div class="btn btn-primary" @onclick=Data.ClearDefaultCharacter>Forget default character</div>
+			<div class="btn btn-primary" @onclick=Auth.TryLogout>LogOut</div>
+			<div class="btn btn-primary" @onclick=TestMessage>TestMessg</div>
+			<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
+		</div>
+	}
+	else
+	{
+		<div class="d-flex flex-column w-100">
+			<div>Selected character: @Data.PlayerCharacter.Name</div>
+			<div>Loged in player: @Auth.ConnectedUserName</div>
+			<div class="btn btn-primary" @onclick=Auth.TryLogin>Login</div>
+			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
+			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>
+			@if (isDefaultIDSet)
+			{
+				<div class="btn btn-primary" @onclick=Auth.LoginWithoutLogin>Start without login</div>
+			}
+			else
+			{
+				<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Choose character</div>
+			}
+		</div>
 
-	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-body">
+		<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">
 					
-					<EditForm Model="Model">
-						<!-- Email input -->
-						<div class="d-flex flex-column mb-3">
-							<label class="text-secondary" for="form2Example1">Email address</label>
-							<InputText id="form2Example1" placeholder="mail@mail.com" type="mail" @bind-Value=Model.Mail />
-						</div>
+						<EditForm Model="Model">
+							<!-- Email input -->
+							<div class="d-flex flex-column mb-3">
+								<label class="text-secondary" for="form2Example1">Email address</label>
+								<InputText id="form2Example1" placeholder="mail@mail.com" type="mail" @bind-Value=Model.Mail />
+							</div>
 
-						<!-- Password input -->
-						<div class="d-flex flex-column">
-							<label class="text-secondary" for="form2Example2">Password</label>
-							<InputText type="password" placeholder="pass" @bind-Value=Model.Pass />
-						</div>
-					</EditForm>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=ConfirmModal>Save changes</button>
+							<!-- Password input -->
+							<div class="d-flex flex-column">
+								<label class="text-secondary" for="form2Example2">Password</label>
+								<InputText type="password" placeholder="pass" @bind-Value=Model.Pass />
+							</div>
+						</EditForm>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=ConfirmModal>Save changes</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	}
 }
-
-
 
 @code {
 	enum Mode {createLogin, DoLogin};

@@ -41,6 +41,44 @@
 		D_Spe_01, D_Spe_02, D_Spe_03,
 		D_Swo_01, D_Swo_02, D_Swo_03,
 		D_Imp_01, D_Imp_02, D_Imp_03,
+		U_Corr_01,
+		U_Corr_02,
+		U_Fae_01,
+		U_Fae_02,
+		U_Fae_03,
+		U_Fae_04,
+		U_Fae_05,
+		U_Imp_01,
+		U_Imp_02,
+		U_Ora_01,
+		U_Ora_02,
+		U_Mage_01,
+		U_Mage_02,
+		U_Mage_03,
+		U_Mage_04,
+		U_Mage_05,
+		U_Mage_06,
+		U_Mage_07,
+		U_Swo_01,
+		U_Swo_02,
+		U_Swo_03,
+		U_Swo_04,
+		U_Vamp_01,
+		U_Vamp_02,
+		U_Vamp_03,
+		U_Spec_01,
+		U_Spec_02,
+		U_Spec_03,
+		U_Spec_04,
+		U_Spec_05,
+		U_Spec_06,
+		U_Spec_07,
+		U_Spec_08,
+		U_Vet_01,
+		U_Vet_02,
+		U_Awa_01,
+		U_Awa_02,
+		U_Awa_03,
 	}
 
 	public class USMove : BaseMovement<USMoveIDs, USAttributes>
@@ -50,11 +88,15 @@
 			Tittle = "No title";
 		}
 
-		public enum MovementTypes { NotSet, ArquetipeMovement, FactionMovement, CorruptionMovement, DramaticMovement, DebtMovements, BasicMovements }
+		public enum MovementTypes { NotSet, ArchetipeMovement, FactionMovement, CorruptionMovement, DramaticMovement, DebtMovements, BasicMovements,
+			UniqueMove,
+			MageMagic,
+			FaeMagic
+		}
 
 		public bool IsImproved { get; set; } = false;
 		public MovementTypes TypeOfMovement = MovementTypes.NotSet;
-		public AvailableArchetypes Arquetipe = AvailableArchetypes.All;
+		public AvailableArchetypes Archetipe = AvailableArchetypes.All;
 		public bool IsSelected { get; set; } = false;
 		public bool TicksCircle { get; set; } = false;
 

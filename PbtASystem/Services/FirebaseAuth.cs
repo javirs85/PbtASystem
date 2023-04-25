@@ -106,6 +106,7 @@ public class FirebaseAuth
             IsConnectedViaGoogle = false;
 
 			Toaster.ShowInfo("User disconnected");
+            IsDoingInit = false;
         }
         else
         {
@@ -114,10 +115,13 @@ public class FirebaseAuth
             DB.ConnectedPlaerIDLocalCopyDoNotUse = newName;
 
 			DB.SetDefaultCharacterToCurrentPlayer(ConnectedUserName);
+            IsDoingInit = false;
 		}
 
         UserChanged?.Invoke(this, ConnectedUserName);
     }
+
+    public bool IsDoingInit = true;
 
     public void UpdateMasterID(string chronicleMasterID)
     {

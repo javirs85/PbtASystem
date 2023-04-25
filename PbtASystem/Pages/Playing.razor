@@ -70,10 +70,28 @@
 			<div class="MovesButton @(CurrentlyShowing == Sections.Drama?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Drama))>Drama</div>
 		</div>
 		<div class="MovesArea d-flex flex-column gap-2 p-2">
-			@foreach(var Mov in MovesOnScreen)
+			
+			@if(CurrentlyShowing == Sections.Book)
 			{
-				<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov))/>
+				<div>Movimientos seleccionados</div>
+				@foreach (var Mov in MovesOnScreen)
+				{
+					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) />
+				}
+				<div>@Data.CurrentPlayerSheet.Archetype.ToUI()</div>
+				@foreach(var Mov in UniqueMovesOnScreen)
+				{
+					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) />
+				}
 			}
+			else
+			{
+				@foreach (var Mov in MovesOnScreen)
+				{
+					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov))/>
+				}
+			}
+			
 			@if(CurrentlyShowing == Sections.Book)
 			{
 				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForBooks>Cambiar movimientos de Libreto</button>
@@ -82,17 +100,40 @@
 			{
 				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForCorruption>Cambiar movimientos de corrupción</button>
 			}
+			@if(CurrentlyShowing == Sections.Debt)
+			{
+				<div class="ms-1 opacity-75">Deudas a pagar</div>
+				@foreach(var debt in Data.AllDebts.Where(x=>x.PayingID == Data.CurrentCharacter.ID))
+				{
+					<div class="ms-3">@debt.Amount a @Data.GetCharacterByID(debt.ReceivingID).Name</div>
+				}
+				<div class="ms-1 opacity-75">Deudas a cobrar</div>
+				@foreach (var debt in Data.AllDebts.Where(x => x.ReceivingID == Data.CurrentCharacter.ID))
+				{
+					<div class="ms-3">@debt.Amount de @Data.GetCharacterByID(debt.PayingID).Name</div>
+				}
+
+				<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");})>Gestonar deudas</button>
+			}
 		</div>
 
 		<div class="ExtraActions d-flex flex-column align-items-center">
 			<button class="btn btn-outline-light align-items-center" @onclick=Roll2d6>2d6</button>
-			<button class="btn btn-outline-light align-items-center">Detalles del @Data.CurrentPlayerSheet.Archetype.ToUI()</button>
+			@if(Data.CurrentPlayerSheet.ArchetypeUniqueTittle1 != "")
+			{
+				<button class="btn btn-outline-light align-items-center" @onclick=ShowUnique1>@Data.CurrentPlayerSheet.ArchetypeUniqueTittle1</button>
+			}
+			@if (Data.CurrentPlayerSheet.ArchetypeUniqueTittle2 != "")
+			{
+				<button class="btn btn-outline-light align-items-center" @onclick=ShowUnique2>@Data.CurrentPlayerSheet.ArchetypeUniqueTittle2</button>
+			}
+			
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCircleAdvances>Mejoras por Círculos</button>
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCorruptionAdvances>Mejoras por Corrupción</button>
 		</div>
 	</div>
 
-	<!--Moda for electing moves to add-->
+	<!--Modal for selecting moves to add-->
 	<div class="FullScreenModal ModalTop d-flex flex-column @(IsShowingMoveSelector?"":"HideModal")" @onclick=CloseMovesSelector>
 		<div class="w-100 d-flex justify-content-end p-2">
 			<img src="/imgs/Icons/Close.svg" style="cursor: pointer;"/>
@@ -110,7 +151,7 @@
 							 </div>
 							
 						</h2>
-						<div id="flush-collapseOne-@pack.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(pack.Moves[0].Arquetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+						<div id="flush-collapseOne-@pack.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(pack.Moves[0].Archetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
 							<div class="Darker d-flex flex-column flex-column gap-2">
 								@foreach (var mov in pack.Moves)
 								{
@@ -121,14 +162,56 @@
 										SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})"/>
 								}
 							</div>
-						</div>
-						
+						</div>						
 					</div>
 				}
+				<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(MageMagic == SelectedPack?"":"DarkAccordionNotSelected")">
+					<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne">
+						<div data-bs-toggle="collapse"
+							data-bs-target="#flush-collapseOne-@MageMagic.Tittle.Replace(' ', '_')"
+						 @onclick=@(_ =>{SelectedPack = MageMagic;})>
+							@MageMagic.Tittle
+						</div>
+
+					</h2>
+					<div id="flush-collapseOne-@MageMagic.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(MageMagic.Moves[0].Archetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+						<div class="Darker d-flex flex-column flex-column gap-2">
+							@foreach (var mov in MageMagic.Moves)
+							{
+								<MoveViewer ID="mov.ID"
+									IsSelected=IsThisMoveSelected(mov)
+									IsSelectionMode=true
+									Clicked=@(_ => Select(mov))
+									SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})" />
+							}
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(FaeMagic == SelectedPack?"":"DarkAccordionNotSelected")">
+					<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne">
+						<div data-bs-toggle="collapse"
+		   data-bs-target="#flush-collapseOne-@FaeMagic.Tittle.Replace(' ', '_')"
+						 @onclick=@(_ =>{SelectedPack = FaeMagic;})>
+							@FaeMagic.Tittle
+						</div>
+
+					</h2>
+					<div id="flush-collapseOne-@FaeMagic.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(FaeMagic.Moves[0].Archetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+						<div class="Darker d-flex flex-column flex-column gap-2">
+							@foreach (var mov in FaeMagic.Moves)
+							{
+								<MoveViewer ID="mov.ID"
+									IsSelected=IsThisMoveSelected(mov)
+									IsSelectionMode=true
+									Clicked=@(_ => Select(mov))
+									SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})" />
+							}
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-
 
 	<!-- Armor editor -->
 	<div class="FullScreenModal d-flex flex-column justify-content-center @(IsShowingArmor?"":"HideModal")" @onclick=HideArmorEditor>
@@ -209,12 +292,81 @@
 	<div class="FullScreenModal d-flex flex-column justify-content-center @(IsShowingCorruptionAdvances?"":"HideModal")" @onclick=HideCorruptionAdvances>
 		<div class="CloseButton"></div>
 		<div class="ModalBody Darker" style="width: 80%; background: #1C1E20; padding: 15px;" @onclick:stopPropagation=true>
-			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
-				<div class="py-3 pb-5" style="font-size:16px; font-weight:bold;">Avances de corrupción</div>
+			<div class="d-flex flex-column align-items-center justify-content-start mb-3 w-100 h-100">
+				<div class="py-3 pb-4" style="font-size:16px; font-weight:bold;">Avances de corrupción</div>
 				<div class="flex-grow-1 d-flex flex-column w-100 gap-4">
 					@foreach (var advance in Data.CurrentPlayerSheet.AdvancesCorruptions)
 					{
 						<AdvanceViewer Advance=advance />
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Unique1	-->
+	<div class="FullScreenModal d-flex flex-column justify-content-start h-100 @(IsShowingUnique1?"":"HideModal")" @onclick=HideUnique1>
+		<div class="CloseButton"></div>
+		<div class="ModalBody Darker" style="width:90%; background:#1C1E20; padding:0; max-height:100%; margin: auto;" @onclick:stopPropagation=true>
+			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
+				<div class="flex-grow-1 d-flex flex-column w-100">
+					@if(IsEditingUnique1 == false)
+					{
+						<div class="ps-4 pb-4">
+							<div class="pt-3 mt-2 d-flex justify-content-start mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
+								@Data.CurrentPlayerSheet.ArchetypeUniqueTittle1
+								<img src="/imgs/Icons/Edit.svg" style="cursor: pointer;" @onclick=EditUnique1 />
+							</div>
+							<div>
+								<DecodedString Value=@Data.CurrentPlayerSheet.ArchetypeUniqueBody1 />
+							</div>
+						</div>
+					}
+					else
+					{
+						<div class="pt-3 ps-4 d-flex justify-content-between mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
+							@Data.CurrentPlayerSheet.ArchetypeUniqueTittle1
+							<img src="/imgs/Icons/Tick.svg" style="cursor: pointer;" @onclick=ConfirmEditUnique1 />
+						</div>
+						<div>
+							<EditForm Model="Data.CurrentPlayerSheet">
+								<InputTextArea style="width:100%; min-height:400px;" @bind-Value=Data.CurrentPlayerSheet.ArchetypeUniqueBody1 />
+							</EditForm>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal Unique2	-->
+	<div class="FullScreenModal d-flex flex-column justify-content-start h-100 @(IsShowingUnique2?"":"HideModal")" @onclick=HideUnique2>
+		<div class="CloseButton"></div>
+		<div class="ModalBody Darker" style="width:90%; background:#1C1E20; padding:0; max-height:100%; margin: auto;" @onclick:stopPropagation=true>
+			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
+				<div class="flex-grow-1 d-flex flex-column w-100">
+					@if (IsEditingUnique2 == false)
+					{
+						<div class="ps-4 pb-4">
+							<div class="pt-3 mt-2 d-flex justify-content-start mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
+								@Data.CurrentPlayerSheet.ArchetypeUniqueTittle2
+								<img src="/imgs/Icons/Edit.svg" style="cursor: pointer;" @onclick=EditUnique2 />
+							</div>
+							<div>
+								<DecodedString Value=@Data.CurrentPlayerSheet.ArchetypeUniqueBody2 />
+							</div>
+						</div>
+					}
+					else
+					{
+						<div class="pt-3 ps-4 d-flex justify-content-between mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
+							@Data.CurrentPlayerSheet.ArchetypeUniqueTittle2
+							<img src="/imgs/Icons/Tick.svg" style="cursor: pointer;" @onclick=ConfirmEditUnique2 />
+						</div>
+						<div>
+							<EditForm Model="Data.CurrentPlayerSheet">
+								<InputTextArea style="width:100%; min-height:400px;" @bind-Value=Data.CurrentPlayerSheet.ArchetypeUniqueBody2 />
+							</EditForm>
+						</div>
 					}
 				</div>
 			</div>
@@ -257,12 +409,19 @@ else
 
 
 @code {
-	[Parameter] public string IDString { get; set; } = "";
-	string NoSheetButtonText = "";
-	string ErrorMessage = "";
-	USMove? SelectedMovement = null;
+		[Parameter] public string IDString { get; set; } = "";
+		string NoSheetButtonText = "";
+		string ErrorMessage = "";
+		USMove? SelectedMovement = null;
 	private List<USMove> MovesOnScreen = new();
+	private List<USMove> UniqueMovesOnScreen = new();
+	private List<Debt> DebtsToPay = new();
+	private List<Debt> DebtsToBePaid = new();
+
 	USMove LIO;
+
+	MovesPack FaeMagic = new();
+	MovesPack MageMagic = new();
 
 	private bool IsSheetReady = false;
 
@@ -276,6 +435,8 @@ else
 
 		Guid ID = new Guid(IDString);
 		var character = Data.GetCharacterByID(ID);
+		Data.CurrentCharacter = character;
+
 		var Map = Data.Chronicle.PlayerLinks.Find(x => x.CharacterID == ID);
 		if (Map is null)
 		{
@@ -292,6 +453,7 @@ else
 		if (await Data.CheckIfSheetExists((SheetID)))
 		{
 			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID(SheetID);
+			if (Data.CurrentPlayerSheet.ArchetypeUniqueTittle1 == "") Data.CurrentPlayerSheet.InitArchetypeUnique();
 			IsSheetReady = true;
 		}
 		else
@@ -302,6 +464,12 @@ else
 			ErrorMessage = $"The character {IDString} has no Sheeet associated";
 			return;
 		}
+
+		MageMagic.Moves = Moves.AllMovements.Where(mov => mov.TypeOfMovement == USMove.MovementTypes.MageMagic).ToList();
+		MageMagic.Tittle = "Magia de magos";
+		FaeMagic.Moves = Moves.AllMovements.Where(mov => mov.TypeOfMovement == USMove.MovementTypes.FaeMagic).ToList();
+		FaeMagic.Tittle = "Magia de Hadas";
+
 
 		SectionSelected(Sections.Basic);
 
@@ -324,6 +492,7 @@ else
 	{
 		CurrentlyShowing = section;
 		MovesOnScreen.Clear();
+		UniqueMovesOnScreen.Clear();
 		if (section == Sections.Basic)
 		{
 			MovesOnScreen = Moves.AllMovements.Where(
@@ -339,6 +508,7 @@ else
 				var m = MovesOnScreen.Find(x => x.ID == upgraded);
 				if (m is not null) m.IsImproved = true;
 			}
+
 		}
 		else if (section == Sections.Cricle)
 		{
@@ -347,12 +517,14 @@ else
 		else if (section == Sections.Debt)
 		{
 			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.DebtMovements).ToList();
+			DebtsToPay.Clear();
+			DebtsToPay = Data.AllDebts.Where(x => x.PayingID == Data.CurrentCharacter.ID).ToList();
 		}
 		else if (section == Sections.Drama)
 		{
 			MovesOnScreen = Moves.AllMovements.Where(x =>
 				x.TypeOfMovement == USMove.MovementTypes.DramaticMovement &&
-				x.Arquetipe == Data.CurrentPlayerSheet.Archetype
+				x.Archetipe == Data.CurrentPlayerSheet.Archetype
 			).ToList();
 			SelectedMovement = MovesOnScreen[0];
 		}
@@ -362,6 +534,14 @@ else
 			foreach (var m in Data.CurrentPlayerSheet.SelectedArchetypeMoves)
 			{
 				MovesOnScreen.Add((USMove)Moves.GetMovement(m));
+			}
+
+			foreach (var m in from mov in Moves.AllMovements where 
+								mov.TypeOfMovement == USMove.MovementTypes.UniqueMove && 
+								mov.Archetipe == Data.CurrentPlayerSheet.Archetype 
+									select mov.ID)
+			{
+				UniqueMovesOnScreen.Add((USMove)Moves.GetMovement(m));				
 			}
 		}
 		else if (section == Sections.Corruption)
@@ -399,6 +579,8 @@ else
 	private bool IsShowingArmor = false;
 	private bool IsShowingScars = false;
 	private bool IsShowingAdvances = false;
+	private bool IsShowingUnique1 = false;
+	private bool IsShowingUnique2 = false;
 	private bool IsShowingCorruptionAdvances = false;
 	private List<MovesPack> MovesToChooseFrom = new();
 	private MovesPack SelectedPack = new();
@@ -415,7 +597,7 @@ else
 
 		MovesPack pack = new();
 		pack.Tittle = Data.CurrentPlayerSheet.Archetype.ToUI();
-		pack.Moves = Moves.AllMovements.Where(x => x.Arquetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.ArquetipeMovement).ToList();
+		pack.Moves = Moves.AllMovements.Where(x => x.Archetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement).ToList();
 		MovesToChooseFrom.Add(pack);
 		SelectedPack = pack;
 
@@ -427,7 +609,7 @@ else
 				MovesToChooseFrom.Add(new MovesPack
 					{
 						Tittle = arc.ToUI(),
-						Moves = Moves.AllMovements.Where(x=>x.TypeOfMovement == USMove.MovementTypes.ArquetipeMovement && x.Arquetipe == arc).ToList()
+						Moves = Moves.AllMovements.Where(x=>x.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement && x.Archetipe == arc).ToList()
 					});
 			}
 		}
@@ -443,7 +625,7 @@ else
 
 		MovesPack pack = new();
 		pack.Tittle = Data.CurrentPlayerSheet.Archetype.ToUI();
-		pack.Moves = Moves.AllMovements.Where(x => x.Arquetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement).ToList();
+		pack.Moves = Moves.AllMovements.Where(x => x.Archetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement).ToList();
 		MovesToChooseFrom.Add(pack);
 		SelectedPack = pack;
 
@@ -457,7 +639,7 @@ else
 						Tittle = arc.ToUI(),
 						Moves = Moves.AllMovements.Where(x => 
 							x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement && 
-							x.Arquetipe == arc).ToList()
+							x.Archetipe == arc).ToList()
 					});
 			}
 		}
@@ -474,7 +656,7 @@ else
 	{
 		var sheet = Data.CurrentPlayerSheet;
 
-		if (mov.TypeOfMovement == USMove.MovementTypes.ArquetipeMovement)
+		if (mov.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement)
 		{
 			if (sheet.SelectedArchetypeMoves.Contains(mov.ID))
 				sheet.SelectedArchetypeMoves.Remove(mov.ID);
@@ -505,6 +687,28 @@ else
 
 	void ShowCorruptionAdvances() => IsShowingCorruptionAdvances = true;
 	void HideCorruptionAdvances() => IsShowingCorruptionAdvances = false;
+
+	void ShowUnique1() => IsShowingUnique1 = true;
+	void HideUnique1(){ IsShowingUnique1 = false; IsEditingUnique1 = false;	}
+
+	void ShowUnique2() => IsShowingUnique2 = true;
+	void HideUnique2() { IsShowingUnique2 = false; IsEditingUnique2 = false; }
+
+	bool IsEditingUnique1 = false;
+	void EditUnique1() => IsEditingUnique1 = true;
+	async Task ConfirmEditUnique1()
+	{
+		IsEditingUnique1 = false;
+		await Data.StoreCharacterSheet();
+	}
+
+	bool IsEditingUnique2 = false;
+	void EditUnique2() => IsEditingUnique2 = true;
+	async Task ConfirmEditUnique2()
+	{
+		IsEditingUnique2 = false;
+		await Data.StoreCharacterSheet();
+	}
 
 	async Task ToggleScar(USAttributes attribute)
 	{

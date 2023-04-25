@@ -22,7 +22,7 @@ namespace PbtASystem.Services
 				await Data.StablishJSConnector(FirebaseJSRef);
 			}
 
-			if (Data != null && Data.AllCharacters.Count == 0)
+			if (Data != null && Data.AllCharacters != null &&  Data.AllCharacters.Count == 0)
 				await Data.LoadAllAsync();
 
 			if (Data != null && Data.Chronicle.Name == "")
