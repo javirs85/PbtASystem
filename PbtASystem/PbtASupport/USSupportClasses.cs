@@ -25,19 +25,12 @@ public class Character
 	public string Kind { get; set; } = "Noy set";
 	public Circles Circle { get; set; } = Circles.NotSet;
 	public Guid? FactionID { get; set; } = null;
-	public string Motivation { get; set; } = "motivacion";
 	public string Aspecto { get; set; } = "aspecto";
 	public string Tick { get; set; } = "tick";
 	public string FinalGoal { get; set; } = "";
 	public string CurrentGoal { get; set; } = "";
 	public string MasterSeeds { get; set; } = "";
-	public string LIO1 { get; set; } = "";
-	public string LIO2 { get; set; } = "";
-	public string LIO3 { get; set; } = "";
-	public string LIO4 { get; set; } = "";
-	public string IntimacyMovement { get; set; } = "";
-	public string CorruptionMovement { get; set; } = "";
-	public List<QandA> InitialQuestions { get; set; } = new();
+	
 
 	public Character Duplicate()
 	{
