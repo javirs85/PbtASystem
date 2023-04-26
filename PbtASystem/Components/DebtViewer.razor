@@ -3,7 +3,7 @@
 		<div class="TheOther" @onclick=ChooseCharacter>@TheOtherName</div>
 		<div class="Amount d-flex justify-content-center" @onclick=AddOneToDebt>@Debt.Amount</div>
 	</div>
-	<div class="DebtMain flex-grow-1" @onclick=@(()=>{Navigation.NavigateTo($"/DebEdit/{Debt.ID}");})>
+	<div class="DebtMain flex-grow-1" @onclick=@(()=>{Navigation.NavigateTo($"DebEdit/{Debt.ID}");})>
 		@Debt.Reason
 	</div>
 	<div class="ClossingButton" @onclick=RemoveOneDebt>

@@ -29,7 +29,7 @@
 											</div>
 										</div>
 										<div class="d-block d-md-none">
-											<div class="ImageButton" @onclick=@(()=>{Navigation.NavigateTo("/Select");})>
+											<div class="ImageButton" @onclick=@(()=>{Navigation.NavigateTo("Select");})>
 												<i class="bi bi-arrow-left BackButton"  />
 											</div>
 										</div>
@@ -137,7 +137,7 @@
 
 	private void Edit()
 	{
-		Navigation.NavigateTo($"/EditCharacter/{Data.CurrentCharacter.ID}");
+		Navigation.NavigateTo($"EditCharacter/{Data.CurrentCharacter.ID}");
 	}
 
 	private async Task Delete()	
@@ -146,7 +146,7 @@
 		if (Confirmed)
 		{
 			var friend = await Data.DeleteCharacter(Data.CurrentCharacter);
-			Navigation.NavigateTo($"/Character/{friend.ID}");
+			Navigation.NavigateTo($"Character/{friend.ID}");
 		}
 	}
 

@@ -21,7 +21,7 @@
 		@foreach(var faction in DB.AllFactions.Where(x=>x.Circle == DB.CurrentCircle))
 		{
 			<div class="PhoneMenuFactionBox">
-				<div class="PhoneMenuFactionHeader" @onclick=@(async ()=>{ Navigation.NavigateTo($"/Faction/{faction.ID.ToString()}");})>
+				<div class="PhoneMenuFactionHeader" @onclick=@(async ()=>{ Navigation.NavigateTo($"Faction/{faction.ID.ToString()}");})>
 					<div>
 					@faction.Name
 					</div>
@@ -31,7 +31,7 @@
 				</div>
 				@foreach (var ch in DB.GetMembersOfFaction(faction))
 				{
-					<div class="PhoneMenuItemButton @IsSelected(ch)" @onclick=@(()=>{Navigation.NavigateTo($"/Character/{ch.ID.ToString()}");})>
+					<div class="PhoneMenuItemButton @IsSelected(ch)" @onclick=@(()=>{Navigation.NavigateTo($"Character/{ch.ID.ToString()}");})>
 						@ch.Name
 					</div>
 				}
@@ -78,7 +78,7 @@
 	{
 		var ch = await DB.CreatePlayerAtFaction(fac);
 		await CharacterSelected.InvokeAsync(ch);
-		Navigation.NavigateTo($"/Character/{ch.ID}");
+		Navigation.NavigateTo($"Character/{ch.ID}");
 	}
 
 	async Task CreateFaction()

@@ -34,11 +34,11 @@
 			</div>
 			<div class="d-flex CorruptionArea gap-2">
 				<div style="opacity: 0.25;">CORRUPCIÓN</div>
-				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 1?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(1))/></div>
-				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 2?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(2)) /></div>
-				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 3?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(3)) /></div>
-				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 4?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(4)) /></div>
-				<div><img src="/imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 5?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(5)) /></div>
+				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 1?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(1)) /></div>
+				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 2?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(2)) /></div>
+				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 3?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(3)) /></div>
+				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 4?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(4)) /></div>
+				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 5?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(5)) /></div>
 			</div>
 			<div class="d-flex align-items-center justify-content-center DamageArea gap-2">
 				<div class="ArmorContainer" @onclick=ShowArmorEditor>
@@ -57,7 +57,7 @@
 					<div class="Wound HardInner @(Data.CurrentPlayerSheet.Damage > 4?"WoundMark":"")" @onclick=@(_ => WoundClicked(5))></div>
 				</div>
 				<div class="KnifeButton">
-					<img src="/imgs/Icons/Knife.png" @onclick=ShowScarEditor/>
+					<img src="imgs/Icons/Knife.png" @onclick=ShowScarEditor/>
 				</div>
 			</div>
 		</div>
@@ -113,7 +113,7 @@
 					<div class="ms-3">@debt.Amount de @Data.GetCharacterByID(debt.PayingID).Name</div>
 				}
 
-				<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");})>Gestonar deudas</button>
+				<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");})>Gestonar deudas</button>
 			}
 		</div>
 
@@ -136,7 +136,7 @@
 	<!--Modal for selecting moves to add-->
 	<div class="FullScreenModal ModalTop d-flex flex-column @(IsShowingMoveSelector?"":"HideModal")" @onclick=CloseMovesSelector>
 		<div class="w-100 d-flex justify-content-end p-2">
-			<img src="/imgs/Icons/Close.svg" style="cursor: pointer;"/>
+			<img src="imgs/Icons/Close.svg" style="cursor: pointer;"/>
 		</div>
 		<div class="ModalBody w-100">
 			<div class="accordion accordion-flush w-100 DarkAccordion" @onclick:stopPropagation=true id="accordionFlushExample">
@@ -221,9 +221,9 @@
 				<div class="pt-3" style="font-size:16px; font-weight:bold;">Armadura</div>
 				<div class="flex-grow-1 d-flex flex-column justify-content-center">
 					<div class="d-flex justify-content-center align-items-center gap-2">
-						<img src="/imgs/Icons/Down.svg" @onclick=ArmorMinus />
+						<img src="imgs/Icons/Down.svg" @onclick=ArmorMinus />
 						<div style="font-size: 30px; font-weight:bold;">@Data.CurrentPlayerSheet.Armor</div>
-						<img src="/imgs/Icons/Up.svg" @onclick=ArmorPlus />
+						<img src="imgs/Icons/Up.svg" @onclick=ArmorPlus />
 					</div>
 				</div>
 			</div>
@@ -315,7 +315,7 @@
 						<div class="ps-4 pb-4">
 							<div class="pt-3 mt-2 d-flex justify-content-start mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
 								@Data.CurrentPlayerSheet.ArchetypeUniqueTittle1
-								<img src="/imgs/Icons/Edit.svg" style="cursor: pointer;" @onclick=EditUnique1 />
+								<img src="imgs/Icons/Edit.svg" style="cursor: pointer;" @onclick=EditUnique1 />
 							</div>
 							<div>
 								<DecodedString Value=@Data.CurrentPlayerSheet.ArchetypeUniqueBody1 />
@@ -326,7 +326,7 @@
 					{
 						<div class="pt-3 ps-4 d-flex justify-content-between mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
 							@Data.CurrentPlayerSheet.ArchetypeUniqueTittle1
-							<img src="/imgs/Icons/Tick.svg" style="cursor: pointer;" @onclick=ConfirmEditUnique1 />
+							<img src="imgs/Icons/Tick.svg" style="cursor: pointer;" @onclick=ConfirmEditUnique1 />
 						</div>
 						<div>
 							<EditForm Model="Data.CurrentPlayerSheet">
@@ -349,7 +349,7 @@
 						<div class="ps-4 pb-4">
 							<div class="pt-3 mt-2 d-flex justify-content-start mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
 								@Data.CurrentPlayerSheet.ArchetypeUniqueTittle2
-								<img src="/imgs/Icons/Edit.svg" style="cursor: pointer;" @onclick=EditUnique2 />
+								<img src="imgs/Icons/Edit.svg" style="cursor: pointer;" @onclick=EditUnique2 />
 							</div>
 							<div>
 								<DecodedString Value=@Data.CurrentPlayerSheet.ArchetypeUniqueBody2 />
@@ -360,7 +360,7 @@
 					{
 						<div class="pt-3 ps-4 d-flex justify-content-between mb-2" style="font-size:16px; font-weight:bold; margin-left:-10px;">
 							@Data.CurrentPlayerSheet.ArchetypeUniqueTittle2
-							<img src="/imgs/Icons/Tick.svg" style="cursor: pointer;" @onclick=ConfirmEditUnique2 />
+							<img src="imgs/Icons/Tick.svg" style="cursor: pointer;" @onclick=ConfirmEditUnique2 />
 						</div>
 						<div>
 							<EditForm Model="Data.CurrentPlayerSheet">

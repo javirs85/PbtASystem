@@ -17,13 +17,13 @@
 			}			
 		</div>
 		<div class="ImagesContainer">
-			<img src="/imgs/Icons/UpgradedArrow.png" class="@(Move.IsImproved?"":"Hidden")" />
-			<img src="/imgs/Icons/TicksCircleIcon.png" class="@(Move.TicksCircle?"":"Hidden")"/>
+			<img src="imgs/Icons/UpgradedArrow.png" class="@(Move.IsImproved?"":"Hidden")" />
+			<img src="imgs/Icons/TicksCircleIcon.png" class="@(Move.TicksCircle?"":"Hidden")"/>
 			@if (!IsSelectionMode)
 			{
 				if(Move.HasRoll())
 				{
-					<img class="DiceButton" src="/imgs/Icons/Dice.svg" @onclick=@(async ()=>{await Roll();}) @onclick:stopPropagation=true/>
+					<img class="DiceButton" src="imgs/Icons/Dice.svg" @onclick=@(async ()=>{await Roll();}) @onclick:stopPropagation=true/>
 				}	
 			}
 			else
@@ -31,11 +31,11 @@
 				@if(Data.CurrentPlayerSheet.SelectedArchetypeMoves.Contains(Move.ID) || 
 					Data.CurrentPlayerSheet.SelectedCorruptionMoves.Contains(Move.ID))
 				{
-					<img src="/imgs/Icons/Remove.svg" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);}) />
+					<img src="imgs/Icons/Remove.svg" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);}) />
 				}
 				else
 				{
-					<img src="/imgs/Icons/Add.svg" style="opacity: 0.75;" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);})/>
+					<img src="imgs/Icons/Add.svg" style="opacity: 0.75;" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);})/>
 				}
 			}
 		</div>
@@ -55,7 +55,7 @@
 			</div>
 
 			<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
-				<div class="px-2"><img src="/imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
+				<div class="px-2"><img src="imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
 				<div class="AdvancedMainText">
 					<DecodedString Value="@Move.AvancedConsequences.MainText" />
 					@if (Move.AvancedConsequences.Options != null)
@@ -132,7 +132,7 @@
 			@if (Move.TypeOfMovement == USMove.MovementTypes.BasicMovements)
 			{
 				<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
-					<div class="px-2"><img src="/imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
+					<div class="px-2"><img src="imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
 					<div class="AdvancedMainText">
 						<DecodedString Value="@Move.AvancedConsequences.MainText" />
 						@if (Move.AvancedConsequences.Options != null)
@@ -160,7 +160,7 @@
 		<div class="d-flex gap-2">
 			<button class="btn btn-outline-light" @onclick=MakeMoveNOTAdvanced @onclick:stopPropagation=true>Movimiento normal</button>
 			<button class="btn btn-outline-light" @onclick=MakeMoveAdvanced @onclick:stopPropagation=true>
-				<img src="/imgs/Icons/UpgradedArrow.png"/> Avanzado
+				<img src="imgs/Icons/UpgradedArrow.png"/> Avanzado
 				</button>
 		</div>		
 	</div>

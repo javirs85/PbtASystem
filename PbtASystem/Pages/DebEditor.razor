@@ -79,12 +79,12 @@
 	private void Cancel()
 	{
 		Debt = Original;
-		Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");
+		Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");
 	}
 
 	private async Task Submit()
 	{
 		await Data.StoreDebt(Debt);
-		Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");
+		Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");
 	}
 }

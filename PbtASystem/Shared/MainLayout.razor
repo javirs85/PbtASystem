@@ -43,6 +43,12 @@
 	protected async override Task OnParametersSetAsync()
 	{
 		await Connectors.SetConnectors(JS, Data, Auth);
+		#if DEBUG
+			URLSupport.IsRelease = false;
+		#else
+			URLSupport.IsRelease = true;
+		#endif
+		
 	}
 
 	private void NavigateToRootAndDisconnect(object? sender, EventArgs e)

@@ -16,8 +16,8 @@
                     data-bs-target="#navbarNavAltMarkup" 
                     aria-current="page"
                     style="cursor:pointer"
-                   @onclick=@(()=>{Navigation.NavigateTo("/");})
-                    href="/Meta">
+                   @onclick=@(()=>{Navigation.NavigateTo("Meta");})
+                    >
                     Meta
                 </a>
                 <a class="nav-link  @GetActive("Playing")"
@@ -42,6 +42,7 @@
 </nav>
 
 @code{
+
     private string Top
     {
         get
@@ -60,10 +61,10 @@
     {
         if(Data.PlayerCharacter.Circle != Circles.NotSet)
         {
-            Navigation.NavigateTo("/Character/"+Data.PlayerCharacter.ID.ToString());
+            Navigation.NavigateTo($"Character/" + Data.PlayerCharacter.ID.ToString());
         }
         else
-            Navigation.NavigateTo("/Select");
+            Navigation.NavigateTo($"Select");
     }
 
     private void GoToPlay()
@@ -75,7 +76,7 @@
         else
         {
             Data.CurrentCharacter = Data.PlayerCharacter;
-            Navigation.NavigateTo($"/Playing/{Data.PlayerCharacter.ID}");
+            Navigation.NavigateTo($"Playing/{Data.PlayerCharacter.ID}");
         }
     }
 

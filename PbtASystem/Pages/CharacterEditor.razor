@@ -150,13 +150,13 @@
 	private async Task Submit()
 	{
 		await Data.StoreCharacter(Character);
-		Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");
+		Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");
 	}
 
 	private async Task Dismiss()
 	{
 		Character = Backup;
 		await Data.StoreImageBase64(OriginalImage, Data.CurrentCharacter.ID);
-		Navigation.NavigateTo($"/Character/{Data.CurrentCharacter.ID}");
+		Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");
 	}
 }
