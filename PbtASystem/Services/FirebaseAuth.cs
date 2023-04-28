@@ -110,7 +110,7 @@ public class FirebaseAuth
         }
         else
         {
-            Toaster.ShowSuccess($"{newName} is connected");
+            //Toaster.ShowSuccess($"{newName} is connected");
             IsConnectedViaGoogle = true;
             DB.ConnectedPlaerIDLocalCopyDoNotUse = newName;
 

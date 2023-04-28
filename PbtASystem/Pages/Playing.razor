@@ -76,19 +76,19 @@
 				<div>Movimientos seleccionados</div>
 				@foreach (var Mov in MovesOnScreen)
 				{
-					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) />
+					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) ForceUpdate="Update" />
 				}
 				<div>@Data.CurrentPlayerSheet.Archetype.ToUI()</div>
 				@foreach(var Mov in UniqueMovesOnScreen)
 				{
-					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) />
+					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) ForceUpdate="Update" />
 				}
 			}
 			else
 			{
 				@foreach (var Mov in MovesOnScreen)
 				{
-					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov))/>
+					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) ForceUpdate="Update"/>
 				}
 			}
 			
@@ -130,6 +130,8 @@
 			
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCircleAdvances>Mejoras por Círculos</button>
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCorruptionAdvances>Mejoras por Corrupción</button>
+			<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"Initial/{Data.CurrentCharacter.ID}");})>Cuestiones iniciales</button>
+			<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"FactionsPhase");})>Fase de facciones</button>
 		</div>
 	</div>
 
@@ -428,6 +430,8 @@ else
 	private enum Sections {Basic, Cricle, Book, Corruption, Debt, Drama};
 	private Sections CurrentlyShowing = Sections.Basic;
 
+	private void Update() => SectionSelected(Sections.Basic);
+
 	protected async override void OnParametersSet()
 	{
 		await Connectors.SetConnectors(JS, Data, Auth);
@@ -488,7 +492,7 @@ else
 		else Data.CurrentPlayerSheet.Damage--;
 	}
 
-	private void SectionSelected(Sections section)
+	private async Task SectionSelected(Sections section)
 	{
 		CurrentlyShowing = section;
 		MovesOnScreen.Clear();
@@ -500,6 +504,19 @@ else
 				x.TypeOfMovement == USMove.MovementTypes.BasicMovements
 			).ToList();
 			var lio = (USMove)Moves.GetMovement(USMoveIDs.B_LiberarPoder, Data.CurrentPlayerSheet.Archetype);
+			lio.PreCondition.Options = new List<string>();
+
+			if(Data.CurrentPlayerSheet.LIOs is null || Data.CurrentPlayerSheet.LIOs.Count == 0)
+			{
+				Data.CurrentPlayerSheet.LIOs = (from l in Moves.AllLio where l.Archetype == Data.CurrentPlayerSheet.Archetype select l.ID).ToList();
+				await Data.StoreCharacterSheet();
+			}
+
+			foreach(var hab in Data.CurrentPlayerSheet.LIOs)
+			{
+				lio.PreCondition.Options.Add(Moves.AllLio.Find(x => x.ID == hab)?.Text ?? "");
+			}
+
 
 			MovesOnScreen.Add(lio);
 
@@ -567,6 +584,7 @@ else
 	private async Task CreateSheet()
 	{
 		Data.CurrentPlayerSheet.SelectedArchetypeMoves = Moves.GetInitialMovesIDsByArchetype(Data.CurrentPlayerSheet.Archetype);
+		Data.CurrentPlayerSheet.LIOs = (from lio in Moves.AllLio where lio.Archetype == Data.CurrentPlayerSheet.Archetype select lio.ID).ToList();
 		Data.CurrentPlayerSheet.ID = Guid.NewGuid();
 		await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
 		Data.Chronicle.PlayerLinks.Find(x => x.PlayerID == Auth.ConnectedUserName).CharacterSheetID = Data.CurrentPlayerSheet.ID;

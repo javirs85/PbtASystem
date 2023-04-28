@@ -48,6 +48,9 @@ public class FirebaseData : USBDbase
 	}
 
 	public bool IsConnectorSet => Firebase != null;
+
+	public int LocalDataAgeInDays { get; private set; }
+
 	public async Task StablishJSConnector(IJSObjectReference reference)
 	{
 		Firebase = reference;
@@ -93,13 +96,13 @@ public class FirebaseData : USBDbase
 		else
 		{
 			var LastUpdateTime = await LocalStorage.GetItemAsync<DateTime>("LastUpdateTime");
-			var age = DateTime.Now - LastUpdateTime;
+			LocalDataAgeInDays = (DateTime.Now - LastUpdateTime).Days;
 			int numChars = AllCharacters?.Count ?? 0;
 			int numFactions = AllFactions?.Count ?? 0;
 			int numDebts = AllDebts?.Count ?? 0;
 			int numRumors = Rumors?.Count ?? 0;
 
-			Toaster.ShowSuccess($"{numChars} characters loaded from local memory. \n {numFactions} factions \n {numDebts} Debts \n {numRumors} rumors \n {age.Days} days old");
+			// Toaster.ShowSuccess($"{numChars} characters loaded from local memory. \n {numFactions} factions \n {numDebts} Debts \n {numRumors} rumors \n {LocalDataAge.Days} days old");
 
 			if (await IsDefaultCharacterIDSet())
 				PlayerCharacter = GetCharacterByID(await GetDefaultCharacterID());

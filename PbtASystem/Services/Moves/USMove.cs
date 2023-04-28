@@ -41,44 +41,29 @@
 		D_Spe_01, D_Spe_02, D_Spe_03,
 		D_Swo_01, D_Swo_02, D_Swo_03,
 		D_Imp_01, D_Imp_02, D_Imp_03,
-		U_Corr_01,
-		U_Corr_02,
-		U_Fae_01,
-		U_Fae_02,
-		U_Fae_03,
-		U_Fae_04,
-		U_Fae_05,
-		U_Imp_01,
-		U_Imp_02,
-		U_Ora_01,
-		U_Ora_02,
-		U_Mage_01,
-		U_Mage_02,
-		U_Mage_03,
-		U_Mage_04,
-		U_Mage_05,
-		U_Mage_06,
-		U_Mage_07,
-		U_Swo_01,
-		U_Swo_02,
-		U_Swo_03,
-		U_Swo_04,
-		U_Vamp_01,
-		U_Vamp_02,
-		U_Vamp_03,
-		U_Spec_01,
-		U_Spec_02,
-		U_Spec_03,
-		U_Spec_04,
-		U_Spec_05,
-		U_Spec_06,
-		U_Spec_07,
-		U_Spec_08,
-		U_Vet_01,
-		U_Vet_02,
-		U_Awa_01,
-		U_Awa_02,
-		U_Awa_03,
+		U_Corr_01, U_Corr_02, U_Fae_01, U_Fae_02, U_Fae_03, U_Fae_04, U_Fae_05, U_Imp_01, U_Imp_02, U_Ora_01, U_Ora_02, U_Mage_01, U_Mage_02, U_Mage_03, U_Mage_04,
+		U_Mage_05, U_Mage_06, U_Mage_07, U_Swo_01, U_Swo_02, U_Swo_03, U_Swo_04, U_Vamp_01, U_Vamp_02, U_Vamp_03, U_Spec_01, U_Spec_02, U_Spec_03, U_Spec_04, U_Spec_05,
+		U_Spec_06, U_Spec_07, U_Spec_08, U_Vet_01, U_Vet_02, U_Awa_01, U_Awa_02, U_Awa_03,
+		LIO_Awa_01, LIO_Awa_02, LIO_Awa_03, LIO_Awa_04,
+		LIO_Hunter_01, LIO_Hunter_02, LIO_Hunter_03, LIO_Hunter_04,
+		LIO_Vet_01, LIO_Vet_02, LIO_Vet_03, LIO_Vet_04,
+		LIO_Wolf_01, LIO_Wolf_02, LIO_Wolf_03, LIO_Wolf_04,
+		LIO_Vamp_01, LIO_Vamp_02, LIO_Vamp_03, LIO_Vamp_04,
+		LIO_Spect_01, LIO_Spect_02, LIO_Spect_03, LIO_Spect_04,
+		LIO_Mage_01, LIO_Mage_02, LIO_Mage_03, LIO_Mage_04,
+		LIO_Orac_01, LIO_Orac_02, LIO_Orac_03, LIO_Orac_04,
+		LIO_Sworn_01, LIO_Sworn_02, LIO_Sworn_03, LIO_Sworn_04,
+		LIO_Fae_01, LIO_Fae_02, LIO_Fae_03, LIO_Fae_04,
+		LIO_Imp_01, LIO_Imp_02, LIO_Imp_03, LIO_Imp_04,
+		LIO_Corrupt_01, LIO_Corrupt_02, LIO_Corrupt_03, LIO_Corrupt_04
+	}
+
+	public class LIO
+	{
+		public string Text { get; set; } = "";
+		public USMoveIDs ID { get; set; }
+		public AvailableArchetypes Archetype { get; set; }
+
 	}
 
 	public class USMove : BaseMovement<USMoveIDs, USAttributes>

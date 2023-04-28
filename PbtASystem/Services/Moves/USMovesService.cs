@@ -8,6 +8,7 @@ namespace PbtASystem.Services.Moves;
 public class USMovesService : MovementsProviderBase
 {
 	public List<USMove> AllMovements { get; set; } = new();
+	public List<LIO> AllLio { get; set; } = new();
 	public USMovesService() {
 		AllMovements.AddRange(GenerateBasicMovments());
 
@@ -73,6 +74,19 @@ public class USMovesService : MovementsProviderBase
 		AllMovements.Add(new USMove(USMoveIDs.rawNight, USAttributes.Night) { Tittle = "Noche" });
 		AllMovements.Add(new USMove(USMoveIDs.rawPower, USAttributes.Power) { Tittle = "Poder" });
 		AllMovements.Add(new USMove(USMoveIDs.raw2d6, USAttributes.None) { Tittle = "2d6" });
+
+		AllLio.AddRange(GenerateAwakenLIO());
+		AllLio.AddRange(GenerateHunterLIO());
+		AllLio.AddRange(GenerateVeteranLIO());
+		AllLio.AddRange(GenerateMageLIO());
+		AllLio.AddRange(GenerateOracleLIO());
+		AllLio.AddRange(GenerateSwornLIO());
+		AllLio.AddRange(GenerateFairLIO());
+		AllLio.AddRange(GenerateImpLIO());
+		AllLio.AddRange(GenerateCorruptedLIO());
+		AllLio.AddRange(GenerateWolfLIO());
+		AllLio.AddRange(GenerateVampireLIO());
+		AllLio.AddRange(GenerateSpecterLIO());
 	}
 
 	public List<USMoveIDs> GetInitialMovesIDsByArchetype(AvailableArchetypes arch)
@@ -129,91 +143,7 @@ public class USMovesService : MovementsProviderBase
 
 		m.Tittle = "Liberar tu poder";
 
-		switch (archetype)
-		{
-			case AvailableArchetypes.Hunter:
-				m.PreCondition.Options = new List<string> {
-						"Encuentra y persigue a algien o algo por la ciudad con rastros o información limitados.",
-						"Improvisa un arma (daño2, mano, desastrosa) o (armadura-1, frágil).",
-						"Improvisa un explosivo (daño3, ruidoso, fuego) o bomba de humo (aturdidor, ruidosa, humo).",
-						"Forzar a un enemigo vulnerable a huir de tu\r\npresencia y entregar un mensaje.",
-					};
-				break;
-			case AvailableArchetypes.Awaken:
-				m.PreCondition.Options = new List<string> {
-						"Consigue acceso a una zona asegurada o bloqueada",
-						"Atrae atencion inmediata de los mortales sobre una persona o situación",
-						"Encuentra una pista o ventaja en un area inmediata que antes se había pasado por alto",
-						"Convence a un PNJ de que actue con bondad, interés o en propio beneficio",
-					};
-				break;
-			case AvailableArchetypes.Veteran:
-				m.PreCondition.Options = new List<string> {
-						"Sorprende a un enemigo desprevenido con un golpe terrible o dejalo K.O.",
-						"Proteje un lugar, o genera barricadas con materiales mínimos",
-						"Asusta o intimida a alguien con un recordatorio de quien solias ser",
-						"Revela la forma en que un antiguo aliado o enemigo está dando forma a un conflicto actual",
-					};
-				break;
-			case AvailableArchetypes.Vampire:
-				m.PreCondition.Options = new List<string> {
-						"Crea una oportunidad para ESCAPAR, ignorando impedimentos mortales",
-						"Realiza una azaña fantástica de fuerza o agiliad vampírica",
-						"Extiende tus sentidos vampíricos por un corto periodo de tiempo",
-						"Muestra dominancia: PNJ de bajo nivel se van, PJ deben MANTENER LA CALMA",
-					};
-				break;
-			case AvailableArchetypes.Wolf:
-				m.PreCondition.Options = new List<string> {
-						"Curate 2-daño inmediatamente empezando por daño crítico",
-						"Transformate sin necesidad de la Luna",
-						"Realiza una proheza de fuerza o velocidad lupína",
-						"Aumenta tus sentidos lupinos a niveles supernaturales",
-					};
-				break;
-			case AvailableArchetypes.Spectre:
-				m.PreCondition.Options = new List<string> {
-						"Transportate instantaneamente a uno de tus anclas, sin importar la distancia",
-						"Toma control de una maqina o vehículo poseyendo su forma mecánica",
-						"Desata un rayo de energía extoplasmática (daño2, cerca, area, perforante)",
-						"Sige a un mortal ordinario, sin importar a donde vaya",
-					};
-				break;
-			case AvailableArchetypes.Mage:
-				m.PreCondition.Options = new List<string> {
-						"Deflecta o redirige un golpe justo antes de que te toque",
-						"Realiza una proheza de fuerza o precisión telekinésica",
-						"Detecta la presencia o funcionamiento de objetos mágicos o hechizos",
-						"Cambia la forma o naturaleza de un objeto expuesto o hechizo mágico",
-					};
-				break;
-			case AvailableArchetypes.Oracle:
-				m.PreCondition.Options = new List<string> {
-						"Expón la verdad esencial de una cosa o persona en tu presencia",
-						"Manipula las hebras de la realidad para ayudar o perjudicar un PNJ en tu presencia",
-						"Impresiona o asusta a alguien con un conocimiento del pasado",
-						"Canaliza una potente profecía del más allá sobre un personaje presente",
-					};
-				break;
-			case AvailableArchetypes.Fair:
-				m.PreCondition.Options = new List<string> {
-						"Invoca una tormenta elemental de tu corte (daño2, cerca, area, penetrante)",
-						"Aparece ante los demás como alguein a quien anteriormente has tocado",
-						"Obliga a los elementos de tu corte a explicarte lo que han visto",
-						"Crea un vinculo telepático con alguien durante una escena",
-					};
-				break;
-			case AvailableArchetypes.Corrupted:
-				m.PreCondition.Options = new List<string> {
-						"Impregna tu tacto de corrupción demoníaca (daño2, intimidante, penetrante)",
-						"Impresiona, asusta o consterna a alguien con una demostración de furia demoníaca",
-						"Atraviesa un obstaculo físico creado por manos mortales",
-						"Invoca a tu patrón oscuro directamente donde estas",
-					};
-				break;
-			default:
-				break;
-		}
+		
 
 		return m;
 	}
@@ -3524,6 +3454,366 @@ public class USMovesService : MovementsProviderBase
 	}
 
 
+	private List<LIO> GenerateHunterLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Hunter_01,
+				Text = "Encuentra y persigue a algien o algo por la ciudad con rastros o información limitados.",
+				Archetype = AvailableArchetypes.Hunter
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Hunter_02,
+				Text = "Improvisa un arma (daño2, mano, desastrosa) o (armadura-1, frágil).",
+				Archetype = AvailableArchetypes.Hunter
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Hunter_03,
+				Text = "Improvisa un explosivo (daño3, ruidoso, fuego) o bomba de humo (aturdidor, ruidosa, humo).",
+				Archetype = AvailableArchetypes.Hunter
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Hunter_04,
+				Text = "Forzar a un enemigo vulnerable a huir de tu\r\npresencia y entregar un mensaje.",
+				Archetype = AvailableArchetypes.Hunter
+			}
+		};
+	}
+	private List<LIO> GenerateAwakenLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Awa_01,
+				Text = "Consigue acceso a una zona asegurada o bloqueada.",
+				Archetype = AvailableArchetypes.Awaken
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Awa_02,
+				Text = "Atrae atencion inmediata de los mortales sobre una persona o situación.",
+				Archetype = AvailableArchetypes.Awaken
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Awa_03,
+				Text = "Encuentra una pista o ventaja en un area inmediata que antes se había pasado por alto.",
+				Archetype = AvailableArchetypes.Awaken
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Awa_04,
+				Text = "Convence a un PNJ de que actue con bondad, interés o en propio beneficio.",
+				Archetype = AvailableArchetypes.Awaken
+			}
+		};
+	}
+	private List<LIO> GenerateVeteranLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vet_01,
+				Text = "Sorprende a un enemigo desprevenido con un golpe terrible o dejalo K.O.",
+				Archetype = AvailableArchetypes.Veteran
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vet_02,
+				Text = "Proteje un lugar, o genera barricadas con materiales mínimos.",
+				Archetype = AvailableArchetypes.Veteran
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vet_03,
+				Text = "Asusta o intimida a alguien con un recordatorio de quien solias ser.",
+				Archetype = AvailableArchetypes.Veteran
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vet_04,
+				Text = "Revela la forma en que un antiguo aliado o enemigo está dando forma a un conflicto actual.",
+				Archetype = AvailableArchetypes.Veteran
+			}
+		};
+	}
+	private List<LIO> GenerateVampireLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vamp_01,
+				Text = "Crea una oportunidad para ESCAPAR, ignorando impedimentos mortales",
+				Archetype = AvailableArchetypes.Vampire
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vamp_02,
+				Text = "Realiza una azaña fantástica de fuerza o agiliad vampírica",
+				Archetype = AvailableArchetypes.Vampire
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vamp_03,
+				Text = "Extiende tus sentidos vampíricos por un corto periodo de tiempo",
+				Archetype = AvailableArchetypes.Vampire
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Vamp_04,
+				Text = "Muestra dominancia: PNJ de bajo nivel se van, PJ deben MANTENER LA CALMA",
+				Archetype = AvailableArchetypes.Vampire
+			}
+		};
+	}
+	private List<LIO> GenerateWolfLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Wolf_01,
+				Text = "Curate 2-daño inmediatamente empezando por daño crítico",
+				Archetype = AvailableArchetypes.Wolf
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Wolf_02,
+				Text = "Transformate sin necesidad de la Luna",
+				Archetype = AvailableArchetypes.Wolf
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Wolf_03,
+				Text = "Realiza una proheza de fuerza o velocidad lupína",
+				Archetype = AvailableArchetypes.Wolf
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Wolf_04,
+				Text = "Aumenta tus sentidos lupinos a niveles supernaturales",
+				Archetype = AvailableArchetypes.Wolf
+			}
+		};
+	}
+	private List<LIO> GenerateSpecterLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Spect_01,
+				Text = "Transportate instantaneamente a uno de tus anclas, sin importar la distancia",
+				Archetype = AvailableArchetypes.Spectre
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Spect_02,
+				Text = "Toma control de una maqina o vehículo poseyendo su forma mecánica",
+				Archetype = AvailableArchetypes.Spectre
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Spect_03,
+				Text = "Desata un rayo de energía extoplasmática (daño2, cerca, area, perforante)",
+				Archetype = AvailableArchetypes.Spectre
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Spect_04,
+				Text = "Sige a un mortal ordinario, sin importar a donde vaya",
+				Archetype = AvailableArchetypes.Spectre
+			}
+		};
+	}
+	private List<LIO> GenerateMageLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Mage_01,
+				Text = "Deflecta o redirige un golpe justo antes de que te toque",
+				Archetype = AvailableArchetypes.Mage
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Mage_02,
+				Text = "Realiza una proheza de fuerza o precisión telekinésica",
+				Archetype = AvailableArchetypes.Mage
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Mage_03,
+				Text = "Detecta la presencia o funcionamiento de objetos mágicos o hechizos",
+				Archetype = AvailableArchetypes.Mage
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Mage_04,
+				Text = "Cambia la forma o naturaleza de un objeto expuesto o hechizo mágico",
+				Archetype = AvailableArchetypes.Mage
+			}
+		};
+	}
+	private List<LIO> GenerateOracleLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Orac_01,
+				Text = "Expón la verdad esencial de una cosa o persona en tu presencia",
+				Archetype = AvailableArchetypes.Oracle
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Orac_02,
+				Text = "Manipula las hebras de la realidad para ayudar o perjudicar un PNJ en tu presencia",
+				Archetype = AvailableArchetypes.Oracle
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Orac_03,
+				Text = "Impresiona o asusta a alguien con un conocimiento del pasado",
+				Archetype = AvailableArchetypes.Oracle
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Orac_04,
+				Text = "Canaliza una potente profecía del más allá sobre un personaje presente",
+				Archetype = AvailableArchetypes.Oracle
+			}
+		};
+	}
+	private List<LIO> GenerateSwornLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Sworn_01,
+				Text = "Destruye un conjuro mágico o ilusión o encantamiento solo con tocarlo",
+				Archetype = AvailableArchetypes.Sworn
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Sworn_02,
+				Text = "Cúbrete con una armadura mágica. Consúmela para absorver todo del daño de un solo golpe",
+				Archetype = AvailableArchetypes.Sworn
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Sworn_03,
+				Text = "Derriba a todos los enemigos menores con una ráfaga de fuerza elemental",
+				Archetype = AvailableArchetypes.Sworn
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Sworn_04,
+				Text = "Obliga a alguien a responder preguntas sinceras durante una escena",
+				Archetype = AvailableArchetypes.Sworn
+			}
+		};
+	}
+	private List<LIO> GenerateFairLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Fae_01,
+				Text = "Invoca una tormenta elemental de tu corte (daño2, cerca, area, penetrante)",
+				Archetype = AvailableArchetypes.Fair
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Fae_02,
+				Text = "Aparece ante los demás como alguein a quien anteriormente has tocado",
+				Archetype = AvailableArchetypes.Fair
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Fae_03,
+				Text = "Obliga a los elementos de tu corte a explicarte lo que han visto",
+				Archetype = AvailableArchetypes.Fair
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Fae_04,
+				Text = "Crea un vinculo telepático con alguien durante una escena",
+				Archetype = AvailableArchetypes.Fair
+			}
+		};
+	}
+	private List<LIO> GenerateCorruptedLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Corrupt_01,
+				Text = "Impregna tu tacto de corrupción demoníaca (daño2, intimidante, penetrante)",
+				Archetype = AvailableArchetypes.Corrupted
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Corrupt_02,
+				Text = "Impresiona, asusta o consterna a alguien con una demostración de furia demoníaca",
+				Archetype = AvailableArchetypes.Corrupted
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Corrupt_03,
+				Text = "Atraviesa un obstaculo físico creado por manos mortales",
+				Archetype = AvailableArchetypes.Corrupted
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Corrupt_04,
+				Text = "Invoca a tu patrón oscuro directamente donde estas",
+				Archetype = AvailableArchetypes.Corrupted
+			}
+		};
+	}
+	private List<LIO> GenerateImpLIO()
+	{
+		return new List<LIO>
+		{
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Imp_01,
+				Text = "Olfatear un escondite secreto, incluso cuando esté expertamente oculto o escondido",
+				Archetype = AvailableArchetypes.Imp
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Imp_02,
+				Text = "Teletransportarte a tu establecimiento desde cualquier distancia o posición",
+				Archetype = AvailableArchetypes.Imp
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Imp_03,
+				Text = "Infiltrarte en una zona hostil aparentando no ser digno de interés",
+				Archetype = AvailableArchetypes.Imp
+			},
+			new LIO
+			{
+				ID= USMoveIDs.LIO_Imp_04,
+				Text = "Infligir 4 daños (ap) a un objetivo vulnerable que te subestime",
+				Archetype = AvailableArchetypes.Imp
+			}
+		};
+	}
 
 
 

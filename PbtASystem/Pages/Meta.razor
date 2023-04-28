@@ -15,8 +15,11 @@ else
 	@if(Auth.IsUserConnected)
 	{
 		<div class="d-flex flex-column w-100">
-			<div>Selected character: @Data.PlayerCharacter.Name</div>
-			<div>Loged in player: @Auth.ConnectedUserName</div>
+			<div><span class="opacity-75">Cronica:</span> @Data.Chronicle.Name</div>
+			<div><span class="opacity-75">Personajes:</span> @Data.AllCharacters.Count</div>
+			<div><span class="opacity-75">Antiguedad:</span> @Data.LocalDataAgeInDays dias</div>
+			<div><span class="opacity-75">Personaje:</span> @Data.PlayerCharacter.Name</div>
+			<div><span class="opacity-75">Usuario:</span> @Auth.ConnectedUserName</div>
 			<div class="btn btn-primary" @onclick=Data.ForceDataRefresh>Force Update</div>
 			<div class="btn btn-primary" @onclick=Data.ClearDefaultCharacter>Forget default character</div>
 			<div class="btn btn-primary" @onclick=Auth.TryLogout>LogOut</div>
@@ -27,8 +30,10 @@ else
 	else
 	{
 		<div class="d-flex flex-column w-100">
-			<div>Selected character: @Data.PlayerCharacter.Name</div>
-			<div>Loged in player: @Auth.ConnectedUserName</div>
+			<div>Personajes cargados: @Data.AllCharacters.Count</div>
+			<div>Antiguedad de los datos cargados en local: @Data.LocalDataAgeInDays dias</div>
+			<div>Personaje escogido para jugar: @Data.PlayerCharacter.Name</div>
+			<div>Usuario: @Auth.ConnectedUserName</div>
 			<div class="btn btn-primary" @onclick=Auth.TryLogin>Login</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>

@@ -1,0 +1,186 @@
+﻿@page "/Initial/{IDString}"
+@inject IToastService Toaster;
+@inject FirebaseData Data;
+@inject FirebaseAuth Auth;
+@inject FirebaseMessaging Msgs;
+@inject HttpClient Http
+@inject ConfirmationModalService Confirm;
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject USMovesService Moves
+
+@if (IsSheetReady)
+{
+	<div class="PbtASystemContainer">
+		@if (!IsEditing)
+		{
+			<div class="p-2 d-flex align-items-center justify-content-between px-2">
+				<img src="imgs/Icons/Back.svg" @onclick=@(()=>{Navigation.NavigateTo($"Playing/{Data.CurrentCharacter.ID}");}) style="width: 30px; cursor:pointer;"/>
+				<img src="imgs/Icons/Edit.svg" @onclick=StarEdit style="width: 30px; cursor:pointer;" />
+			</div>
+			<div class="d-flex flex-column p-3 gap-3">
+				<div class="d-flex flex-column ">
+					<div class="Tittle">Aspecto:</div>
+					<div class="Detail">@Data.CurrentPlayerSheet.Aspect</div>
+				</div>
+				<div class="d-flex flex-column">
+					<div class="Tittle">Comportamiento:</div>
+					<div class="Detail">@Data.CurrentPlayerSheet.Demeanor</div>
+				</div>
+				<h4 class="Header">Preguntas iniciales</h4>
+				<div class="d-flex flex-column gap-1">
+				@foreach(var q in Data.CurrentPlayerSheet.InitialQuestions)
+				{
+					<div class="d-flex pack">
+						<div>@q.Question</div>
+						<div class="ps-2 d-flex"><div class="px-1">-</div><DecodedString Value=@q.Answer /></div>
+					</div>
+				}
+				</div>
+				<h4 class="Header">Deudas iniciales</h4>
+				<div class="d-flex flex-column gap-1">
+				@foreach (var d in Data.CurrentPlayerSheet.InitialDebs)
+				{
+					<div class="d-flex pack">
+						<div>@d</div>
+					</div>
+				}
+				</div>
+				<h4 class="Header">Equipo</h4>
+				<div class="pack">
+					<DecodedString Value=@Data.CurrentPlayerSheet.Equipe/>
+				</div>
+			</div>
+		}
+		else
+		{
+			<EditForm Model="Data.CurrentPlayerSheet">
+				<div class="p-2 d-flex align-items-center justify-content-end px-2">
+					<img src="imgs/Icons/Save.svg" @onclick=FinishEdit style="width: 30px; cursor:pointer;" />
+				</div>
+				<div class="d-flex flex-column p-3 gap-3">
+					<div class="d-flex flex-column ">
+						<div class="Tittle">Aspecto:</div>
+						<InputText class="Detail" @bind-Value=@Data.CurrentPlayerSheet.Aspect />
+					</div>
+					<div class="d-flex flex-column">
+						<div class="Tittle">Comportamiento:</div>
+						<InputText class="Detail" @bind-Value=@Data.CurrentPlayerSheet.Demeanor />
+					</div>
+					<h4 class="Header">Preguntas iniciales</h4>
+					<div class="d-flex flex-column gap-1">
+						@if (Data.CurrentPlayerSheet.InitialQuestions[0] is not null)
+						{
+							<div class="d-flex pack">
+								<div>@Data.CurrentPlayerSheet.InitialQuestions[0].Question</div>
+								<InputTextArea class="Detail" @bind-Value=@Data.CurrentPlayerSheet.InitialQuestions[0].Answer />
+							</div>
+						}
+						@if (Data.CurrentPlayerSheet.InitialQuestions[1] is not null)
+						{
+							<div class="d-flex pack">
+								<div>@Data.CurrentPlayerSheet.InitialQuestions[1].Question</div>
+								<InputTextArea class="Detail" @bind-Value=@Data.CurrentPlayerSheet.InitialQuestions[1].Answer />
+							</div>
+						}
+						@if (Data.CurrentPlayerSheet.InitialQuestions[2] is not null)
+						{
+							<div class="d-flex pack">
+								<div>@Data.CurrentPlayerSheet.InitialQuestions[2].Question</div>
+								<InputTextArea class="Detail" @bind-Value=@Data.CurrentPlayerSheet.InitialQuestions[2].Answer />
+							</div>
+						}
+						@if (Data.CurrentPlayerSheet.InitialQuestions[3] is not null)
+						{
+							<div class="d-flex pack">
+								<div>@Data.CurrentPlayerSheet.InitialQuestions[3].Question</div>
+								<InputTextArea class="Detail" @bind-Value=@Data.CurrentPlayerSheet.InitialQuestions[3].Answer />
+							</div>
+						}
+						@if (Data.CurrentPlayerSheet.InitialQuestions[4] is not null)
+						{
+							<div class="d-flex pack">
+								<div>@Data.CurrentPlayerSheet.InitialQuestions[4].Question</div>
+								<InputTextArea class="Detail" @bind-Value=@Data.CurrentPlayerSheet.InitialQuestions[4].Answer />
+							</div>
+						}
+					</div>
+					<h4 class="Header">Deudas iniciales</h4>
+					<div class="d-flex flex-column gap-1">
+						@foreach (var d in Data.CurrentPlayerSheet.InitialDebs)
+						{
+							<div class="d-flex pack">
+								<div>@d</div>
+							</div>
+						}
+					</div>
+					<h4 class="Header">Equipo</h4>
+					<div class="pack">
+						<InputTextArea class="Detail" @bind-Value=@Data.CurrentPlayerSheet.Equipe />
+					</div>
+				</div>
+			</EditForm>
+		}
+	</div>
+}
+else
+{
+	<div>Sheet not created: @ErrorMessage</div>
+}
+
+@code {
+	[Parameter] public string IDString { get; set; } = "";
+	string ErrorMessage = "";
+	bool IsSheetReady = false;
+	bool IsEditing = false;
+
+
+	protected async override void OnParametersSet()
+	{
+		await Connectors.SetConnectors(JS, Data, Auth);
+		Guid ID = new Guid(IDString);
+		var character = Data.GetCharacterByID(ID);
+		Data.CurrentCharacter = character;
+
+		var Map = Data.Chronicle.PlayerLinks.Find(x => x.CharacterID == ID);
+		if (Map is null)
+		{
+			ErrorMessage = $"{ID} is not in the maps of the chronicle";
+			return;
+		}
+		if (Map.CharacterSheetID is null || Map.CharacterSheetID == new Guid())
+		{
+			ErrorMessage = $"{character.Name} ({ID}) No tiene una ficha en esta crónica.";
+			return;
+		}
+		var SheetID = (Guid)Map.CharacterSheetID;
+
+		if (await Data.CheckIfSheetExists((SheetID)))
+		{
+			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID(SheetID);
+			if (Data.CurrentPlayerSheet.ArchetypeUniqueTittle1 == "") Data.CurrentPlayerSheet.InitArchetype();
+			IsSheetReady = true;
+		}
+		else
+			ErrorMessage = $"The character {IDString} has no Sheeet associated";
+
+		if (Data.CurrentPlayerSheet is null)
+		{
+			ErrorMessage = $"The character {IDString} has no Sheeet associated";
+			return;
+		}
+
+		StateHasChanged();
+	}
+
+	private void StarEdit()
+	{
+		IsEditing = true;
+	}
+
+	private void FinishEdit()
+	{
+		IsEditing = false;
+		Data.StoreCharacterSheet();
+	}
+}

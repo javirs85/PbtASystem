@@ -1,4 +1,5 @@
-﻿@inject FirebaseData Data
+﻿@using static PbtASystem.Pages.Playing;
+@inject FirebaseData Data
 @inject FirebaseMessaging Messaging
 @inject USMovesService Moves
 @inject IToastService Toaster
@@ -45,13 +46,16 @@
 		{
 			<DecodedString Value="@Move.PreCondition.MainText" />
 
-			<div class="LIOContainer">
+			<div class="LIOContainer d-flex flex-column">
 			@foreach(var lio in Move.PreCondition.Options)
 			{
 				<div class="LIOBox">
 					@lio
 				</div>
 			}
+				<div class="d-flex justify-content-center w-100">
+					<button class="btn btn-outline-light w-75 opacity-75 mt-3" @onclick=OpenLIOSelectionModal>Añadir habilidad</button>
+				</div>
 			</div>
 
 			<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
@@ -65,8 +69,7 @@
 							{
 								<li><DecodedString Value="@item" /></li>
 							}
-
-						</ul>
+						</ul>						
 					}
 				</div>
 			</div>
@@ -82,7 +85,6 @@
 					{
 						<li><DecodedString Value="@item"/></li>
 					}
-
 				</ul>
 			}	
 			@if (Move.ConsequencesOn79 != null)
@@ -95,7 +97,6 @@
 						{
 							<li><DecodedString Value="@item" /></li>
 						}
-
 					</ul>
 				}
 			}
@@ -109,7 +110,6 @@
 						{
 							<li><DecodedString Value="@item" /></li>
 						}
-
 					</ul>
 				}
 			}
@@ -124,12 +124,14 @@
 						{
 							<li><DecodedString Value="@item" /></li>
 						}
-
 					</ul>
 				}
 			}
 
-			@if (Move.TypeOfMovement == USMove.MovementTypes.BasicMovements)
+			@if (Move.TypeOfMovement == USMove.MovementTypes.BasicMovements && 
+					Move.AvancedConsequences is not null &&					
+					Move.AvancedConsequences.MainText is not null &&
+					Move.AvancedConsequences.MainText != "")
 			{
 				<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
 					<div class="px-2"><img src="imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
@@ -163,6 +165,49 @@
 				<img src="imgs/Icons/UpgradedArrow.png"/> Avanzado
 				</button>
 		</div>		
+	</div>
+</div>
+
+
+<!--Add lio modal-->
+<div class="FullScreenModal @(IsSLioSelectingModalON?"":"HideModal")" @onclick=CloseLIOSelectionModal>
+	<div class="w-100 d-flex justify-content-end p-2">
+		<img src="imgs/Icons/Close.svg" style="cursor: pointer;" />
+	</div>
+	<div class="ModalBody w-100">
+		<div class="accordion accordion-flush w-100 DarkAccordion" @onclick:stopPropagation=true id="accordionFlushExample">
+		@foreach (var pack in LIOs)
+		{
+			<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(pack == SelectedPack?"":"DarkAccordionNotSelected")">
+				<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne-@pack.Habilities[0].ToString()">
+					<div data-bs-toggle="collapse" 
+						 data-bs-target="#flush-collapseOne-@pack.Habilities[0].ToString()"
+					     @onclick=@(_ =>{SelectedPack = pack;})>
+						@pack.Tittle
+					</div>
+
+				</h2>
+				<div id="flush-collapseOne-@pack.Habilities[0].ToString()" class="accordion-collapse collapse @(pack == SelectedPack?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="flush-headingOne-@pack.Habilities[0].ToString()">
+					<div class="Darker d-flex flex-column flex-column gap-3">
+						@foreach (var hability in pack.Habilities)
+						{
+							<div class="d-flex w-100 justify-content-between gap-3" >
+								@Moves.AllLio.Find(x=>x.ID == hability).Text
+								@if(Data.CurrentPlayerSheet.LIOs.Contains(hability))
+								{
+									<img src="imgs/Icons/Remove.svg" width="25" style="cursor:pointer;"@onclick=@(async _=> {await ToggleLIO(hability);})/>
+								}
+								else
+								{
+										<img src="imgs/Icons/Add.svg" width="25" style="cursor:pointer;" @onclick=@(async _=> {await ToggleLIO(hability);}) />
+								}
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		}
+		</div>
 	</div>
 </div>
 
@@ -205,6 +250,7 @@
 	[Parameter] public EventCallback<USMove> Clicked { get; set; }
 	[Parameter] public bool IsSelectionMode { get; set; }
 	[Parameter] public EventCallback<USMove> SelectedInSelectionMode { get; set; }
+	[Parameter] public EventCallback ForceUpdate{ get; set; }
 	USMove Move;
 
 	string rollNumber
@@ -249,6 +295,39 @@
 	bool IsShowingFullScreenModal = false;
 	private void OpenFullScreenModal() => IsShowingFullScreenModal = true;
 	private void CloseFullScreenModal() => IsShowingFullScreenModal = false;
+
+	private class LIOsPack
+	{
+		public string Tittle {get;set;} ="";
+		public List<USMoveIDs> Habilities {get;set;}=new();
+	}
+	List<LIOsPack> LIOs = new();
+	LIOsPack SelectedPack = new();
+	bool IsSLioSelectingModalON = false;
+	private void OpenLIOSelectionModal() { 
+		IsSLioSelectingModalON = true; 
+		foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)).Cast<AvailableArchetypes>())
+		{
+			if (arc != AvailableArchetypes.All && arc != AvailableArchetypes.NotSet && arc != Data.CurrentPlayerSheet.Archetype)
+			{
+				LIOs.Add(new LIOsPack
+					{
+						Tittle = arc.ToUI(),
+						Habilities = (from l in Moves.AllLio where l.Archetype == arc select l.ID).ToList()
+					});
+			}
+		}
+	}
+	private void CloseLIOSelectionModal() => IsSLioSelectingModalON = false;
+	private async Task ToggleLIO(USMoveIDs lioId)
+	{
+		if (Data.CurrentPlayerSheet.LIOs.Contains(lioId))
+			Data.CurrentPlayerSheet.LIOs.Remove(lioId);
+		else
+			Data.CurrentPlayerSheet.LIOs.Add(lioId);
+		await Data.StoreCharacterSheet();
+		await ForceUpdate.InvokeAsync();
+	}
 
 	async Task MakeMoveAdvanced()
 	{

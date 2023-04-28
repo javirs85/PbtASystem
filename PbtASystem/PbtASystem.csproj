@@ -1,10 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\FactionsPhase.razor" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
@@ -17,5 +21,44 @@
   <ItemGroup>
     <Folder Include="wwwroot\imgs\Icons\" />
   </ItemGroup>
+
+	<ItemGroup>
+		<ContentWithTargetPath Include="$(ProjectDir)wwwroot\index.html">
+			<TargetPath>wwwroot\index.html</TargetPath>
+		</ContentWithTargetPath>
+	</ItemGroup>
+
+	<Target Name="CustomActionsBeforePublish" BeforeTargets="BeforePublish">
+		<FileUpdate Files="$(ProjectDir)wwwroot\index.html" Regex="&lt;base href=&quot;/&quot; /&gt;" ReplacementText="&lt;base href=&quot;/UrbanShadows/&quot; /&gt;" />
+		<Message Text="Base href updated to /UrbanShadows/ for publishing" Importance="high" />
+	</Target>
+
+	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+
+	<Target Name="CustomActionsAfterPublish" AfterTargets="AfterPublish">
+		<ItemGroup>
+			<WebFiles Include="$(ProjectDir)bin\Release\net7.0\browser-wasm\publish\wwwroot\**\*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(WebFiles)" DestinationFolder="C:\Users\Rodríguez\source\repos\javirs85\UrbanShadows\UrbanShadows\%(RecursiveDir)" />
+
+		<FileUpdate Files="$(ProjectDir)wwwroot\index.html" Regex="&lt;base href=&quot;/UrbanShadows/&quot; /&gt;" ReplacementText="&lt;base href=&quot;/&quot; /&gt;" />
+
+		<Message Text="Copied files from publish folder to UrbanShadows folder and reverted base href to /" Importance="high" />
+		<Exec Command="cd C:\Users\Rodríguez\source\repos\javirs85\UrbanShadows\UrbanShadows\ &amp; git add * &amp; git commit -m &quot;AutoCommit&quot; &amp; git push" />
+		<Message Text="commited changes to github" Importance="high" />
+	</Target>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Pages\FactionsPhase.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Pages\FactionsPhase.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Pages\FactionsPhase.razor" />
+	</ItemGroup>
 
 </Project>

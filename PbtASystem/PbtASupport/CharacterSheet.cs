@@ -44,6 +44,8 @@ public class CharacterSheet
 	public List<USMoveIDs> SelectedCorruptionMoves { get; set; } = new();
 	public List<USMoveIDs> UpgradedMoves { get; set; } = new();
 
+	public List<USMoveIDs> LIOs { get; set; } = new();
+
 	public string ArchetypeUniqueTittle1 { get; set; } = "";
 	public string ArchetypeUniqueTittle2 { get; set; } = "";
 	public string ArchetypeUniqueBody1 { get; set; } = "";
