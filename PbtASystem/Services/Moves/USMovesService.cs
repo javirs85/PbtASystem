@@ -174,7 +174,7 @@ public class USMovesService : MovementsProviderBase
 						"Crea una oportunidad para escapar"
 					}
 			},
-			ConsequencesOn79 = new Consequences
+			ConsequencesOn10 = new Consequences
 			{
 				MainText = "Con un 10+, TU eliges también 1 de las siguientes opciones:",
 				Options = new List<string>
