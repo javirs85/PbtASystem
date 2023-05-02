@@ -30,10 +30,10 @@ else
 	else
 	{
 		<div class="d-flex flex-column w-100">
-			<div>Personajes cargados: @Data.AllCharacters.Count</div>
-			<div>Antiguedad de los datos cargados en local: @Data.LocalDataAgeInDays dias</div>
-			<div>Personaje escogido para jugar: @Data.PlayerCharacter.Name</div>
-			<div>Usuario: @Auth.ConnectedUserName</div>
+			<div>Personajes cargados: @Data?.AllCharacters?.Count</div>
+			<div>Antiguedad de los datos cargados en local: @Data?.LocalDataAgeInDays? dias</div>
+			<div>Personaje escogido para jugar: @Data?.PlayerCharacter?.Name</div>
+			<div>Usuario: @Auth?.ConnectedUserName</div>
 			<div class="btn btn-primary" @onclick=Auth.TryLogin>Login</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>

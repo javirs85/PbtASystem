@@ -36,6 +36,22 @@
                 @onclick=GoToCampaign>
                     Campaña
                 </a>
+                <a class="nav-link  @GetActive("FactionPhase")"
+                   data-bs-toggle="collapse"
+                   data-bs-target="#navbarNavAltMarkup"
+                   aria-current="page"
+                   style="cursor:pointer"
+                   @onclick=GoToFactionPhase>
+                    Turno de facciones
+                </a>
+                <a class="nav-link  @GetActive("Master")"
+                   data-bs-toggle="collapse"
+                   data-bs-target="#navbarNavAltMarkup"
+                   aria-current="page"
+                   style="cursor:pointer"
+                   @onclick=GoToMaster>
+                    Master
+                </a>
             </div>
         </div>
     </div>
@@ -48,11 +64,9 @@
         get
         {
             if (IsActive("Playing")) return Data.CurrentCharacter.Name;
-            else
-            {
-                if (IsActive("Select")) return "Campaña";
-                else return "PbtASystem";
-            }
+            else if (IsActive("Select")) return "Campaña";
+            else if (IsActive("FactionPhase")) return "Fase de facciones";
+            else return "PbtASystem";
         }
     }
     protected override void OnInitialized() => Navigation.LocationChanged += (s, e) => StateHasChanged();
@@ -66,6 +80,13 @@
         else
             Navigation.NavigateTo($"Select");
     }
+
+    private void GoToFactionPhase()
+    {
+        Navigation.NavigateTo($"FactionPhase");
+    }
+
+    private void GoToMaster() => Navigation.NavigateTo("Master");
 
     private void GoToPlay()
     {

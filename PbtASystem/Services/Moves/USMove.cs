@@ -55,7 +55,21 @@
 		LIO_Sworn_01, LIO_Sworn_02, LIO_Sworn_03, LIO_Sworn_04,
 		LIO_Fae_01, LIO_Fae_02, LIO_Fae_03, LIO_Fae_04,
 		LIO_Imp_01, LIO_Imp_02, LIO_Imp_03, LIO_Imp_04,
-		LIO_Corrupt_01, LIO_Corrupt_02, LIO_Corrupt_03, LIO_Corrupt_04
+		LIO_Corrupt_01, LIO_Corrupt_02, LIO_Corrupt_03, LIO_Corrupt_04,
+		CityStatus1_01,
+		CityStatus1_02,
+		CityStatus1_03,
+		CityStatus2_01,
+		CityStatus2_02,
+		CityStatus2_03,
+		CityStatus2_04,
+		CityFaction_01,
+		CityFaction_02,
+		CityFaction_03,
+		CityFaction_04,
+		CityFaction_05,
+		CityFaction_06,
+		CityFaction_07
 	}
 
 	public class LIO
@@ -76,7 +90,10 @@
 		public enum MovementTypes { NotSet, ArchetipeMovement, FactionMovement, CorruptionMovement, DramaticMovement, DebtMovements, BasicMovements,
 			UniqueMove,
 			MageMagic,
-			FaeMagic
+			FaeMagic,
+			CityMoveStatus1,
+			CityMoveStatus2,
+			FactionPhaseCityMove
 		}
 
 		public bool IsImproved { get; set; } = false;

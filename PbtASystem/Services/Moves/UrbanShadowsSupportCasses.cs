@@ -203,6 +203,7 @@ public static class EnumExtensions
 			USAttributes.Veil => "Velo",
 			USAttributes.Power => "Poder",
 			USAttributes.Circle => "Círculo",
+			USAttributes.Status => "Estatus",
 			_ => $"Unknown characteristic ToUI {ch}"
 		};
 	}

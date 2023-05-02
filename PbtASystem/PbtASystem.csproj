@@ -16,6 +16,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.4" PrivateAssets="all" />
     <PackageReference Include="MQTTnet" Version="4.1.4.563" />
+    <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +37,13 @@
 		<Message Text="Base href updated to /UrbanShadows/ for publishing" Importance="high" />
 	</Target>
 
-	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+	<PropertyGroup>
+		<MSBuildCommunityTasksPath>$(SolutionDir)\.build</MSBuildCommunityTasksPath>
+	</PropertyGroup>
+	
+	<!--
+
+	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
 
 	<Target Name="CustomActionsAfterPublish" AfterTargets="AfterPublish">
 		<ItemGroup>
@@ -48,17 +58,7 @@
 		<Exec Command="cd C:\Users\Rodríguez\source\repos\javirs85\UrbanShadows\UrbanShadows\ &amp; git add * &amp; git commit -m &quot;AutoCommit&quot; &amp; git push" />
 		<Message Text="commited changes to github" Importance="high" />
 	</Target>
+	-->
 
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="Pages\FactionsPhase.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <_ContentIncludedByDefault Remove="Pages\FactionsPhase.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="Pages\FactionsPhase.razor" />
-	</ItemGroup>
 
 </Project>

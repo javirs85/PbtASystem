@@ -169,6 +169,11 @@
     background: var(--Darker);
 }
 
+.AdvancedYEs {
+    opacity: 1;
+    background-color:transparent;
+}
+
 .LIOBox {
     border: 1px solid #521010;
     padding: 5px;
@@ -181,5 +186,19 @@
     padding-inline: 5px;
 }
 
+.MasterSelected{
+    border: 1px solid green;
+    padding: 5px;
+}
+
+.green{
+    border-color:green;
+}
+.red {
+    border-color: red;
+}
+.orange {
+    border-color: orange;
+}
 
 

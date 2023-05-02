@@ -1,0 +1,25 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+    background: black;
+    font-family: Roboto;
+    font-size: 14px;
+    height: 100%;
+}
+
+.Darker {
+    background: #1C1E20;
+}
+
+.MovesArea {
+    background: var(--Darker);
+}
+.PackHeader {
+    opacity: 0.8;
+    font-size:20px;
+}
+.Pack{
+    border: 1px solid gray;
+}

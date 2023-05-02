@@ -10,6 +10,7 @@
 @inject IJSRuntime JS
 @inject USMovesService Moves
 
+
 @if (IsSheetReady)
 {
 	<div class="PbtASystemContainer">
@@ -131,7 +132,6 @@
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCircleAdvances>Mejoras por Círculos</button>
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCorruptionAdvances>Mejoras por Corrupción</button>
 			<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"Initial/{Data.CurrentCharacter.ID}");})>Cuestiones iniciales</button>
-			<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"FactionsPhase");})>Fase de facciones</button>
 		</div>
 	</div>
 
@@ -377,36 +377,46 @@
 }
 else
 {
-	<div class="d-flex flex-column align-items-center">
+	if (ErrorMessage == "")
+	{
+		<div>Cargando ficha de jugador ...</div>
+	}
+	else
+	{
+		<div class="d-flex flex-column align-items-center">
 
-		<div class="m-5">@ErrorMessage</div>
+			<div class="m-5">@ErrorMessage</div>
 
-		@if (Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
-		{
-			<button @onclick=CreateSheet class="btn btn-primary w-75 p-2">
-				<div class="d-flex flex-column align-content-center">
-					<div>Crear Ficha de personaje para</div>
-					<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
-					<div>controlada por @Auth.ConnectedUserName</div>				
-				</div>
-			</button>
-		}
-		else
-		{
-			<EditForm Model="Data.PlayerCharacter">
-				<label for="body">Elige un arquetipo para la ficha:</label>
-				<InputSelect @bind-Value=Data.CurrentPlayerSheet.Archetype>
-					@foreach(var arc in Enum.GetValues(typeof(AvailableArchetypes)))
-					{
-						@if((AvailableArchetypes)arc != AvailableArchetypes.All && (AvailableArchetypes)arc != AvailableArchetypes.NotSet)
+			@if (Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
+			{
+				<button @onclick=CreateSheet class="btn btn-primary w-75 p-2">
+					<div class="d-flex flex-column align-content-center">
+						<div>Crear Ficha de personaje para</div>
+						<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
+						<div>controlada por @Auth.ConnectedUserName</div>				
+					</div>
+				</button>
+			}
+			else
+			{
+				<EditForm Model="Data.PlayerCharacter">
+					<label for="body">Elige un arquetipo para la ficha:</label>
+					<InputSelect @bind-Value=Data.CurrentPlayerSheet.Archetype>
+						@foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)))
 						{
-							<option value="@arc">@(((AvailableArchetypes)arc).ToUI())</option>
+							@if ((AvailableArchetypes)arc != AvailableArchetypes.All && (AvailableArchetypes)arc != AvailableArchetypes.NotSet)
+							{
+								<option value="@arc">@(
+								((AvailableArchetypes)arc).ToUI()
+								)</option>
+							}
 						}
-					}
-				</InputSelect>
-			</EditForm>
-		}
-	</div>
+					</InputSelect>
+				</EditForm>
+			}
+		</div>
+	}
+
 }
 
 

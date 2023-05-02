@@ -12,7 +12,7 @@
 	<div class="Box">
 		<div class="TextContainer">
 			<div class="TextTitle">@Move.Tittle</div>
-			@if (Move.HasRoll())
+			@if (Move.HasRoll() && !MasterView)
 			{
 				<div class="RollDetails">(@Move.Roll.ToUI().ToLower()@rollNumber)</div>
 			}			
@@ -22,7 +22,7 @@
 			<img src="imgs/Icons/TicksCircleIcon.png" class="@(Move.TicksCircle?"":"Hidden")"/>
 			@if (!IsSelectionMode)
 			{
-				if(Move.HasRoll())
+				if (Move.HasRoll() && !MasterView)
 				{
 					<img class="DiceButton" src="imgs/Icons/Dice.svg" @onclick=@(async ()=>{await Roll();}) @onclick:stopPropagation=true/>
 				}	
@@ -47,18 +47,25 @@
 			<DecodedString Value="@Move.PreCondition.MainText" />
 
 			<div class="LIOContainer d-flex flex-column">
-			@foreach(var lio in Move.PreCondition.Options)
-			{
-				<div class="LIOBox">
-					@lio
-				</div>
-			}
-				<div class="d-flex justify-content-center w-100">
-					<button class="btn btn-outline-light w-75 opacity-75 mt-3" @onclick=OpenLIOSelectionModal>Añadir habilidad</button>
-				</div>
+				@if(MasterView)
+				{
+					<div class="LIOBox">Pregunta al jugador que habilidad utiliza</div>
+				}
+				else
+				{
+					@foreach (var lio in Move.PreCondition.Options)
+					{
+						<div class="LIOBox">
+							@lio
+						</div>
+					}
+					<div class="d-flex justify-content-center w-100">
+						<button class="btn btn-outline-light w-75 opacity-75 mt-3" @onclick=OpenLIOSelectionModal>Añadir habilidad</button>
+					</div>
+				}				
 			</div>
 
-			<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
+			<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT") @(MasterView ? "AdvancedYEs" : "")">
 				<div class="px-2"><img src="imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
 				<div class="AdvancedMainText">
 					<DecodedString Value="@Move.AvancedConsequences.MainText" />
@@ -89,43 +96,49 @@
 			}	
 			@if (Move.ConsequencesOn79 != null)
 			{
-				<DecodedString Value="@Move.ConsequencesOn79.MainText" />
-				@if (Move.ConsequencesOn79.Options != null)
-				{
-					<ul class="mt-1">
-						@foreach (var item in Move.ConsequencesOn79.Options)
-						{
-							<li><DecodedString Value="@item" /></li>
-						}
-					</ul>
-				}
+				<div class="@(MasterView && MasterRolledValue >= 7 && MasterRolledValue <= 9? "MasterSelected orange" : "")">
+					<DecodedString Value="@Move.ConsequencesOn79.MainText" />
+					@if (Move.ConsequencesOn79.Options != null)
+					{
+						<ul class="mt-1">
+							@foreach (var item in Move.ConsequencesOn79.Options)
+							{
+								<li><DecodedString Value="@item" /></li>
+							}
+						</ul>
+					}
+				</div>
 			}
 			@if (Move.ConsequencesOn10 != null)
 			{
-				<DecodedString Value="@Move.ConsequencesOn10.MainText" />
-				@if (Move.ConsequencesOn10.Options != null)
-				{
-					<ul class="mt-1">
-						@foreach (var item in Move.ConsequencesOn10.Options)
-						{
-							<li><DecodedString Value="@item" /></li>
-						}
-					</ul>
-				}
+				<div class="@(MasterView && MasterRolledValue >= 10 ? "MasterSelected green" : "")">
+					<DecodedString Value="@Move.ConsequencesOn10.MainText" />
+					@if (Move.ConsequencesOn10.Options != null)
+					{
+						<ul class="mt-1">
+							@foreach (var item in Move.ConsequencesOn10.Options)
+							{
+								<li><DecodedString Value="@item" /></li>
+							}
+						</ul>
+					}
+				</div>
 			}
 
 			@if (Move.ConsequencesOn6 != null)
 			{
-				<DecodedString Value="@Move.ConsequencesOn6.MainText" />
-				@if (Move.ConsequencesOn6.Options != null)
-				{
-					<ul class="mt-1">
-						@foreach (var item in Move.ConsequencesOn6.Options)
-						{
-							<li><DecodedString Value="@item" /></li>
-						}
-					</ul>
-				}
+				<div class="@(MasterView && MasterRolledValue <= 6 ? "MasterSelected red" : "")">
+					<DecodedString Value="@Move.ConsequencesOn6.MainText" />
+					@if (Move.ConsequencesOn6.Options != null)
+					{
+						<ul class="mt-1">
+							@foreach (var item in Move.ConsequencesOn6.Options)
+							{
+								<li><DecodedString Value="@item" /></li>
+							}
+						</ul>
+					}
+				</div>
 			}
 
 			@if (Move.TypeOfMovement == USMove.MovementTypes.BasicMovements && 
@@ -133,7 +146,7 @@
 					Move.AvancedConsequences.MainText is not null &&
 					Move.AvancedConsequences.MainText != "")
 			{
-				<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT")">
+				<div class="Advanced @(Move.IsImproved?"AdvancedYEs":"AdvancedNOT") @(MasterView ? "AdvancedYEs" : "")">
 					<div class="px-2"><img src="imgs/Icons/UpgradedArrow@(Move.IsImproved?"":"NO").png" /></div>
 					<div class="AdvancedMainText">
 						<DecodedString Value="@Move.AvancedConsequences.MainText" />
@@ -167,7 +180,6 @@
 		</div>		
 	</div>
 </div>
-
 
 <!--Add lio modal-->
 <div class="FullScreenModal @(IsSLioSelectingModalON?"":"HideModal")" @onclick=CloseLIOSelectionModal>
@@ -251,6 +263,8 @@
 	[Parameter] public bool IsSelectionMode { get; set; }
 	[Parameter] public EventCallback<USMove> SelectedInSelectionMode { get; set; }
 	[Parameter] public EventCallback ForceUpdate{ get; set; }
+	[Parameter] public bool MasterView { get; set; } = false;
+	[Parameter] public int MasterRolledValue { get; set; }
 	USMove Move;
 
 	string rollNumber
@@ -277,8 +291,9 @@
 	{
 		Move = Moves.AllMovements.Find(x => x.ID == ID);
 		if (Move is null)
+		{
 			Toaster.ShowError($"The move {ID} is not in the DB");
-
+		}
 		StateHasChanged();
 	}
 
@@ -368,6 +383,14 @@
 			CloseCircleSelectionModal();
 			bonus = Data.CurrentPlayerSheet.GetAttribute(circle);
 			rollText = circle.ToUI();
+		}
+		else if(Move.Roll == USAttributes.Status)
+		{
+			OpenCircleSelectionModal();
+			var circle = await WaitForUserToChoseCircle();
+			CloseCircleSelectionModal();
+			bonus = Data.CurrentPlayerSheet.GetStatusInCircle(circle);
+			rollText = "estatus en "+circle.ToUI();
 		}
 		else
 		{

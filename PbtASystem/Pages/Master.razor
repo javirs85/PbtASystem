@@ -1,0 +1,125 @@
+﻿@page "/Master"
+@inject IToastService Toaster;
+@inject FirebaseData Data;
+@inject FirebaseAuth Auth;
+@inject FirebaseMessaging Msgs;
+@inject HttpClient Http
+@inject ConfirmationModalService Confirm;
+@inject NavigationManager Navigation
+@inject USMovesService Moves
+@inject IJSRuntime JS
+
+<div class="d-flex flex-column">
+	
+	@if (LastMoveMsg != null)
+	{
+		<div class="LastMove p-2">
+			<div class="d-flex w-100 pb-2 px-4 justify-content-between">
+				<div class="d-flex flex-column">
+					<div>@LastRollName</div>
+					<div>@LastRollTxt</div>
+				</div>
+				<div class="RolledValue d-flex align-items-center">@LastMoveMsg.RollValue</div>
+			</div>
+			
+			<MoveViewer IsSelected=true MasterView=true MasterRolledValue=@LastMoveMsg.RollValue ID=LastMove.ID />
+		</div>
+	}
+		
+	<div class="Item" id="MainAccordeon">
+		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack1">Movimientos</h1>
+		<div class="Pack collapse" id="Pack1" data-bs-parent="#MainAccordeon">
+			@foreach (var mov in Movimientos.OrderBy(x=>x.Usage))
+			{
+				<div class="@(mov.Usage == 0 ? "Used0" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used2" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
+			}		
+		</div>
+	</div>
+	<div class="Item">
+		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack2">Princípios</h1>
+		<div class="Pack collapse" id="Pack2" data-bs-parent="#MainAccordeon">
+			@foreach (var mov in Princípios.OrderBy(x => x.Usage))
+			{
+				<div class="@(mov.Usage == 0 ? "Used2" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used0" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
+			}
+		</div>
+	</div>
+	<div class="Item">
+		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack3">Relojes</h1>
+		<div class="Pack collapse" id="Pack3" data-bs-parent="#MainAccordeon">
+			<div>relojes varios</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	string LastRollName => LastMoveMsg?.SenderName ?? "No hay ningúna tirada";
+	string LastRollTxt => LastMoveMsg?.Message ?? "";
+	int RolledValue => LastMoveMsg?.RollValue ?? 0;
+
+	RollMessage? LastMoveMsg;
+	USMove? LastMove;
+
+
+	private class MasterMovement
+	{
+		public string Tittle = "";
+		public int Usage = 0;
+		public void Use()
+		{
+			Usage++;
+			if (Usage == 3)
+				Usage = 0;
+		}
+	}
+
+	List<MasterMovement> Movimientos = new List<MasterMovement>
+	{
+		new MasterMovement{ Tittle = "Saca a relucir un conflicto, ya sea antiguo o nuevo" },
+		new MasterMovement{ Tittle = "Pon en peligro a alguien" },
+		new MasterMovement{ Tittle = "Haz daño (o intercámbialo)" },
+		new MasterMovement{ Tittle = "Ofrece una oportunidad con un coste" },
+		new MasterMovement{ Tittle = "Revela un trato hecho en ausencia de los personajes" },
+		new MasterMovement{ Tittle = "Vuelve un movimiento suyo en su contra" },
+		new MasterMovement{ Tittle = "Ofréceles o reclámales una Deuda" },
+		new MasterMovement{ Tittle = "Moviliza recursos para cambiar las proba‐bilidades" },
+		new MasterMovement{ Tittle = "Avisa a alguien del peligro que se cierne" },
+		new MasterMovement{ Tittle = "Bloquea, explota o reclama un lugar poderoso" },
+		new MasterMovement{ Tittle = "Di las consecuencias y pregunta" },
+		new MasterMovement{ Tittle = "Activa las desventajas de sus cosas" },
+		new MasterMovement{ Tittle = "Haz un movimiento de Peligro o Facción" }
+	};
+	List<MasterMovement> Princípios = new List<MasterMovement>
+	{
+		new MasterMovement{ Tittle = "Muestra ampliamente la ciudad, desde los rascacielos hasta las chabolas"},
+		new MasterMovement{ Tittle = "Dirígete a los personajes, no a los jugadores"},
+		new MasterMovement{ Tittle = "Reúne a los personajes, aunque tengan que cruzar límites"},
+		new MasterMovement{ Tittle = "Coloca a los personajes en el centro de conflictos políticos y personales"},
+		new MasterMovement{ Tittle = "Oculta tus movimientos en la oscuridad"},
+		new MasterMovement{ Tittle = "Ponle nombre a todo el mundo, dales motivaciones"},
+		new MasterMovement{ Tittle = "Trata a todo el mundo según su posición"},
+		new MasterMovement{ Tittle = "Haz muchas preguntas y construye basándote en las respuestas"},
+		new MasterMovement{ Tittle = "Hazte admirador de los personajes jugadores"},
+		new MasterMovement{ Tittle = "Dales a los jugadores la oportunidad de sopesar las cosas (tiempo para pensar)"},
+		new MasterMovement{ Tittle = "Mancha las manos de todos los implicados"},
+		new MasterMovement{ Tittle = "Ponle precio a todo, incluso a la amistad"}
+	};
+	protected async override void OnParametersSet()
+	{
+		await Connectors.SetConnectors(JS, Data, Auth);
+		await Msgs.CheckIfReConnnectionNeeded();
+
+		Msgs.NewRoll -= NewRoll;
+		Msgs.NewRoll += NewRoll;
+
+		StateHasChanged();
+	}
+
+	private void NewRoll(object? sender, RollMessage msg)
+	{
+		LastMoveMsg = msg;
+		LastMove = Moves.GetMovement(msg.MoveID) as USMove;
+		StateHasChanged();
+	}
+}

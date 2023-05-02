@@ -1,0 +1,44 @@
+﻿.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+    background: black;
+    font-family: Roboto;
+    font-size: 14px;
+    height: 100%;
+}
+
+.Darker{
+    background-color: var(--Darker) !important;
+}
+
+.headerbutton{
+    cursor: pointer
+}
+
+.Item {
+    padding: 10px;
+}
+
+.Pack{
+    padding-left: 10px;
+}
+
+.Pack div{
+    padding: 5px;
+    cursor:pointer;
+}
+
+.Used0 {
+    background-color: transparent;
+}
+.Used1 {
+    background: #6e4200;
+}
+.Used2 {
+    background: #890000;
+}
+.RolledValue{
+    font-size: 24px;
+}

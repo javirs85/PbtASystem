@@ -87,6 +87,10 @@ public class USMovesService : MovementsProviderBase
 		AllLio.AddRange(GenerateWolfLIO());
 		AllLio.AddRange(GenerateVampireLIO());
 		AllLio.AddRange(GenerateSpecterLIO());
+
+		AllMovements.AddRange(GenerateStatus1CityMoves());
+		AllMovements.AddRange(GenerateStatus2CityMoves());
+		AllMovements.AddRange(GenerateFactionMoves());
 	}
 
 	public List<USMoveIDs> GetInitialMovesIDsByArchetype(AvailableArchetypes arch)
@@ -3815,7 +3819,336 @@ public class USMovesService : MovementsProviderBase
 		};
 	}
 
+	private List<USMove> GenerateStatus1CityMoves()
+	{
+		return new List<USMove>
+		{
+			new USMove(USMoveIDs.CityStatus1_01, USAttributes.Status)
+			{
+				Tittle = "Debilitar la posición de alguien",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus1,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando usas rumores y cotilleos, tira con Estatus. Con un éxito, los rumores cuajan. Tienen un -1 en curso a los movimientos durante el turno de facción hasta que encuentren alguna forma de disipar los rumores."
+				},
+				ConsequencesOn10 = new Consequences
+				{
+					MainText = "Con un 10+, uno de sus enemigos se entera de tus chismes y se acerca a ti con información perjudicial sobre los intereses de tu objetivo."
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText="Con un fallo, tu objetivo rastrea las historias directamente hasta ti... y te pilla en un punto vulnerable antes de que puedas reaccionar."
+				}
+			},
+			new USMove(USMoveIDs.CityStatus1_02, USAttributes.Status)
+			{
+				Tittle = "Hacer correr la voz",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus1,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando corres la voz de que necesitas algo para tu Círculo -un tomo mágico, información secreta, un guardaespaldas experto, etc.- tira con Estatus. "
+				},
+				ConsequencesOn10 = new Consequences
+				{
+					MainText="Con un 10+, aparece en manos de un aliado; es tuyo a cambio de una Deuda."
+				},
+				ConsequencesOn79 = new Consequences
+				{
+					MainText="Con un resultado de 7-9, acaba en manos de un rival, que quiere un favor o un regalo además de una Deuda antes de entregarlo."
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText = "Con un fallo, la cosa aparece en la puerta de tu casa con malvadas ataduras, exponiéndote a la ira de un PNJ de estatus 3 de otro Círculo."
+				}
+			},
+			new USMove(USMoveIDs.CityStatus1_02, USAttributes.Status)
+			{
+				Tittle = "Consulta a sus contactos",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus1,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = $"Cuando consultes a tus contactos en otro Círculo, tira con estatus en ese Círculo. Con un éxito, pregunta 3; tus contactos responderán lo mejor que puedan.\r\n\r\n",
+					Options = new List<string>
+					{
+						"¿De qué conflicto está hablando todo el mundo?",
+						"¿Qué pasó con ________?",
+						"¿Qué ha estado haciendo ________ recientemente?",
+						"¿Quién es responsable de ________?",
+						"¿Quién tiene una deuda con ________?"
+					}
+				},
+				ConsequencesOn79 = new Consequences
+				{
+					MainText="Con un 7-9, mantén 1. Con un 10+, mantén 2."
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText = "Con un fallo, pregunte 1 y mantenga 1, pero su contacto también tiene una pregunta dura sobre sus lealtades y fidelidades. Responde honestamente, marca corrupción o debes una deuda, tú eliges."
+				}
+			},
+			new USMove(USMoveIDs.CityStatus1_03, USAttributes.Status)
+			{
+				Tittle = "Ocuparte de tus asusntos",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus1,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{ 
+					MainText = "Cuando no te metas en los asuntos de la ciudad, dile al MC cómo pasas el tiempo y tira. Con un éxito, un viejo amigo o un nuevo aliado se acerca a ti para pedirte ayuda; marca una corrupción si lo rechazas."
+				},
+				ConsequencesOn10 = new Consequences{MainText="Con un 10+, haz una pregunta al MC sobre la situación; te responderá con sinceridad."},
+				ConsequencesOn6 = new Consequences {MainText="Con un fallo, un PNJ interrumpe tus asuntos cotidianos para cobrar una Deuda que esperabas haber olvidado, mezclándote en un lío dentro de tu Círculo que preferirías haber evitado."}
+			}
+		};
+	}
 
+	private List<USMove> GenerateStatus2CityMoves()
+	{
+		return new List<USMove>
+		{
+			new USMove(USMoveIDs.CityStatus2_01, USAttributes.Status)
+			{
+				Tittle = "Reunir las fuerzas de una facción",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus2,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando intentes reunir fuerzas en tu Círculo para socavar una facción o sus posesiones, tira con Estatus.\r\nCon un éxito, puedes dar una Deuda a un PNJ poderoso de tu Círculo -a elección del MC- para reducir la fuerza de tu objetivo o debilitar su control sobre un activo específico, a tu elección.\r\n"
+				},
+				ConsequencesOn79 = new Consequences
+				{
+					MainText = "Con un 7-9, tus aliados tardan en moverse; dales otra Deuda para acelerar las cosas, o únete a ellos directamente en el ataque."
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText = "Con un fallo, el ataque se desmorona y crea una oportunidad para tus enemigos; dile al MC cómo te has dejado vulnerable ante ellos."
+				}
+			},
+			new USMove(USMoveIDs.CityStatus2_02, USAttributes.Status)
+			{
+				Tittle = "Reclamar",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus2,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando reclames un bien vulnerable, tira con Estatus. Con un éxito, tu reclamación es ampliamente reconocida; apodérate del bien y el MC te dirá qué beneficios te aporta.",
+					Options = new List<string>
+					{
+						"el bien ya no es vulnerable",
+						"el activo no tiene rival que lo reclame",
+						"el activo no requiere que cobres una deuda."
+					}
+				},
+				ConsequencesOn79 = new Consequences
+				{
+					MainText = "Con un 7-9, elige 1"
+				},
+				ConsequencesOn10 = new Consequences
+				{
+					MainText = "Con un 10+, los 3"
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText = "Si fallas, tu reclamación te pone en el punto de mira de un PNJ de Estatus 3 que también desea el activo; tu reclamación se queda corta, y el MC te dirá cuál de tus aliados o activos está en el punto de mira del PNJ de Estatus 3 en un intento de asustarte."
+				}
+			},
+			new USMove(USMoveIDs.CityStatus2_03, USAttributes.Status)
+			{
+				Tittle = "Reclutar nuevos aliados",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus2,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando reclutes aliados de otro Círculo, dile al MC qué ayuda necesitas y tira con Estatus. Con un éxito, el MC te dirá quién está disponible para ser contratado; si gastas una Deuda, estará disponible hasta después del siguiente turno de facción.",
+					Options = new List<string>
+					{
+						"son infaliblemente honestos",
+						"son excepcionalmente hábiles",
+						"son notablemente discretos",
+						"están agresivamente centrados"
+					}
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Con un 10+, elige 3"},
+				ConsequencesOn79 = new Consequences
+				{
+					MainText = "Con un 7-9, elige 2"
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText = "Con un fallo, antes de que puedas conectar con nadie, alguien de tu propio Círculo se entera de tu petición y difunde rumores sobre tu debilidad; lleva -1 en curso a tu Estatus hasta que demuestres tu fuerza a los tuyos."
+				}
+			},
+			new USMove(USMoveIDs.CityStatus2_04, USAttributes.Status)
+			{
+				Tittle = "Reclamar estatus 3",
+				TypeOfMovement = USMove.MovementTypes.CityMoveStatus2,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando hagas una reclamación de Estatus-3 en la ciudad, tira 2d6 y revisa la lista. Con un éxito, sube tu estatus a Estatus-3 y obtén el control de una facción relevante. Cualquier PC que alcance el Estatus-3 puede hacer movimientos de facción junto a las facciones de PNJs en cada turno de facción; su facción siempre se considera creciendo.",
+					Options = new List<string>
+					{
+						"Si tienes influencia significativa sobre una facción de Tamaño 2+, suma 1.",
+						"Si tienes seis Deudas sobre PNJ de Estatus-3, suma 1.",
+						"Si tienes Estatus-0 en más de un Círculo, resta 1.",
+						"Si controlas personalmente menos de dos activos, resta 1."
+					}
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Con un 10+, tu ascenso al poder genera nuevas alianzas y oportunidades; realiza un movimiento de ciudad adicional durante los dos próximos turnos de facción. "},
+				ConsequencesOn79 = new Consequences { MainText = "Con un resultado de 7-9, tu ascenso provoca animadversión y celos dentro de tus propias filas; otro miembro de tu facción se marcha para unirse a otra facción, llevándose consigo un activo tuyo." },
+				ConsequencesOn6 = new Consequences { MainText = " Con un fallo, tu ascenso se ve bloqueado por un PNJ de Estatus 3 que te odia a ti y a tus aliados; no puedes hacer otra reclamación hasta que te los ganes... o los elimines directamente." }
+			}
+		};
+	}
+
+	private List<USMove> GenerateFactionMoves()
+	{
+		return new List<USMove>
+		{
+			new USMove(USMoveIDs.CityFaction_01, USAttributes.None)
+			{
+				Tittle = "Atacar abiertamente a una facción",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando una facción ataca abiertamente a otra facción, tira con la diferencia entre los Tamaños de las dos facciones. Con un éxito, la facción atacada sacrifica una baza apropiada o pierde un punto de Tamaño, a su elección."
+				},
+				ConsequencesOn79 = new Consequences
+				{
+					MainText = "Con un resultado de 7-9, la facción atacante debe sacrificar una baza apropiada o perder también un punto de Tamaño."
+				},
+				ConsequencesOn6 = new Consequences
+				{
+					MainText = "Con un fallo, el objetivo tiende una trampa inteligente; captura o destruye una baza o reduce el Tamaño del atacante, a su elección."
+				}
+			},
+			new USMove(USMoveIDs.CityFaction_02, USAttributes.None)
+			{
+				Tittle = "Consolidar el control",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando los líderes de una facción consolidan el control sobre sus fuerzas y activos existentes, tiran con su Fuerza.",
+					Options = new List<string>
+					{
+						"se aseguran nuevas posesiones; marca recursos",
+						"Buscan nuevos miembros; marcan reclutamiento",
+						"exigen secreto; encubren otra acción"
+					}
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Con un 10+, eligen 2."},
+				ConsequencesOn79 = new Consequences { MainText = "Con un 7-9, eligen 1" },
+				ConsequencesOn6 = new Consequences { MainText = "Con un fallo, sus esfuerzos conducen a luchas internas; una autoridad es destronada o humillada, y una coalición rebelde dentro de la facción gana impulso: reduce la Fuerza de la facción." }
+			},
+			new USMove(USMoveIDs.CityFaction_03, USAttributes.None)
+			{
+				Tittle = "Localizar a alguien",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando una facción intenta localizar a un personaje de estatus 1 o 2 dentro de la ciudad, tira:",
+					Options = new List<string>
+					{
+						"Si la facción tiene una baza relevante, suma 1.",
+						"Si su presa es del mismo Círculo, suma 1.",
+						"Si la facción es de Tamaño-1 o Fuerza-1, resta 1.",
+						"Si la presa se esconde activamente, resta 1."
+					}
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Si la presa es un PNJ: Con un 10+, descubren a la presa expuesta o vulnerable; la facción puede actuar impunemente sobre ella. Si la presa es un PC: Con un 10+, la facción rastreadora saca lo mejor de su presa; acorralan al PC con una fuerza abrumadora o una cuidadosa planificación que le deja poco espacio para evitar a sus perseguidores."},
+				ConsequencesOn79 = new Consequences { MainText = "Si la presa es un PNJ: Con un resultado de 7-9, la facción encuentra a su presa; la ataca, la secuestra o se enfrenta a ella con algún coste. Si la presa es un PC: Con un 7-9, la facción rastrea su localización, pero el PC tiene tiempo de prepararse para las fuerzas limitadas que vienen hacia él." },
+				ConsequencesOn6 = new Consequences { MainText = "Si la presa es un PNJ: Con un fallo, los intentos de la facción de localizarlos tienen éxito, pero sus agentes lo estropean todo y permiten que la presa escape ilesa. Si la presa es un PC: Con un fallo, alguien cercano al Pc le avisa antes de tiempo de la búsqueda de la facción... y de una oportunidad o debilidad que el Pc puede explotar..." }
+			},
+			new USMove(USMoveIDs.CityFaction_04, USAttributes.None)
+			{
+				Tittle = "Incitar al adversario",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando una facción intenta incitar a un oponente a cometer un error, tira con la diferencia entre las Fuerzas de las dos facciones."
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Con un 10+, el objetivo muerde el anzuelo; la facción instigadora asesta un golpe terrible, destruye una baza vulnerable o socava una relación o alianza clave."},
+				ConsequencesOn79 = new Consequences { MainText = "Con un resultado de 7-9, el objetivo evita lo peor de la trampa, pero causa suficientes problemas como para avergonzarse a sí mismo." },
+				ConsequencesOn6 = new Consequences { MainText = "Con un fallo, el objetivo se da cuenta del plan; alguien de la facción objetivo acude a uno de los PJ para que le ayude a cambiar las tornas contra la facción instigadora." }
+			},
+			new USMove(USMoveIDs.CityFaction_05, USAttributes.None)
+			{
+				Tittle = "Apoderarse por la fuerza",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando una facción se apodera de algo vulnerable por la fuerza, tira con su Fuerza. Con un éxito, se apoderan de ello; reducen el atributo apropiado de la facción objetivo y se apoderan de un bien vulnerable.",
+					Options = new List<string>
+					{
+						"No sacrifican a un líder, aliado o activo importante.",
+						"No suplantan un ataque de represalia inmediato.",
+						"No causan daños colaterales graves."
+					}
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Con un 10+, los tres"},
+				ConsequencesOn79 = new Consequences { MainText = "Con un 7-9, eligen uno" },
+				ConsequencesOn6 = new Consequences { MainText = "Con un fallo, el ataque resulta en la destrucción total de la cosa que la facción atacante intentó apoderarse; alguien acude a uno de los PCs buscando ayuda para obtener justicia o venganza." }
+			},
+			new USMove(USMoveIDs.CityFaction_06, USAttributes.None)
+			{
+				Tittle = "Buscar en la ciduad",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando una facción busca en la ciudad información útil -un raro conocimiento oculto, las debilidades de otra facción, la localización de un artefacto- tira con su Tamaño. Si aciertan, descubren algunos detalles cruciales, suficientes para pedir a un PJ o PNJ notable que siga investigando.",
+					Options = new List<string>
+					{
+						"atraen la atención de una facción rival",
+						"tienen que hacer vulnerable un activo",
+						"tienen -1 en curso hasta el final del siguiente turno de la facción "
+					}
+				},
+				ConsequencesOn10 = new Consequences { MainText = "Con un 10+, también eligen 1"},
+				ConsequencesOn79 = new Consequences { MainText = "Con un 7-9, también eligen 2." },
+				ConsequencesOn6 = new Consequences { MainText = "Con un fallo, un miembro de la facción que ha conseguido alguna información vital acaba muerto o desaparecido... pero no antes de transmitir lo que sabe a uno de los PJ." }
+			},
+			new USMove(USMoveIDs.CityFaction_07, USAttributes.None)
+			{
+				Tittle = "Ofrecer pasaje",
+				TypeOfMovement = USMove.MovementTypes.FactionPhaseCityMove,
+				IsSelected = true,
+				Archetipe = AvailableArchetypes.All,
+				PreCondition = new Consequences
+				{
+					MainText = "Cuando una facción ofrece paso a alguien -para entrar o salir de la ciudad- tira con su Tamaño. Si aciertas, el camino queda expedito, sin importar quién se oponga; elige 1:",
+					Options = new List<string>
+					{
+						"alguien sale; queda fuera de su alcance hasta que decida regresar",
+						"alguien entra; la facción gana una poderosa baza"
+					}
+				},
+				ConsequencesOn79 = new Consequences { MainText = "Con un 7-9, el paso ofende a un PNJ de Estatus 3 que busca tributo por la intrusión; la facción debe realizar un favor -dedicar un movimiento de facción en el próximo turno de facción- sacrificar un activo o arriesgarse a una guerra abierta." },
+				ConsequencesOn6 = new Consequences { MainText = "Con un fallo, el pasaje provoca un conflicto entre la facción y sus propios aliados antes de que pueda completarse; alguien acude a uno de los PJ en busca de ayuda para negociar una tregua." }
+			}
+		};
+	}
 
 
 }

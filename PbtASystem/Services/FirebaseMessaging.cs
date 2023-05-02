@@ -13,6 +13,7 @@ namespace PbtASystem.Services;
 
 public class FirebaseMessaging
 {
+    public event EventHandler<RollMessage> NewRoll;
     public event EventHandler<MQTTMessage> MessageReceived;
     public FirebaseMessaging(IToastService _toaster, FirebaseData _data, USMovesService _moves)
     {
@@ -30,7 +31,9 @@ public class FirebaseMessaging
     FirebaseData Data;
     USMovesService Moves;
     public bool isConnected => mqttClient?.IsConnected ?? false;
-    private bool AlreadyConnecting = false;
+
+
+	private bool AlreadyConnecting = false;
 
     public async Task StartMessaging()
     {
@@ -135,7 +138,7 @@ public class FirebaseMessaging
         if(encodedMessage is RollMessage)
         {
             var roll = encodedMessage as RollMessage;
-
+            NewRoll?.Invoke(this, roll as RollMessage);
             Toaster.ShowRollToast(roll.SenderName, Moves.GetMovement(roll.MoveID).Tittle, roll.Message, roll.RollValue);
 		}
         else

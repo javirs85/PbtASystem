@@ -1,0 +1,89 @@
+﻿@page "/FactionPhase"
+@inject IToastService Toaster;
+@inject FirebaseData Data;
+@inject FirebaseAuth Auth;
+@inject FirebaseMessaging Msgs;
+@inject HttpClient Http
+@inject ConfirmationModalService Confirm;
+@inject NavigationManager Navigation
+@inject USMovesService Moves
+@inject IJSRuntime JS
+
+@if (IsSheetReady)
+{
+	<div class="d-flex flex-column p-2">
+		<h3>Movimientos de ciudad para PJ's</h3>
+		<ol>
+			<li>Los jugadores hacen tantos movimientos de ciudad como su mayor estatus. No se revelan consecuencias</li>
+			<li>El MC hace movimientos de facción para facciones que estén creciendo o muriendo</li>
+			<li>El MC revela la información inmediata, le resto aparecerá reflejado en partida</li>
+		</ol>
+
+		<div class="Pack Darker d-flex flex-column gap-2 p-2 mt-2">
+			<div class="PackHeader">Movimientos para jugadores de Estatus 1:</div>
+			@foreach(var m in Moves.AllMovements.Where(x=>x.TypeOfMovement == USMove.MovementTypes.CityMoveStatus1))
+			{
+				<MoveViewer ID="m.ID" IsSelected=@(m == SelectedMovement) Clicked=@(_=>{Select(m);}) />
+			}
+		</div>
+		<div class="Pack Darker d-flex flex-column gap-2 p-2 mt-2">
+			<div class="PackHeader">Movimientos para jugadores de Estatus 2:</div>
+			@foreach (var m in Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.CityMoveStatus2))
+			{
+				<MoveViewer ID="m.ID" IsSelected=@(m == SelectedMovement) Clicked=@(_=>{Select(m);}) />
+			}
+		</div>
+		<h3 class="mt-4">Movimientos de facción para Master</h3>
+		<div class="d-flex flex-column gap-2 p-2 mt-2">
+			<ul>
+				<li>Después de que los jugadores hayan hecho sus movimientos de ciudad el master hace movimientos de facción</li>
+				<li>Hace movimientos para aquellas facciones que estan creciendo o decreciendo</li>
+				<li>Organizaciónes de tamaño 1-2 hacen un movimiento.</li>
+				<li>Organizaciónes de tamaño 3-4 hacen dos movimiento.</li>
+				<li>El orden de activación es: Mortalis > Noche > Poder > Velo</li>
+				<li>Dentro del círculo por orden de fuerza</li>
+				<li>Tras los movientos el MC provee el resultado de sus movimientos de ciudad junto a cualquier información que obtendrían inmediatamente del turno de facción. El resto de información se proveerá durante la partida por medio de PNJ</li>
+			</ul>
+		</div>
+		<div class="Pack Darker d-flex flex-column gap-2 p-2 mt-2">
+			<div class="PackHeader">Movimientos de facciones:</div>
+			@foreach (var m in Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.FactionPhaseCityMove))
+			{
+				<MoveViewer ID="m.ID" IsSelected=@(m == SelectedMovement) Clicked=@(_=>{Select(m);}) />
+			}
+		</div>
+	</div>
+}
+else
+{
+	@if(ErrorMessage == ""){
+		<div>Something went wrong: @ErrorMessage</div>
+	}
+	else
+	{
+		<div>Cargando ...</div>
+	}
+}
+
+@code {
+	[Parameter] public string IDString { get; set; } = "";
+	string ErrorMessage;
+	bool IsSheetReady;
+	USMove? SelectedMovement = null;
+
+	protected async override void OnParametersSet()
+	{
+		await Connectors.SetConnectors(JS, Data, Auth);
+		await Msgs.CheckIfReConnnectionNeeded();
+		IsSheetReady = true;
+		StateHasChanged();
+	}
+
+	private void Select(USMove mov)
+	{
+		if (mov == SelectedMovement)
+			SelectedMovement = null;
+		else
+			SelectedMovement = mov;
+	}
+}
