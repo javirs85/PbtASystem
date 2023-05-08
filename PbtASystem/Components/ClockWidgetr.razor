@@ -1,0 +1,44 @@
+﻿<div class="PbtASystemContainer Darker d-flex flex-column p-2">
+	<div class="d-flex justify-content-between">
+		<div>@Clock.Title</div>
+		<div class="d-flex">
+			<img src="imgs/Icons/Remove.svg" @onclick=@(_=>{Clock.Minus();})/>
+			<div class="ClockNumber">@Clock.Value</div>
+			<img src="imgs/Icons/Add.svg" @onclick=@(_=>{Clock.Plus();})/>
+		</div>
+	</div>
+	<div>@last</div>
+	<div>@next</div>
+</div>
+
+@code {
+	[Parameter] public Clock Clock { get; set; } = new();
+	string last
+	{
+		get
+		{
+			int i = Clock.Value;
+			string txt = "";
+			while(txt == "" && i >= 0)
+			{
+				txt = Clock.events[i];
+				i--;
+			}
+			return $"{i++}: {txt}";
+		}
+	}
+	string next
+	{
+		get
+		{
+			int i = Clock.Value;
+			string txt = "";
+			while (txt == "" && i < 9)
+			{
+				txt = Clock.events[i];
+				i++;
+			}
+			return $"{i--}: {txt}";
+		}
+	}
+}

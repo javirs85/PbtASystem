@@ -14,14 +14,16 @@ namespace PbtASystem.Services
 		public string HeaderText = "Estar seguro?";
 		public string BodyText = "Confirma que deseas hacerlo";
 		public string ButtonText = "Borrar Personaje";
+		public string CancelButtonText = "Cancelar";
 
 		TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
-		public async Task<bool> AskUserForConfirmation(string _bodyText = "Confirma que deseas hacerlo", string _buttonText="Borrar", string _headerText = "Estas seguro?")
+		public async Task<bool> AskUserForConfirmation(string _bodyText = "Confirma que deseas hacerlo", string _buttonText="Borrar", string _headerText = "Estas seguro?", string _cancelButtonText = "Cancelar")
 		{
 			HeaderText = _headerText;
 			BodyText = _bodyText;
 			ButtonText = _buttonText;
+			CancelButtonText = _cancelButtonText;
 
 			try
 			{

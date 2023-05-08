@@ -4,7 +4,7 @@
 			<div class="ModalHeader">@Controller.HeaderText</div>
 			<div class="ModalBody">@Controller.BodyText</div>
 			<div class="ModalButtons d-flex w-100 gap-2 justify-content-end">
-				<button class="btn btn-secondary" @onclick=DismissClicked>Cancelar</button>
+				<button class="btn btn-secondary" @onclick=DismissClicked>@Controller.CancelButtonText</button>
 				<button class="btn btn-primary" @onclick=ConfirmClicked>@Controller.ButtonText</button>
 			</div>
 		</div>

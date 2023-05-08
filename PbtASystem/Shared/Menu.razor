@@ -66,6 +66,7 @@
             if (IsActive("Playing")) return Data.CurrentCharacter.Name;
             else if (IsActive("Select")) return "Campaña";
             else if (IsActive("FactionPhase")) return "Fase de facciones";
+            else if (IsActive("Master")) return "Master";
             else return "PbtASystem";
         }
     }
@@ -103,7 +104,7 @@
 
     void Back()
     {
-        
+
     }
 
     bool IsActive(string href)
@@ -115,6 +116,11 @@
             return relativePath.StartsWith("select".ToLower()) ||
                     relativePath.StartsWith("campaña".ToLower()) ||
                     relativePath.StartsWith("character".ToLower());
+        }
+        else if(href == "Master")
+        {
+            return relativePath.StartsWith("master".ToLower()) ||
+                    relativePath.StartsWith("ClockViewer".ToLower());
         }
         return relativePath.StartsWith(href.ToLower());
     }

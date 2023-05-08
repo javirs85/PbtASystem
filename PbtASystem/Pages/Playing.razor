@@ -450,7 +450,7 @@ else
 		Guid ID = new Guid(IDString);
 		var character = Data.GetCharacterByID(ID);
 		Data.CurrentCharacter = character;
-
+		 
 		var Map = Data.Chronicle.PlayerLinks.Find(x => x.CharacterID == ID);
 		if (Map is null)
 		{

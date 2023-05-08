@@ -138,6 +138,48 @@ public class Chronicle
 	public List<Guid> FactionIDs { get; set; } = new();
 	public string MasterPlayerID { get; set; } = "";
 	public List<MapPlayerCharacter> PlayerLinks { get; set; } = new();
+	public List<Clock> Clocks { get; set; } = new();
+}
+
+
+public class Clock
+{
+	public Guid ID { get; set; } = new Guid();
+	public string Title { get; set; } = "";
+	public int Value { get; set; } = 0;
+	public List<string> events { get; set; } = new();
+	public string Event1 { get { return events[0]; }set { events[0] = value; } }
+	public string Event2 { get { return events[1]; }set { events[1] = value; } }
+	public string Event3 { get { return events[2]; }set { events[2] = value; } }
+	public string Event4 { get { return events[3]; }set { events[3] = value; } }
+	public string Event5 { get { return events[4]; }set { events[4] = value; } }
+	public string Event6 { get { return events[5]; }set { events[5] = value; } }
+	public string Event7 { get { return events[6]; }set { events[6] = value; } }
+	public string Event8 { get { return events[7]; }set { events[7] = value; } }
+	public string Event9 { get { return events[8]; }set { events[8] = value; } }
+
+	public void Minus()
+	{
+		Value = Math.Max(0, Value-1);
+	}
+	public void Plus() =>Value = Math.Min(8, Value+1);
+	
+
+	public Clock()
+	{
+
+		ID = Guid.NewGuid();
+		Title = "Nuevo reloj";
+		events.Add("");
+		events.Add("");
+		events.Add("");
+		events.Add("");
+		events.Add("");
+		events.Add("");
+		events.Add("");
+		events.Add("");
+		events.Add("");
+	}
 }
 
 public class MapPlayerCharacter

@@ -227,4 +227,5 @@ public static class EnumExtensions
 			_ => $"Unknown arquetipe ToUI: {arq.ToString()}"
 		};
 	}
+
 }

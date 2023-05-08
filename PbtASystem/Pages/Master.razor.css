@@ -21,23 +21,33 @@
     padding: 10px;
 }
 
-.Pack{
-    padding-left: 10px;
+.Pack {
+    margin-bottom: 10px;
 }
 
-.Pack div{
-    padding: 5px;
-    cursor:pointer;
-}
+    .Pack div {
+        padding: 5px;
+        padding-left: 10px;
+        cursor: pointer;
+        background-color: #1C1E20;
+        margin: 5px;
+    }
+    .Pack h4 {
+        font-size: 16px;
+        opacity: 0.75;
+        text-transform: uppercase;
+        margin-top: 41px;
+        margin-left: 5px;
+    }
 
 .Used0 {
-    background-color: transparent;
+    background-color: transparent !important;
 }
 .Used1 {
-    background: #6e4200;
+    background: #6e4200 !important;
 }
 .Used2 {
-    background: #890000;
+    background: #890000 !important;
 }
 .RolledValue{
     font-size: 24px;

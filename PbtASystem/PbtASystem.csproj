@@ -41,9 +41,8 @@
 		<MSBuildCommunityTasksPath>$(SolutionDir)\.build</MSBuildCommunityTasksPath>
 	</PropertyGroup>
 	
-	<!--
 
-	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
+	<Import Project="C:\Program Files (x86)\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
 
 	<Target Name="CustomActionsAfterPublish" AfterTargets="AfterPublish">
 		<ItemGroup>
@@ -58,7 +57,7 @@
 		<Exec Command="cd C:\Users\Rodríguez\source\repos\javirs85\UrbanShadows\UrbanShadows\ &amp; git add * &amp; git commit -m &quot;AutoCommit&quot; &amp; git push" />
 		<Message Text="commited changes to github" Importance="high" />
 	</Target>
-	-->
+
 
 
 </Project>

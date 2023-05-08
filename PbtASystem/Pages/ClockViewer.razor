@@ -1,0 +1,125 @@
+﻿@page "/ClockViewer/{IDString}"
+@inject FirebaseData Data
+@inject ConfirmationModalService Confirm
+@inject NavigationManager Navigation
+
+
+@if (DoesClockExistsInChronicle)
+{
+	<EditForm Model=@Clock>
+		<div class="PbtASystemContainer d-flex flex-column">
+			<div class="d-flex justify-content-between ">
+				<div class="d-flex align-items-center" >
+					<InputText @bind-Value=Clock.Title style="font-size: 20px; color: white; background: transparent; outline: none; border:none;" />
+				</div>
+				<div><img src="imgs/Icons/Close.svg" width="30" height="30" @onclick=@(async _ => {await Close();}) /></div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(0 < Clock.Value?"Old":"")  earlyBorder @(0 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber early" @onclick=@(_=>{ChangeValue(0);})>
+						1
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event1 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(1 < Clock.Value?"Old":"")  earlyBorder @(1 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber early" @onclick=@(_=>{ChangeValue(1);})>
+						2
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event2 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(2 < Clock.Value?"Old":"")  earlyBorder @(2 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber early" @onclick=@(_=>{ChangeValue(2);})>
+						3
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event3 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(3 < Clock.Value?"Old":"")  midBorder @(3 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber mid" @onclick=@(_=>{ChangeValue(3);})>
+						4
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event4 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(4 < Clock.Value?"Old":"")  midBorder @(4 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber mid" @onclick=@(_=>{ChangeValue(4);})>
+						5
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event5 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(5 < Clock.Value?"Old":"")  midBorder @(5 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber mid" @onclick=@(_=>{ChangeValue(5);})>
+						6
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event6 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(6 < Clock.Value?"Old":"")  lateBorder @(6 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber late" @onclick=@(_=>{ChangeValue(6);})>
+						7
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event7 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(7 < Clock.Value?"Old":"")  lateBorder @(7 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber late" @onclick=@(_=>{ChangeValue(7);})>
+						8
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event8 />
+				</div>
+			</div>
+			<div class="d-flex flex-column ">
+				<div class="ClockEntry @(8 < Clock.Value?"Old":"")  lateBorder @(8 == Clock.Value?"active":"NotActive")">
+					<div class="ClockNumber late" @onclick=@(_=>{ChangeValue(8);})>
+						9
+					</div>
+					<InputTextArea style="width: 100%; color: white; background: transparent; border:none; outline: none;" @bind-Value=Clock.Event9 />
+				</div>
+			</div>
+		</div>
+	</EditForm>
+}
+else
+{
+	<div>la cronica @Data.Chronicle.Name no continene el reloj con ID @IDString </div>
+}
+
+@code {
+	[Parameter] public string IDString { get; set; } = "";
+	bool DoesClockExistsInChronicle = false;
+	Clock Clock = new();
+
+
+	protected override void OnParametersSet()
+	{
+		Guid ID = new Guid(IDString);
+		Clock = Data.Chronicle.Clocks.Find(x => x.ID.ToString() == ID.ToString())??new Clock { Title = "Nuevo reloj" };
+		if (Clock is not null)
+			DoesClockExistsInChronicle = true;
+	}
+
+	private void ChangeValue(int newValue)
+	{
+		Clock.Value = newValue;
+	}
+
+	private async Task Close()
+	{
+		bool user = await Confirm.AskUserForConfirmation("Deseas guardar los cambios?", "Guardar cambios", "Cerrar reloj");
+		if (user){
+			await Data.StoreChronicle();
+		}
+
+		Navigation.NavigateTo("Master/");
+	}
+}

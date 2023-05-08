@@ -29,10 +29,31 @@
 	<div class="Item" id="MainAccordeon">
 		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack1">Movimientos</h1>
 		<div class="Pack collapse" id="Pack1" data-bs-parent="#MainAccordeon">
+			<h4>Movimientos del MC</h4>
 			@foreach (var mov in Movimientos.OrderBy(x=>x.Usage))
 			{
 				<div class="@(mov.Usage == 0 ? "Used0" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used2" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
 			}		
+			<h4>Movimientos de la mortandad</h4>
+			@foreach (var mov in Mortalis.OrderBy(x => x.Usage))
+			{
+				<div class="@(mov.Usage == 0 ? "Used0" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used2" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
+			}
+			<h4>Movimientos de la Noche</h4>
+			@foreach (var mov in Noche.OrderBy(x => x.Usage))
+			{
+				<div class="@(mov.Usage == 0 ? "Used0" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used2" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
+			}
+			<h4>Movimientos del Poder</h4>
+			@foreach (var mov in Poder.OrderBy(x => x.Usage))
+			{
+				<div class="@(mov.Usage == 0 ? "Used0" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used2" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
+			}
+			<h4>Movimientos del Velo</h4>
+			@foreach (var mov in Velo.OrderBy(x => x.Usage))
+			{
+				<div class="@(mov.Usage == 0 ? "Used0" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used2" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
+			}
 		</div>
 	</div>
 	<div class="Item">
@@ -47,7 +68,11 @@
 	<div class="Item">
 		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack3">Relojes</h1>
 		<div class="Pack collapse" id="Pack3" data-bs-parent="#MainAccordeon">
-			<div>relojes varios</div>
+			@foreach(var clock in Data.Chronicle.Clocks)
+			{
+				<ClockWidgetr Clock="clock"/>
+			}
+			<button class="btn btn-outline-light" @onclick=AddClock>Añadir reloj</button>
 		</div>
 	</div>
 </div>
@@ -105,6 +130,35 @@
 		new MasterMovement{ Tittle = "Mancha las manos de todos los implicados"},
 		new MasterMovement{ Tittle = "Ponle precio a todo, incluso a la amistad"}
 	};
+	List<MasterMovement> Mortalis = new List<MasterMovement>
+	{
+		new MasterMovement{ Tittle = "Adaptarse a circunstancias cambiantes"},
+		new MasterMovement{ Tittle = "Reunirse en gran número para hacer frentea una amenaza"},
+		new MasterMovement{ Tittle = "Descubrir información que ponga a alguien en peligro"},
+		new MasterMovement{ Tittle = "Recordarle a alguien sus obligaciones del día a día"}
+	};
+	List<MasterMovement> Noche = new List<MasterMovement>
+	{
+		new MasterMovement{ Tittle = "Exhibir un agresivo despliegue de fuerza."},
+		new MasterMovement{ Tittle = "Amenazar las posesiones o intereses de alguien."},
+		new MasterMovement{ Tittle = "Reclamar el territorio de necios o débiles."},
+		new MasterMovement{ Tittle = "Sacar el mayor partido posible de una situación difícil."}
+	};
+	List<MasterMovement> Poder = new List<MasterMovement>
+	{
+		new MasterMovement{ Tittle = "Dar prioridad a las consecuencias a largo plazo."},
+		new MasterMovement{ Tittle = "Augurar místicamente una Tormenta que	se avecina."},
+		new MasterMovement{ Tittle = "Actuar en contra del caos o el cambio."},
+		new MasterMovement{ Tittle = "Arrebatar recursos vulnerables o expuestos."}
+	};
+	List<MasterMovement> Velo = new List<MasterMovement>
+	{
+		new MasterMovement{ Tittle = "Revelar una diversidad de culturas foráneas e insólitas."},
+		new MasterMovement{ Tittle = "Ofrecer poder a cambio de una promesa o prenda."},
+		new MasterMovement{ Tittle = "Llevar algo de un reino a otro."},
+		new MasterMovement{ Tittle = "Agravar un conflicto por razones misteriosas u oscuras."}
+	};
+
 	protected async override void OnParametersSet()
 	{
 		await Connectors.SetConnectors(JS, Data, Auth);
@@ -121,5 +175,12 @@
 		LastMoveMsg = msg;
 		LastMove = Moves.GetMovement(msg.MoveID) as USMove;
 		StateHasChanged();
+	}
+
+	private void AddClock()
+	{
+		Clock cl = new();
+		Data.Chronicle.Clocks.Add(cl);
+		Navigation.NavigateTo($"ClockViewer/{cl.ID}");
 	}
 }
