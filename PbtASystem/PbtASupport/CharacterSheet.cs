@@ -53,6 +53,8 @@ public class CharacterSheet
 
 	public void InitArchetype()
 	{
+		InitialDebs.Clear();
+		InitialQuestions.Clear();
 		switch (Archetype)
 		{
 			case AvailableArchetypes.Hunter:
