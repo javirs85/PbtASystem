@@ -30,7 +30,7 @@ public class Character
 	public string FinalGoal { get; set; } = "";
 	public string CurrentGoal { get; set; } = "";
 	public string MasterSeeds { get; set; } = "";
-	
+	public Guid? SheetID { get; set; } = null;
 
 	public Character Duplicate()
 	{
@@ -186,5 +186,4 @@ public class MapPlayerCharacter
 {
 	public string PlayerID { get; set; } = "";
 	public Guid CharacterID { get; set; } = new();
-	public Guid? CharacterSheetID { get; set;} = new();
 }

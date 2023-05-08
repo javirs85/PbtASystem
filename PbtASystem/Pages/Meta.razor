@@ -34,7 +34,7 @@ else
 			<div>Antiguedad de los datos cargados en local: @Data?.LocalDataAgeInDays? dias</div>
 			<div>Personaje escogido para jugar: @Data?.PlayerCharacter?.Name</div>
 			<div>Usuario: @Auth?.ConnectedUserName</div>
-			<div class="btn btn-primary" @onclick=Auth.TryLogin>Login</div>
+			<div class="btn btn-primary" @onclick=Auth.TryLogin>Login via gmail</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>
 			@if (isDefaultIDSet)
@@ -122,11 +122,18 @@ else
 	private async Task AllowPlayerToChooseCharacter()
 	{
 		await Auth.AllowPlayerToChooseCharacter();
-		isDefaultIDSet = await Data.IsDefaultCharacterIDSet();
 
-		if(Auth.IsConnectedViaGoogle)
+		await Data.StoreMapPlayerCharacter(Auth.ConnectedUserName, Data.PlayerCharacter.ID);
+	
+
+		Data.CurrentCharacter = Data.PlayerCharacter;
+		if(Data.CurrentCharacter.SheetID is not null)
 		{
-			await Data.StoreMapPlayerCharacter(Auth.ConnectedUserName, Data.PlayerCharacter.ID);
+			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID((Guid)Data.CurrentCharacter.SheetID);
+		}
+		else
+		{
+			Data.CurrentPlayerSheet = new CharacterSheet();
 		}
 
 		StateHasChanged();

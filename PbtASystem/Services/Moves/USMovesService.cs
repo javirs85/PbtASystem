@@ -1239,13 +1239,13 @@ public class USMovesService : MovementsProviderBase
 		});
 		result.Add(new USMove(USMoveIDs.A_Corrup_03, USAttributes.Blood)
 		{
-			Tittle = "No me mires",
+			Tittle = "Lengua de plata",
 			TypeOfMovement = USMove.MovementTypes.ArchetipeMovement,
 			IsSelected = false,
 			Archetipe = AvailableArchetypes.Corrupted,
 			PreCondition = new Consequences
 			{
-				MainText = "Cuando confundas a alguien, tira con Corazón en vez de Mente."
+				MainText = "Cuando *leas a alguien** a alguien, a base de tentarlos con poder, tira con Corazón en vez de Mente."
 			}
 		});
 		result.Add(new USMove(USMoveIDs.A_Corrup_04, USAttributes.Soul)
@@ -3005,7 +3005,7 @@ public class USMovesService : MovementsProviderBase
 			Tittle = "Revelaciones",
 			TypeOfMovement = USMove.MovementTypes.UniqueMove,
 			IsSelected = true,
-			Archetipe = AvailableArchetypes.Corrupted,
+			Archetipe = AvailableArchetypes.Oracle,
 			PreCondition = new Consequences
 			{
 				MainText = "Antes de cada turno de facción, o al comienzo de la partida, tira con espíritu. Si tienes éxito elige una de las opciones siguientes. Después del turno de facción el MC te dirá lo que tus herramientas proféticas han revelado",

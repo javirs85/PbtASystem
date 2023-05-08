@@ -389,7 +389,7 @@ else
 
 			@if (Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
 			{
-				<button @onclick=CreateSheet class="btn btn-primary w-75 p-2">
+				<button @onclick=CreateSheet class="btn btn-primary w-75 p-2 d-flex align-items-center">
 					<div class="d-flex flex-column align-content-center">
 						<div>Crear Ficha de personaje para</div>
 						<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
@@ -450,19 +450,20 @@ else
 		Guid ID = new Guid(IDString);
 		var character = Data.GetCharacterByID(ID);
 		Data.CurrentCharacter = character;
-		 
+
 		var Map = Data.Chronicle.PlayerLinks.Find(x => x.CharacterID == ID);
 		if (Map is null)
 		{
 			ErrorMessage = $"{ID} is not in the maps of the chronicle";
 			return;
 		}
-		if(Map.CharacterSheetID is null || Map.CharacterSheetID == new Guid())
+		if(character.SheetID is null)
 		{
 			ErrorMessage = $"{character.Name} ({ID}) No tiene una ficha en esta crónica.";
+			StateHasChanged();
 			return;
 		}
-		var SheetID = (Guid)Map.CharacterSheetID;
+		var SheetID = (Guid)character.SheetID;
 
 		if (await Data.CheckIfSheetExists((SheetID)))
 		{
@@ -485,18 +486,18 @@ else
 		FaeMagic.Tittle = "Magia de Hadas";
 
 
-		SectionSelected(Sections.Basic);
+		await SectionSelected(Sections.Basic);
 
 		StateHasChanged();
 	}
 
-	private async Task CorruptionClicked(int n)
+	private void CorruptionClicked(int n)
 	{
 		if (n > Data.CurrentPlayerSheet.Corruption) Data.CurrentPlayerSheet.Corruption++;
 		else Data.CurrentPlayerSheet.Corruption--;
 	}
 
-	private async Task WoundClicked(int n)
+	private void WoundClicked(int n)
 	{
 		if (n > Data.CurrentPlayerSheet.Damage) Data.CurrentPlayerSheet.Damage++;
 		else Data.CurrentPlayerSheet.Damage--;
@@ -597,8 +598,11 @@ else
 		Data.CurrentPlayerSheet.LIOs = (from lio in Moves.AllLio where lio.Archetype == Data.CurrentPlayerSheet.Archetype select lio.ID).ToList();
 		Data.CurrentPlayerSheet.ID = Guid.NewGuid();
 		await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
-		Data.Chronicle.PlayerLinks.Find(x => x.PlayerID == Auth.ConnectedUserName).CharacterSheetID = Data.CurrentPlayerSheet.ID;
-		await Data.StoreChronicle();
+		Data.CurrentCharacter.SheetID = Data.CurrentPlayerSheet.ID;
+		await Data.StoreCharacter(Data.CurrentCharacter);
+		await Data.ForceDataRefresh();
+		IsSheetReady = true;
+		StateHasChanged();
 	}
 
 

@@ -148,12 +148,13 @@ else
 			ErrorMessage = $"{ID} is not in the maps of the chronicle";
 			return;
 		}
-		if (Map.CharacterSheetID is null || Map.CharacterSheetID == new Guid())
+		
+		if (character.SheetID is null)
 		{
 			ErrorMessage = $"{character.Name} ({ID}) No tiene una ficha en esta crónica.";
 			return;
 		}
-		var SheetID = (Guid)Map.CharacterSheetID;
+		var SheetID = (Guid)character.SheetID;
 
 		if (await Data.CheckIfSheetExists((SheetID)))
 		{
