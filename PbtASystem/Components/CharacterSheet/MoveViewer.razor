@@ -32,11 +32,11 @@
 				@if(Data.CurrentPlayerSheet.SelectedArchetypeMoves.Contains(Move.ID) || 
 					Data.CurrentPlayerSheet.SelectedCorruptionMoves.Contains(Move.ID))
 				{
-					<img src="imgs/Icons/Remove.svg" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);}) />
+					<img src="imgs/Icons/Remove.svg" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);}) />
 				}
 				else
 				{
-					<img src="imgs/Icons/Add.svg" style="opacity: 0.75;" width="20" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);})/>
+					<img src="imgs/Icons/Add.svg" style="opacity: 0.75;" @onclick=@(_=>{SelectedInSelectionMode.InvokeAsync(Move);})/>
 				}
 			}
 		</div>
@@ -211,7 +211,7 @@
 								}
 								else
 								{
-										<img src="imgs/Icons/Add.svg" width="25" style="cursor:pointer;" @onclick=@(async _=> {await ToggleLIO(hability);}) />
+									<img src="imgs/Icons/Add.svg" width="25" style="cursor:pointer;" @onclick=@(async _=> {await ToggleLIO(hability);}) />
 								}
 							</div>
 						}

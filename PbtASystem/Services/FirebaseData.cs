@@ -6,6 +6,7 @@ using Blazored.LocalStorage;
 using System;
 using PbtASystem.Components;
 using System.Runtime.CompilerServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PbtASystem.Services;
 
@@ -25,10 +26,14 @@ public class FirebaseData : USBDbase
 		{
 			_playerCharacter = value;
 			CurrentCharacter = _playerCharacter;
-		} 
-	}
-
-	public CharacterSheet CurrentPlayerSheet = new CharacterSheet();
+        }
+    }
+    public CharacterSheet CurrentPlayerSheet = new CharacterSheet {ID = new Guid()};
+	public bool IsCharacterSheetReady => PlayerCharacter is not null &&
+									     PlayerCharacter.SheetID is not null &&
+									     CurrentPlayerSheet != null && 
+										 CurrentPlayerSheet.ID.ToString() != "00000000-0000-0000-0000-000000000000" &&
+										 CurrentPlayerSheet.ID == PlayerCharacter.SheetID;
 
 	public Chronicle Chronicle { get; set; } = new Chronicle();
 
@@ -105,7 +110,14 @@ public class FirebaseData : USBDbase
 			// Toaster.ShowSuccess($"{numChars} characters loaded from local memory. \n {numFactions} factions \n {numDebts} Debts \n {numRumors} rumors \n {LocalDataAge.Days} days old");
 
 			if (await IsDefaultCharacterIDSet())
+			{
 				PlayerCharacter = GetCharacterByID(await GetDefaultCharacterID());
+				if(PlayerCharacter.SheetID is not null && PlayerCharacter.SheetID.ToString() != new Guid().ToString())
+				{
+					if(await CheckIfSheetExists((Guid)PlayerCharacter.SheetID))
+						CurrentPlayerSheet = await GetCharacterSheetByID((Guid)PlayerCharacter.SheetID);
+				}
+			}
 
 			IsDataReady = true;
 			DataIsReady?.Invoke(this, EventArgs.Empty);
@@ -160,7 +172,11 @@ public class FirebaseData : USBDbase
 	internal async Task StoreDefaultCharacter(Character selected) => await LocalStorage.SetItemAsync<Guid>("DefaultCharacter", selected.ID);
 	internal async Task<Guid> GetDefaultCharacterID() => await LocalStorage.GetItemAsync<Guid>("DefaultCharacter");
 	internal async Task<bool> IsDefaultCharacterIDSet() => await LocalStorage.ContainKeyAsync("DefaultCharacter");
-	internal async Task ClearDefaultCharacter() => await LocalStorage.RemoveItemAsync("DefaultCharacter");
+	internal async Task ClearDefaultCharacter()
+	{
+		await LocalStorage.RemoveItemAsync("DefaultCharacter");
+		PlayerCharacter = new Character { Name = "Not set" };
+	}
 
 	internal Character GetCharacterByID(Guid id) => AllCharacters?.Find(x=>x.ID == id)??new Character { Name = "Character not found"};
 
@@ -187,6 +203,7 @@ public class FirebaseData : USBDbase
 
 
 	public async Task StoreChronicle() => await Firebase.InvokeVoidAsync("StoreChronicle", Chronicle);
+	public async Task StoreChronicle(Chronicle ch) => await Firebase.InvokeVoidAsync("StoreChronicle", ch);
 	public async Task GetChronicle(Guid ID) => Chronicle = await Firebase.InvokeAsync<Chronicle>("GetChronicle", ID);
 
 	internal void SetDefaultCharacterToCurrentPlayer(string connectedPlayerCode)

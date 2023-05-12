@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using PbtASystem.PbtASupport;
 
 namespace PbtASystem.Services
 {
@@ -22,11 +23,6 @@ namespace PbtASystem.Services
 				await Data.StablishJSConnector(FirebaseJSRef);
 			}
 
-			if (Data != null && Data.AllCharacters != null &&  Data.AllCharacters.Count == 0)
-				await Data.LoadAllAsync();
-
-			if (Data != null && Data.Chronicle.Name == "")
-				await Data.GetChronicle(new Guid("6210b905-e706-477a-bfc9-8d6528fe6e19"));
 		}
 	}
 }

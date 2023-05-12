@@ -9,12 +9,61 @@
 <CharacterSelector/>
 <ConfirmationModal/>
 
-<div class="page d-flex flex-column w-100">
-    <Menu/>
-    @Body
-</div>
+@if(WaitingForConnection)
+{
+	<div class="w-100 d-flex h-100 justify-content-center align-items-center" style="min-height: 200px;">
+		Comprovando credenciales ... 
+	</div>
+}
+else
+{
+	<div class="page d-flex flex-column w-100 PbtASystemContainer Black">
+		@if (Auth.IsUserConnected)
+		{
+			<div class="w-100 d-flex Darker TopMenu gap-1">
+				<div class="d-flex flex-grow-1 gap-1">
+					<div class="TopMenuButton @(CurrentlyViewing == Views.Sheet?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Sheet);}) >Ficha</div>
+					<div class="TopMenuButton @(CurrentlyViewing == Views.Moves?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Moves);})>Movs</div>
+					<div class="TopMenuButton @(CurrentlyViewing == Views.Campaign?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Campaign);})>Campaña</div>
+					<div class="TopMenuButton @(CurrentlyViewing == Views.FactionPhase?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.FactionPhase);})>T.Facción</div>
+				</div>
+				<div class="TopMenuButton @(CurrentlyViewing == Views.Settings?"TopMenuButtonActive":"")"
+					style="max-width: 40px;"
+					@onclick=@(_=>{ChangeViewTo(Views.Settings);})>
+					<img style="@(CurrentlyViewing == Views.Settings?"filter: invert(1);":"") opacity: 0.5;" width="25" src="imgs/Icons/Settings.svg" />
+				</div>
+			</div>
+		}
+		else
+		{
+			<div class="NoUserError">
+				USUARIO NO CONECTADO
+			</div>
+		}
+
+		@if(CurrentlyViewing == Views.Sheet)
+		{
+			<Playing />
+		}
+		else if(CurrentlyViewing == Views.Settings)
+		{
+			<Meta />
+		}
+		else if(CurrentlyViewing == Views.Moves)
+		{
+			<PlayingMoves />
+		}
+		else if(CurrentlyViewing == Views.Campaign)
+		{
+			<CharacterViewer/>
+		}
+	</div>
+}
+
 
 @code{
+	enum Views {Sheet, Moves, Campaign, FactionPhase, Settings};
+	Views CurrentlyViewing = Views.Settings;
 
 	IJSObjectReference FirebaseJSRef;
 	[Inject] IJSRuntime JS { get; set; }
@@ -25,17 +74,62 @@
 	[Inject] Blazored.LocalStorage.ILocalStorageService LocaStorageManager { get; set; }
 	[Inject] CharacterSelectionService CharacterSelector { get; set; }
 	[Inject] NavigationManager NavigationManager { get; set; }
+
+	private bool WaitingForConnection = true;
+
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
-
-			Data.DataIsReady += NavigateToRootAndDisconnect;
-			Auth.UserChanged += (o, name) =>
+			Auth.UserChanged += async (o, name) =>
 			{
+				WaitingForConnection = false;
+				if (name == "No user connected")
+				{
+
+				}
+				else
+				{
+					if (Data != null && Data.AllCharacters != null && Data.AllCharacters.Count == 0)
+						await Data.LoadAllAsync();
+
+					Chronicle test = new Chronicle { Name = "test" };
+					await Data.StoreChronicle(test);
+
+
+					if (Data != null && Data.Chronicle.Name == "")
+						await Data.GetChronicle(new Guid("6210b905-e706-477a-bfc9-8d6528fe6e19"));
+
+					if((await Data.IsDefaultCharacterIDSet()) == false)
+					{
+						await AllowPlayerToChooseCharacter();
+					}
+					await Messaging.CheckIfReConnnectionNeeded();
+				}
+				
 				StateHasChanged();
 			};
 		}
+	}
+
+	private async Task AllowPlayerToChooseCharacter()
+	{
+		await Auth.AllowPlayerToChooseCharacter();
+
+		await Data.StoreMapPlayerCharacter(Auth.ConnectedUserName, Data.PlayerCharacter.ID);
+
+
+		Data.CurrentCharacter = Data.PlayerCharacter;
+		if (Data.CurrentCharacter.SheetID is not null)
+		{
+			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID((Guid)Data.CurrentCharacter.SheetID);
+		}
+		else
+		{
+			Data.CurrentPlayerSheet = new CharacterSheet();
+		}
+
+		StateHasChanged();
 	}
 
 	private bool AlreadySetUp = false;
@@ -43,18 +137,19 @@
 	protected async override Task OnParametersSetAsync()
 	{
 		await Connectors.SetConnectors(JS, Data, Auth);
+
 		#if DEBUG
-			URLSupport.IsRelease = false;
+		URLSupport.IsRelease = false;
 		#else
-			URLSupport.IsRelease = true;
+		URLSupport.IsRelease = true;
 		#endif
-		
 	}
 
-	private void NavigateToRootAndDisconnect(object? sender, EventArgs e)
+	private void ChangeViewTo(Views newView)
 	{
-		// NavigationManager.NavigateTo("/");
+		CurrentlyViewing = newView;
 	}
+
 
 	public void Dispose()
 	{

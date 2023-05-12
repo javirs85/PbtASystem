@@ -61,12 +61,12 @@ public abstract class USBDbase : iUSDB
 	}
 
 	public event EventHandler ForceUIUpdate;
-	private Character _currentCharacter = new();
+	private Character? _currentCharacter = new();
 
 	/// <summary>
 	/// The Character that is currently selected for inspection. NOT the one MANAGED by the human player.
 	/// </summary>
-	public Character CurrentCharacter
+	public Character? CurrentCharacter
 	{
 		get { return _currentCharacter; }
 		set { 
@@ -76,7 +76,7 @@ public abstract class USBDbase : iUSDB
 		}
 	}
 
-	public Faction CurrentFaction { get; set; } = new();
+	public Faction? CurrentFaction { get; set; } = new();
 	public Circles CurrentCircle { get; set; } = Circles.Mortalis;
 
 	public List<Character> AllCharacters { get; protected set; } = new();

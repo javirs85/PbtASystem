@@ -101,6 +101,12 @@ public class Faction
 	{
 		get { return Faction.GetGenericFactionMovements; }
 	}
+
+	public Faction Duplicate()
+	{
+		string str = System.Text.Json.JsonSerializer.Serialize(this);
+		return System.Text.Json.JsonSerializer.Deserialize<Faction>(str);
+	}
 }
 public class Move
 {

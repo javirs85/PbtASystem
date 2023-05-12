@@ -1,5 +1,4 @@
-﻿@page "/Character/{IDString}"
-@inject IToastService Toaster;
+﻿@inject IToastService Toaster;
 @inject FirebaseData Data;
 @inject FirebaseAuth Auth;
 @inject FirebaseMessaging Msgs;
@@ -11,133 +10,164 @@
 <div class="d-flex flex-column w-100"> 
 	<div class="PbtASystemContainer container-fluid">
 		<div class="row">
-			<div class="d-none d-md-block col-4 col-xl-3">
-				<CharacterFactionSelector />
-			</div>
-
-			<div class="flex-grow-1 col">
-				<div class="d-flex flex-column">
-					<div class="container-fluid">
-						<div class="row">
-							<div class="col-12 col-sm-6 col-xl-4  col-xxl-3 d-flex flex-column" style="padding:0">
-								<div class="ImageCanvas" style="@(Data.CurrentCharacter.IsDead?"filter: contrast(0.5) brightness(1.5) grayscale(1) sepia(1) hue-rotate(311deg) brightness(0.5) saturate(2.5);":"")">
-									<img src="@Image64"/>
-									<div class="UpperButtons d-flex w-100 justify-content-between flex-row-reverse">
-										<div class="d-flex gap-2">
-											<div class="ImageButton" @onclick=Edit >
-												<i class="bi bi-pencil Edit" />
+			
+			@if(Data.CurrentCharacter is null && Data.CurrentFaction is null)
+			{
+				<div class="">
+					<CharacterFactionSelector CharacterSelected="CharacterSelected" FactionSelected="FactionSelected"/>
+				</div>
+			}
+			else
+			{
+				<div class="d-none d-md-block col-4 col-xl-3">
+					<CharacterFactionSelector CharacterSelected="CharacterSelected" FactionSelected="FactionSelected" />
+				</div>
+			}
+			@if(Data.CurrentCharacter is not null)
+			{
+				<div class="flex-grow-1 col">
+					<div class="d-flex flex-column">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-12 col-sm-6 col-xl-4  col-xxl-3 d-flex flex-column" style="padding:0">
+									<div class="ImageCanvas" style="@(Data.CurrentCharacter.IsDead?"filter: contrast(0.5) brightness(1.5) grayscale(1) sepia(1) hue-rotate(311deg) brightness(0.5) saturate(2.5);":"")">
+										<img src="@Image64"/>
+										<div class="UpperButtons d-flex w-100 justify-content-between flex-row-reverse">
+											<div class="d-flex gap-2">
+												<div class="ImageButton" @onclick=Edit >
+													<i class="bi bi-pencil Edit" />
+												</div>
+											</div>
+											<div class="d-block d-md-none">
+												<div class="ImageButton" @onclick=UnSelect>
+													<i class="bi bi-arrow-left BackButton"  />
+												</div>
 											</div>
 										</div>
-										<div class="d-block d-md-none">
-											<div class="ImageButton" @onclick=@(()=>{Navigation.NavigateTo("Select");})>
-												<i class="bi bi-arrow-left BackButton"  />
-											</div>
+										<div class="NameDiv">
+											@Data.CurrentCharacter.Name
 										</div>
 									</div>
-									<div class="NameDiv">
-										@Data.CurrentCharacter.Name
+
+									<div class="d-flex flex-column gap-2 d-none d-sm-block">
+										<div class="CharacterEntryLine">@CharFactionString</div>
+										<div class="CharacterEntryLine">@Data.CurrentCharacter.Tick</div>
+										<div class="d-flex flex-column gap-4 mt-4">
+											<div class="CharacterEntryBox">
+												<div class="CharacterEntryHeader">Detalles</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.Details</div>
+											</div>
+											<div class="CharacterEntryBox">
+												<div class="CharacterEntryHeader">Objetivo final</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.FinalGoal</div>
+											</div>
+											<div class="CharacterEntryBox">
+												<div class="CharacterEntryHeader">Actualmente...</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.CurrentGoal</div>
+											</div>
+											<div class="MasterSeeds">
+												<div class="CharacterEntryHeader">Master seeds</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.MasterSeeds</div>
+											</div>
+										</div>
 									</div>
 								</div>
-
-								<div class="d-flex flex-column gap-2 d-none d-sm-block">
-									<div class="CharacterEntryLine">@CharFactionString</div>
-									<div class="CharacterEntryLine">@Data.CurrentCharacter.Tick</div>
-									<div class="d-flex flex-column gap-4 mt-4">
-										<div class="CharacterEntryBox">
-											<div class="CharacterEntryHeader">Detalles</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.Details</div>
-										</div>
-										<div class="CharacterEntryBox">
-											<div class="CharacterEntryHeader">Objetivo final</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.FinalGoal</div>
-										</div>
-										<div class="CharacterEntryBox">
-											<div class="CharacterEntryHeader">Actualmente...</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.CurrentGoal</div>
-										</div>
-										<div class="MasterSeeds">
-											<div class="CharacterEntryHeader">Master seeds</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.MasterSeeds</div>
+								<div class="col col-sm-6 col-xl-8 col-xxl-9 mt-4">
+									<div class="d-flex gap-2">
+										<div>Deudas a pagar</div>
+										<i class="bi bi-plus-square AddDebtButton" @onclick=@(async()=>{await AddNewDeb(DebtViewer.PayingMode.ToPay);}) />
+									</div>
+									<div class="DebtsColmnsPhone d-flex d-sm-none p-2 d-flex flex-column gap-1">
+										@foreach (var d in Data.AllDebts.Where(x => x.PayingID == Data.CurrentCharacter.ID))
+										{
+											<DebtViewer Debt="d" ForceUpdateUI="StateHasChanged" />
+										}
+									</div>
+									<div class="DebtsColmns d-none d-sm-flex p-2 d-flex flex-column gap-1">
+										@foreach (var d in Data.AllDebts.Where(x => x.PayingID == Data.CurrentCharacter.ID))
+										{
+											<DebtViewer Debt="d" ForceUpdateUI="StateHasChanged" />
+										}
+									</div>
+									<div class="d-flex gap-2 pt-3">
+										<div>Deudas a cobrar</div>
+										<i class="bi bi-plus-square AddDebtButton" @onclick=@(async()=>{await AddNewDeb(DebtViewer.PayingMode.ToBePaid);}) />
+									</div>
+									<div class="DebtsColmnsPhone d-block d-sm-none p-2 d-flex flex-column gap-1">
+										@foreach (var d in Data.AllDebts.Where(x => x.ReceivingID == Data.CurrentCharacter.ID))
+										{
+											<DebtViewer Debt="d" Mode="DebtViewer.PayingMode.ToBePaid" ForceUpdateUI="StateHasChanged" />
+										}
+									</div>
+									<div class="DebtsColmns d-none d-sm-block  p-2 d-flex flex-column gap-1">
+										@foreach (var d in Data.AllDebts.Where(x => x.ReceivingID == Data.CurrentCharacter.ID))
+										{
+											<DebtViewer Debt="d" Mode="DebtViewer.PayingMode.ToBePaid" ForceUpdateUI="StateHasChanged" />
+										}
+									</div>
+									<div class="d-flex flex-column gap-2 d-block d-sm-none">
+										<div class="CharacterEntryLine">@Data.CurrentCharacter.Name (@Data.CurrentCharacter.Kind)</div>
+										<div class="CharacterEntryLine">@CharFactionString</div>
+										<div class="CharacterEntryLine">@Data.CurrentCharacter.Tick</div>
+										<div class="d-flex flex-column gap-4 mt-4">
+											<div class="CharacterEntryBox">
+												<div class="CharacterEntryHeader">Detalles</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.Details</div>
+											</div>
+											<div class="CharacterEntryBox">
+												<div class="CharacterEntryHeader">Objetivo final</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.FinalGoal</div>
+											</div>
+											<div class="CharacterEntryBox">
+												<div class="CharacterEntryHeader">Actualmente...</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.CurrentGoal</div>
+											</div>
+											<div class="MasterSeeds">
+												<div class="CharacterEntryHeader">Master seeds</div>
+												<div class="CharacterEntryBody">@Data.CurrentCharacter.MasterSeeds</div>
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="col col-sm-6 col-xl-8 col-xxl-9 mt-4">
-								<div class="d-flex gap-2">
-									<div>Deudas a pagar</div>
-									<i class="bi bi-plus-square AddDebtButton" @onclick=@(async()=>{await AddNewDeb(DebtViewer.PayingMode.ToPay);}) />
-								</div>
-								<div class="DebtsColmnsPhone d-flex d-sm-none p-2 d-flex flex-column gap-1">
-									@foreach (var d in Data.AllDebts.Where(x => x.PayingID == Data.CurrentCharacter.ID))
-									{
-										<DebtViewer Debt="d" ForceUpdateUI="StateHasChanged" />
-									}
-								</div>
-								<div class="DebtsColmns d-none d-sm-flex p-2 d-flex flex-column gap-1">
-									@foreach (var d in Data.AllDebts.Where(x => x.PayingID == Data.CurrentCharacter.ID))
-									{
-										<DebtViewer Debt="d" ForceUpdateUI="StateHasChanged" />
-									}
-								</div>
-								<div class="d-flex gap-2 pt-3">
-									<div>Deudas a cobrar</div>
-									<i class="bi bi-plus-square AddDebtButton" @onclick=@(async()=>{await AddNewDeb(DebtViewer.PayingMode.ToBePaid);}) />
-								</div>
-								<div class="DebtsColmnsPhone d-block d-sm-none p-2 d-flex flex-column gap-1">
-									@foreach (var d in Data.AllDebts.Where(x => x.ReceivingID == Data.CurrentCharacter.ID))
-									{
-										<DebtViewer Debt="d" Mode="DebtViewer.PayingMode.ToBePaid" ForceUpdateUI="StateHasChanged" />
-									}
-								</div>
-								<div class="DebtsColmns d-none d-sm-block  p-2 d-flex flex-column gap-1">
-									@foreach (var d in Data.AllDebts.Where(x => x.ReceivingID == Data.CurrentCharacter.ID))
-									{
-										<DebtViewer Debt="d" Mode="DebtViewer.PayingMode.ToBePaid" ForceUpdateUI="StateHasChanged" />
-									}
-								</div>
-								<div class="d-flex flex-column gap-2 d-block d-sm-none">
-									<div class="CharacterEntryLine">@Data.CurrentCharacter.Name (@Data.CurrentCharacter.Kind)</div>
-									<div class="CharacterEntryLine">@CharFactionString</div>
-									<div class="CharacterEntryLine">@Data.CurrentCharacter.Tick</div>
-									<div class="d-flex flex-column gap-4 mt-4">
-										<div class="CharacterEntryBox">
-											<div class="CharacterEntryHeader">Detalles</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.Details</div>
-										</div>
-										<div class="CharacterEntryBox">
-											<div class="CharacterEntryHeader">Objetivo final</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.FinalGoal</div>
-										</div>
-										<div class="CharacterEntryBox">
-											<div class="CharacterEntryHeader">Actualmente...</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.CurrentGoal</div>
-										</div>
-										<div class="MasterSeeds">
-											<div class="CharacterEntryHeader">Master seeds</div>
-											<div class="CharacterEntryBody">@Data.CurrentCharacter.MasterSeeds</div>
-										</div>
-									</div>
+						
+						</div>
+					</div>
+				</div>
+			}
+			else if(Data.CurrentFaction is not null)
+			{
+				<div class="flex-grow-1 col">
+					<div class="d-flex flex-column">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-12 col-sm-6 col-xl-4  col-xxl-3 d-flex flex-column" style="padding:0">
+									<FactionViewer />
 								</div>
 							</div>
 						</div>
-						
 					</div>
 				</div>
-
-			</div>
+			}
 		</div>
 	</div>
 </div>
 
 
 @code {
-	[Parameter] public string IDString { get; set; } = "";
 	string Image64 = "";
 	string CharFactionString = "";
 
 	private void Edit()
 	{
 		Navigation.NavigateTo($"EditCharacter/{Data.CurrentCharacter.ID}");
+	}
+
+	private async Task UnSelect()
+	{
+		Data.CurrentCharacter = null;
+		Data.CurrentFaction = null;
+		await CharacterSelected(null);
 	}
 
 	private async Task Delete()	
@@ -165,13 +195,11 @@
 
 	protected async override void OnParametersSet()
 	{
-		await Connectors.SetConnectors(JS, Data, Auth);
-
-		Guid ID = new Guid(IDString);
-		Data.CurrentCharacter = Data.GetCharacterByID(ID);
-		CharFactionString = Data.GetFaction(Data.CurrentCharacter.FactionID)?.Name ?? "autonomo";
-
-		Image64 = await Data.getImageBase64Async();
+		if (Data.CurrentCharacter is not null)
+		{
+			CharFactionString = Data.GetFaction(Data.CurrentCharacter.FactionID)?.Name ?? "autonomo";
+			Image64 = await Data.getImageBase64Async();
+		}
 
 		StateHasChanged();
 	}
@@ -191,4 +219,19 @@
 		await Data.StoreDebt(d);
 	}
 
+	private async Task CharacterSelected(Character? ch)
+	{
+		Data.CurrentCharacter = ch;
+		Data.CurrentFaction = null;
+		if(ch is not null)
+			Image64 = await Data.getImageBase64Async();
+		StateHasChanged();
+	}
+
+	private void FactionSelected(Faction fac)
+	{
+		Data.CurrentFaction = fac;
+		Data.CurrentCharacter = null;
+		StateHasChanged();
+	}
 }

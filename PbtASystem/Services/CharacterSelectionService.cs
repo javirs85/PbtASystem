@@ -11,6 +11,9 @@ public class CharacterSelectionService
 	public event EventHandler UI_Hide;
     public bool IsVisible { get; set; }
 
+	public string HeaderMessage { get; set; } = "";
+	public bool AllowExit { get; set; } = true;
+
 
 
     private IToastService Toaster;
@@ -36,8 +39,11 @@ public class CharacterSelectionService
 		UI_Hide.Invoke(this, EventArgs.Empty);
 	}
 
-	public async Task<Character> SelectViaSelector()
+	public async Task<Character> SelectViaSelector(string _headerMessage = "", bool _allowExit = true)
 	{
+		HeaderMessage = _headerMessage;
+		AllowExit = _allowExit;
+
 		var _default = DB.AllCharacters[0];
         try
         {

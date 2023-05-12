@@ -31,6 +31,7 @@ public class FirebaseMessaging
     FirebaseData Data;
     USMovesService Moves;
     public bool isConnected => mqttClient?.IsConnected ?? false;
+    public bool isListening = false;
 
 
 	private bool AlreadyConnecting = false;
@@ -96,7 +97,7 @@ public class FirebaseMessaging
                 var result = await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
 
                 var ic = mqttClient.IsConnected;
-                await Task.Delay(50);
+                await Task.Delay(250);
                 if (ic) { Toaster.ShowSuccess("Connected to MQTT"); }
                 else { Toaster.ShowError("Could not connect to MQTT"); }
 
@@ -127,6 +128,8 @@ public class FirebaseMessaging
 
 			if (mqttClient is not null)
 				await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
+
+            isListening = true;
 		}       
     }
 

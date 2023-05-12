@@ -4,6 +4,47 @@
     flex-direction: column;
 }
 
+.PbtASystemContainer {
+    --Darker: #1C1E20;
+    --Middle: #24262B;
+    --Lighter: #2E3138;
+    --HoverLight: #5e5a5a;
+}
+
+.Black {background-color:black;}
+.Darker {background-color:var(--Darker);}
+
+.NoUserError{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    background-color:#5c0808ff;
+}
+
+.TopMenu {
+    padding: 5px;
+}
+.TopMenuButton {
+    background-color: var(--Middle);
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    padding: 7px;
+}
+.TopMenuButton:hover{
+    background-color: var(--Lighter);
+}
+.TopMenuButtonActive {
+    background-color: white !important;
+    color: black;
+}
+
 main {
     flex: 1;
 }

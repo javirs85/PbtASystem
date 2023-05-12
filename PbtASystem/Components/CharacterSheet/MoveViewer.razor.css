@@ -73,8 +73,9 @@
 
 .ImagesContainer img {
     aspect-ratio: 1 / 1;
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
+    margin: 5px;
 }
 
 .DiceButton{

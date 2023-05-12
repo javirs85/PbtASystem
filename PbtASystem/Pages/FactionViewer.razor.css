@@ -31,3 +31,14 @@
 .Explanation{
     font-size:0.8em;
 }
+
+.EditButton{
+    width:40px;
+    opacity: 0.5;
+    cursor:pointer;
+}
+
+.EditButton:hover{
+    opacity: 1;
+}
+

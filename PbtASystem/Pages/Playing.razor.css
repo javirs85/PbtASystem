@@ -69,17 +69,23 @@
 
 /*************************/
 .StatsArea {
-    background: black;
+    background: var(--Darker);
 }
 
 .CorruptionArea{
     font-size:16px;
     font-weight:300;
-    padding: 7px;
+    padding: 18px;
     justify-content:center; 
+    gap: 20px;
 }
 .CorruptionArea div{
     cursor:pointer;
+}
+
+.DamageArea {
+    gap: 17px;
+    padding: 10px;
 }
 
 .ArmorContainer {
@@ -93,7 +99,7 @@
     opacity: 0.75;
     color: #ffffffb3;
     position: relative;
-    cursor:pointer;
+    cursor: pointer;
 }
     .ArmorContainer div {
         position: relative;
@@ -181,10 +187,11 @@ button {
 
 .ExtraActions {
     padding: 20px;
+    padding-top:5px;
 }
 .ExtraActions button{
     border-radius:50px;
-    width: 70%;
+    width: 100%;
 }
 
 .ExtraButton{

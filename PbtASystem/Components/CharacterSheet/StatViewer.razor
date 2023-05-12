@@ -1,7 +1,7 @@
 ﻿@inject FirebaseData Data
 <div class="PbtASystemContainer StatViewer @(IsCircle?"StatViewerCircle":"") @(IsTick?"CircleTick":"")" 
-	@oncontextmenu=OpenFullScreenModal
-	@oncontextmenu:preventDefault=true>
+	@onclick=OpenFullScreenModal
+	 @onclick:preventDefault=true>
 	<div class="prevent-select">@ValueString</div>
 	<div class="prevent-select">@Attr.ToUI()</div>
 	@if (IsCircle)

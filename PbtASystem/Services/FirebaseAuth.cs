@@ -77,7 +77,7 @@ public class FirebaseAuth
 
 	public async Task AllowPlayerToChooseCharacter()
     {
-        var Selected = await CharacterSelectionService.SelectViaSelector();
+        var Selected = await CharacterSelectionService.SelectViaSelector("Debes seleccionar un personaje con el que jugar", false);
         await DB.StoreDefaultCharacter(Selected);
         DB.PlayerCharacter = Selected;
     }
@@ -106,7 +106,6 @@ public class FirebaseAuth
             IsConnectedViaGoogle = false;
 
 			Toaster.ShowInfo("User disconnected");
-            IsDoingInit = false;
         }
         else
         {
@@ -115,13 +114,10 @@ public class FirebaseAuth
             DB.ConnectedPlaerIDLocalCopyDoNotUse = newName;
 
 			DB.SetDefaultCharacterToCurrentPlayer(ConnectedUserName);
-            IsDoingInit = false;
 		}
 
         UserChanged?.Invoke(this, ConnectedUserName);
     }
-
-    public bool IsDoingInit = true;
 
     public void UpdateMasterID(string chronicleMasterID)
     {

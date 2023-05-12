@@ -1,0 +1,168 @@
+﻿@page "/EditFaction/{IDString}"
+
+@inject FirebaseData Data
+@inject FirebaseAuth Auth
+@inject NavigationManager Navigation
+
+<div class="PbtASystemContainer">
+	<EditForm Model="Data.CurrentFaction">
+		<div class="d-flex w-100 flex-column">
+			<div class="d-flex flex-column p-2">
+				<div class="DataBoxSmall">
+					<div class="DataHeader">Nombre:</div>
+					<div class="DataBody">
+						<InputText style="width: 100%; padding: 5px; outline:none; background: var(--bs-gray-700);color: white;border: none;"
+							@bind-Value=Data.CurrentFaction.Name />
+					</div>
+				</div>
+				<div class="DataBoxSmall">
+					<div class="DataHeader">Tipo:</div>
+					<div class="DataBody">
+						<InputText style="width: 100%; padding: 5px; outline:none; background: var(--bs-gray-700);color: white;border: none;" @bind-Value=Data.CurrentFaction.Kind />
+					</div>
+				</div>
+			</div>
+			<div class="d-flex flex-column p-2">
+				<div class="DataBoxSmall">
+					<div class="DataHeader d-flex align-items-center">Creciendo?</div>
+					<div class="DataBody">
+						@if(Data.CurrentFaction.Status == FactionStatuses.Menguando)
+						{
+							<img src="imgs/Icons/DownCircle.svg" width="50" @onclick=@(_ => { Data.CurrentFaction.Status = FactionStatuses.Manteniendo; }) />
+						}
+						else if(Data.CurrentFaction.Status == FactionStatuses.Creciendo) 
+						{
+							<img src="imgs/Icons/UpCircle.svg" width="50" @onclick=@(_ => { Data.CurrentFaction.Status = FactionStatuses.Menguando; }) />
+						}
+						else
+						{
+							<img src="imgs/Icons/EqualCircle.svg" width="50" @onclick=@(_ => { Data.CurrentFaction.Status = FactionStatuses.Creciendo; }) />
+						}
+					</div>
+				</div>
+				<div class="DataBoxSmall">
+					<div class="DataHeader">Fuerza:</div>
+					<div class="d-flex flex-column flex-grow-1">
+						<div class="DataBody d-flex gap-1">
+							<InputNumber style="width: 100%; padding: 5px; outline:none; background: var(--bs-gray-700);color: white;border: none;"
+										@bind-Value=Data.CurrentFaction.Strength />
+							<Track @bind-Value=Data.CurrentFaction.StrengthTemp />
+						</div>
+						<div class="mt-1">
+							<InputText style="width: 100%; padding: 5px; outline:none; background: var(--bs-gray-700);color: white;border: none;"
+										@bind-Value=Data.CurrentFaction.StrengthExplanation />
+						</div>
+					</div>
+				</div>
+				<div class="DataBoxSmall mt-2">
+					<div class="DataHeader">Tamaño:</div>
+					<div class="d-flex flex-column flex-grow-1">
+						<div class="DataBody d-flex gap-1">
+							<InputNumber style="width: 100%; padding: 5px; outline:none; background: var(--bs-gray-700);color: white;border: none;"
+											@bind-Value=Data.CurrentFaction.Size />
+							<Track @bind-Value=Data.CurrentFaction.SizeTemp />
+						</div>
+						<div class="mt-1">
+							<InputText style="width: 100%; padding: 5px; outline:none; background: var(--bs-gray-700);color: white;border: none;"
+										@bind-Value=Data.CurrentFaction.SizeExplanation />
+						</div>
+					</div>
+				</div>
+				<div class="DataBox mt-3">
+					<div class="DataHeader">Trabajando en...</div>
+					<div class="DataBody">
+						<InputTextArea style="width: 100%;background: var(--bs-gray-700);color: white;border: none;"
+									   @bind-Value=Data.CurrentFaction.CurrentlyWorkingOn />
+					</div>
+				</div>
+				<div class="DataBox">
+					<div class="DataHeader">Descripción:</div>
+					<div class="DataBody">
+						<InputTextArea style="width: 100%;background: var(--bs-gray-700);color: white;border: none;"
+									   @bind-Value=Data.CurrentFaction.Description />
+					</div>
+				</div>
+				<div class="DataBox">
+					<div class="DataHeader">Activos</div>
+					<div class="DataBody">
+						<InputTextArea style="width: 100%;background: var(--bs-gray-700);color: white;border: none;"
+									   @bind-Value=Data.CurrentFaction.Assets />
+					</div>
+				</div>
+				@if (Auth.IsMaster)
+				{
+					<div class="DataBox">
+						<div class="DataHeader">Master seeds:</div>
+						<div class="DataBody">
+							<InputTextArea 
+								style="width: 100%;background: var(--bs-gray-700);color: white;border: none;" 
+								@bind-Value=Data.CurrentFaction.MasterSeeds />
+						</div>
+					</div>
+				}
+				else
+				{
+					<div class="DataBox">
+						<div class="DataHeader opacity-25">Las notas para el master han sido ocultadas</div>
+					</div>
+				}
+				<div class="FAB">
+					<i class="bi bi-x-square PanelButton red" @onclick=Dismiss />
+					<i class="bi bi-check-square PanelButton green" @onclick=Submit />
+				</div>
+			</div>
+		</div>
+	</EditForm>
+</div>
+
+@code {
+	[Parameter] public string IDString { get; set; } = "";
+	Faction Backup = new();
+
+	protected async override Task OnParametersSetAsync()
+	{
+		if (await Data.CheckIfNeedToLoad()) StateHasChanged();
+
+		Guid ID = new Guid(IDString);
+		Data.CurrentFaction = Data.GetFaction(ID) ?? new Faction() ;
+		Backup = Data.CurrentFaction.Duplicate();
+
+		StateHasChanged();
+	}
+
+	private async Task Submit()
+	{
+		await Data.StoreFaction(Data.CurrentFaction);
+		await Data.ForceDataRefresh();
+		Navigation.NavigateTo($"Faction/{Data.CurrentFaction.ID}");
+	}
+
+	private void Dismiss()
+	{
+		Data.CurrentFaction = Backup.Duplicate();
+		Navigation.NavigateTo($"Faction/{Data.CurrentFaction.ID}");
+	}
+
+	private void ChangeStatus(FactionStatuses newStatus)
+	{
+		Data.CurrentFaction.Status = newStatus;
+	}
+
+	private void UpdateStrength(int newVal)
+	{
+		if (Data.CurrentFaction.StrengthTemp > newVal) Data.CurrentFaction.StrengthTemp--;
+		else if (Data.CurrentFaction.StrengthTemp <= newVal) Data.CurrentFaction.StrengthTemp++;
+
+		if (Data.CurrentFaction.StrengthTemp >= 3) Data.CurrentFaction.StrengthTemp = 3;
+		if (Data.CurrentFaction.StrengthTemp <= 0) Data.CurrentFaction.StrengthTemp = 0;
+	}
+
+	private void UpdateSize(int newVal)
+	{
+		if (Data.CurrentFaction.SizeTemp >= newVal) Data.CurrentFaction.SizeTemp--;
+		else if (Data.CurrentFaction.SizeTemp < newVal) Data.CurrentFaction.SizeTemp++;
+
+		if (Data.CurrentFaction.SizeTemp >= 3) Data.CurrentFaction.SizeTemp = 3;
+		if (Data.CurrentFaction.SizeTemp <= 0) Data.CurrentFaction.SizeTemp = 0;
+	}
+}

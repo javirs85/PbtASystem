@@ -1,5 +1,4 @@
-﻿@page "/Playing/{IDString}"
-@using Blazored.Toast;
+﻿@using Blazored.Toast;
 @inject IToastService Toaster;
 @inject FirebaseData Data;
 @inject FirebaseAuth Auth;
@@ -14,7 +13,7 @@
 @if (IsSheetReady)
 {
 	<div class="PbtASystemContainer">
-		<div class="DarkArea mb-2" style="background: black;">
+		<div class="Darker mb-2" style="background: black;">
 			<div class="d-flex StatsArea">
 				<div class="d-flex flex-column flex-grow-1">
 					<StatViewer Attr="USAttributes.Blood" />
@@ -33,7 +32,7 @@
 					<StatViewer Attr="USAttributes.Veil" />
 				</div>
 			</div>
-			<div class="d-flex CorruptionArea gap-2">
+			<div class="d-flex CorruptionArea Darker">
 				<div style="opacity: 0.25;">CORRUPCIÓN</div>
 				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 1?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(1)) /></div>
 				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 2?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(2)) /></div>
@@ -41,7 +40,7 @@
 				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 4?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(4)) /></div>
 				<div><img src="imgs/Icons/Skull_@(Data.CurrentPlayerSheet.Corruption >= 5?"YES":"NO").png" @onclick=@(_ => CorruptionClicked(5)) /></div>
 			</div>
-			<div class="d-flex align-items-center justify-content-center DamageArea gap-2">
+			<div class="d-flex align-items-center justify-content-center DamageArea Darker">
 				<div class="ArmorContainer" @onclick=ShowArmorEditor>
 					<div>@Data.CurrentPlayerSheet.Armor</div>
 				</div>
@@ -62,65 +61,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="MovesSelector">
-			<div class="MovesButton @(CurrentlyShowing == Sections.Basic?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Basic))>Básicos</div>
-			<div class="MovesButton @(CurrentlyShowing == Sections.Cricle?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Cricle))>Círculo</div>
-			<div class="MovesButton @(CurrentlyShowing == Sections.Book?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Book))>Libro</div>
-			<div class="MovesButton @(CurrentlyShowing == Sections.Corruption?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Corruption))>Corrup</div>
-			<div class="MovesButton @(CurrentlyShowing == Sections.Debt?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Debt))>Deuda</div>
-			<div class="MovesButton @(CurrentlyShowing == Sections.Drama?"Current":"")" @onclick=@(_ => SectionSelected(Sections.Drama))>Drama</div>
-		</div>
-		<div class="MovesArea d-flex flex-column gap-2 p-2">
-			
-			@if(CurrentlyShowing == Sections.Book)
-			{
-				<div>Movimientos seleccionados</div>
-				@foreach (var Mov in MovesOnScreen)
-				{
-					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) ForceUpdate="Update" />
-				}
-				<div>@Data.CurrentPlayerSheet.Archetype.ToUI()</div>
-				@foreach(var Mov in UniqueMovesOnScreen)
-				{
-					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) ForceUpdate="Update" />
-				}
-			}
-			else
-			{
-				@foreach (var Mov in MovesOnScreen)
-				{
-					<MoveViewer ID="Mov.ID" IsSelected=IsThisMoveSelected(Mov) Clicked=@(_ => Select(Mov)) ForceUpdate="Update"/>
-				}
-			}
-			
-			@if(CurrentlyShowing == Sections.Book)
-			{
-				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForBooks>Cambiar movimientos de Libreto</button>
-			}
-			@if(CurrentlyShowing == Sections.Corruption)
-			{
-				<button class="btn btn-outline-light align-items-center" @onclick=OpenMovesSelectorForCorruption>Cambiar movimientos de corrupción</button>
-			}
-			@if(CurrentlyShowing == Sections.Debt)
-			{
-				<div class="ms-1 opacity-75">Deudas a pagar</div>
-				@foreach(var debt in Data.AllDebts.Where(x=>x.PayingID == Data.CurrentCharacter.ID))
-				{
-					<div class="ms-3">@debt.Amount a @Data.GetCharacterByID(debt.ReceivingID).Name</div>
-				}
-				<div class="ms-1 opacity-75">Deudas a cobrar</div>
-				@foreach (var debt in Data.AllDebts.Where(x => x.ReceivingID == Data.CurrentCharacter.ID))
-				{
-					<div class="ms-3">@debt.Amount de @Data.GetCharacterByID(debt.PayingID).Name</div>
-				}
-
-				<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");})>Gestonar deudas</button>
-			}
-		</div>
-
 		<div class="ExtraActions d-flex flex-column align-items-center">
 			<button class="btn btn-outline-light align-items-center" @onclick=Roll2d6>2d6</button>
-			@if(Data.CurrentPlayerSheet.ArchetypeUniqueTittle1 != "")
+			@if (Data.CurrentPlayerSheet.ArchetypeUniqueTittle1 != "")
 			{
 				<button class="btn btn-outline-light align-items-center" @onclick=ShowUnique1>@Data.CurrentPlayerSheet.ArchetypeUniqueTittle1</button>
 			}
@@ -128,90 +71,10 @@
 			{
 				<button class="btn btn-outline-light align-items-center" @onclick=ShowUnique2>@Data.CurrentPlayerSheet.ArchetypeUniqueTittle2</button>
 			}
-			
+
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCircleAdvances>Mejoras por Círculos</button>
 			<button class="btn btn-outline-light align-items-center" @onclick=ShowCorruptionAdvances>Mejoras por Corrupción</button>
-			<button class="btn btn-outline-light align-items-center" @onclick=@(()=>{Navigation.NavigateTo($"Initial/{Data.CurrentCharacter.ID}");})>Cuestiones iniciales</button>
-		</div>
-	</div>
-
-	<!--Modal for selecting moves to add-->
-	<div class="FullScreenModal ModalTop d-flex flex-column @(IsShowingMoveSelector?"":"HideModal")" @onclick=CloseMovesSelector>
-		<div class="w-100 d-flex justify-content-end p-2">
-			<img src="imgs/Icons/Close.svg" style="cursor: pointer;"/>
-		</div>
-		<div class="ModalBody w-100">
-			<div class="accordion accordion-flush w-100 DarkAccordion" @onclick:stopPropagation=true id="accordionFlushExample">
-				@foreach(var pack in MovesToChooseFrom)
-				{
-					<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(pack == SelectedPack?"":"DarkAccordionNotSelected")">
-						<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne">
-							<div data-bs-toggle="collapse" 
-								 data-bs-target="#flush-collapseOne-@pack.Tittle.Replace(' ', '_')"
-							     @onclick=@(_ =>{SelectedPack = pack;})>
-								 @pack.Tittle
-							 </div>
-							
-						</h2>
-						<div id="flush-collapseOne-@pack.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(pack.Moves[0].Archetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-							<div class="Darker d-flex flex-column flex-column gap-2">
-								@foreach (var mov in pack.Moves)
-								{
-									<MoveViewer ID="mov.ID" 
-										IsSelected=IsThisMoveSelected(mov) 
-										IsSelectionMode=true 
-										Clicked=@(_ => Select(mov)) 
-										SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})"/>
-								}
-							</div>
-						</div>						
-					</div>
-				}
-				<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(MageMagic == SelectedPack?"":"DarkAccordionNotSelected")">
-					<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne">
-						<div data-bs-toggle="collapse"
-							data-bs-target="#flush-collapseOne-@MageMagic.Tittle.Replace(' ', '_')"
-						 @onclick=@(_ =>{SelectedPack = MageMagic;})>
-							@MageMagic.Tittle
-						</div>
-
-					</h2>
-					<div id="flush-collapseOne-@MageMagic.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(MageMagic.Moves[0].Archetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-						<div class="Darker d-flex flex-column flex-column gap-2">
-							@foreach (var mov in MageMagic.Moves)
-							{
-								<MoveViewer ID="mov.ID"
-									IsSelected=IsThisMoveSelected(mov)
-									IsSelectionMode=true
-									Clicked=@(_ => Select(mov))
-									SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})" />
-							}
-						</div>
-					</div>
-				</div>
-				<div class="accordion-item w-100 accordionMovement DarkAccordionItem @(FaeMagic == SelectedPack?"":"DarkAccordionNotSelected")">
-					<h2 class="accordion-header w-100 DarkAccordionHeader" id="flush-headingOne">
-						<div data-bs-toggle="collapse"
-		   data-bs-target="#flush-collapseOne-@FaeMagic.Tittle.Replace(' ', '_')"
-						 @onclick=@(_ =>{SelectedPack = FaeMagic;})>
-							@FaeMagic.Tittle
-						</div>
-
-					</h2>
-					<div id="flush-collapseOne-@FaeMagic.Tittle.Replace(' ', '_')" class="accordion-collapse collapse @(FaeMagic.Moves[0].Archetipe == Data.CurrentPlayerSheet.Archetype?"show":"") DarkAccordionBody" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-						<div class="Darker d-flex flex-column flex-column gap-2">
-							@foreach (var mov in FaeMagic.Moves)
-							{
-								<MoveViewer ID="mov.ID"
-									IsSelected=IsThisMoveSelected(mov)
-									IsSelectionMode=true
-									Clicked=@(_ => Select(mov))
-									SelectedInSelectionMode="@(async _ =>{await ToggleMove(mov);})" />
-							}
-						</div>
-					</div>
-				</div>
-			</div>
+			<button class="btn btn-outline-light align-items-center" @onclick=ShowInitialQuestions>Cuestiones iniciales</button>
 		</div>
 	</div>
 
@@ -261,7 +124,7 @@
 		<div class="CloseButton"></div>
 		<div class="ModalBody Darker" style="width:90%; background:#1C1E20;" @onclick:stopPropagation=true>
 			<div class="d-flex flex-column align-items-center justify-content-start w-100 h-100">
-				<div class="flex-grow-1 d-flex flex-column w-100">
+				<div class="flex-grow-1 d-flex flex-column w-100 gap-2">
 					<div class="pt-3" style="font-size:16px; font-weight:bold; margin-left:-10px;">
 						Avances normales
 					</div>
@@ -272,7 +135,7 @@
 						</div>
 					}
 				</div>
-				<div class="flex-grow-1 d-flex flex-column w-100">
+				<div class="flex-grow-1 d-flex flex-column w-100 gap-2">
 					<div class="pt-3 d-flex flex-column" style="font-size:16px; font-weight:bold; margin-left:-10px;">
 						<div>Avances extra</div>
 						<div style="font-weight: normal; font-size: 14px; margin-top: -7px; margin-bottom: 3px;">
@@ -383,113 +246,20 @@ else
 	}
 	else
 	{
-		<div class="d-flex flex-column align-items-center">
-
-			<div class="m-5">@ErrorMessage</div>
-
-			@if (Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
-			{
-				<button @onclick=CreateSheet class="btn btn-primary w-75 p-2 d-flex align-items-center">
-					<div class="d-flex flex-column align-content-center">
-						<div>Crear Ficha de personaje para</div>
-						<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
-						<div>controlada por @Auth.ConnectedUserName</div>				
-					</div>
-				</button>
-			}
-			else
-			{
-				<EditForm Model="Data.PlayerCharacter">
-					<label for="body">Elige un arquetipo para la ficha:</label>
-					<InputSelect @bind-Value=Data.CurrentPlayerSheet.Archetype>
-						@foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)))
-						{
-							@if ((AvailableArchetypes)arc != AvailableArchetypes.All && (AvailableArchetypes)arc != AvailableArchetypes.NotSet)
-							{
-								<option value="@arc">@(
-								((AvailableArchetypes)arc).ToUI()
-								)</option>
-							}
-						}
-					</InputSelect>
-				</EditForm>
-			}
-		</div>
+		<div>Problemas cargando la ficha de jugador ..</div>
 	}
 
 }
 
 
 @code {
-	[Parameter] public string IDString { get; set; } = "";
 	string NoSheetButtonText = "";
 	string ErrorMessage = "";
-	USMove? SelectedMovement = null;
-	private List<USMove> MovesOnScreen = new();
-	private List<USMove> UniqueMovesOnScreen = new();
-	private List<Debt> DebtsToPay = new();
-	private List<Debt> DebtsToBePaid = new();
-
-	USMove LIO;
-
-	MovesPack FaeMagic = new();
-	MovesPack MageMagic = new();
-
-	private bool IsSheetReady = false;
-
-	private enum Sections {Basic, Cricle, Book, Corruption, Debt, Drama};
-	private Sections CurrentlyShowing = Sections.Basic;
-
-	private void Update() => SectionSelected(Sections.Basic);
-
-	protected async override void OnParametersSet()
-	{
-		await Connectors.SetConnectors(JS, Data, Auth);
-		await Msgs.CheckIfReConnnectionNeeded();
-
-		Guid ID = new Guid(IDString);
-		var character = Data.GetCharacterByID(ID);
-		Data.CurrentCharacter = character;
-
-		var Map = Data.Chronicle.PlayerLinks.Find(x => x.CharacterID == ID);
-		if (Map is null)
-		{
-			ErrorMessage = $"{ID} is not in the maps of the chronicle";
-			return;
-		}
-		if(character.SheetID is null)
-		{
-			ErrorMessage = $"{character.Name} ({ID}) No tiene una ficha en esta crónica.";
-			StateHasChanged();
-			return;
-		}
-		var SheetID = (Guid)character.SheetID;
-
-		if (await Data.CheckIfSheetExists((SheetID)))
-		{
-			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID(SheetID);
-			if (Data.CurrentPlayerSheet.ArchetypeUniqueTittle1 == "") Data.CurrentPlayerSheet.InitArchetype();
-			IsSheetReady = true;
-		}
-		else
-			ErrorMessage = $"The character {IDString} has no Sheeet associated";
-
-		if(Data.CurrentPlayerSheet is null)
-		{
-			ErrorMessage = $"The character {IDString} has no Sheeet associated";
-			return;
-		}
-
-		MageMagic.Moves = Moves.AllMovements.Where(mov => mov.TypeOfMovement == USMove.MovementTypes.MageMagic).ToList();
-		MageMagic.Tittle = "Magia de magos";
-		FaeMagic.Moves = Moves.AllMovements.Where(mov => mov.TypeOfMovement == USMove.MovementTypes.FaeMagic).ToList();
-		FaeMagic.Tittle = "Magia de Hadas";
 
 
-		await SectionSelected(Sections.Basic);
+	private bool IsSheetReady => Data.CurrentPlayerSheet is not null && Data.CurrentPlayerSheet.ID.ToString() != new Guid().ToString();
 
-		StateHasChanged();
-	}
+	private void ShowInitialQuestions() { }
 
 	private void CorruptionClicked(int n)
 	{
@@ -503,210 +273,16 @@ else
 		else Data.CurrentPlayerSheet.Damage--;
 	}
 
-	private async Task SectionSelected(Sections section)
-	{
-		CurrentlyShowing = section;
-		MovesOnScreen.Clear();
-		UniqueMovesOnScreen.Clear();
-		if (section == Sections.Basic)
-		{
-			MovesOnScreen = Moves.AllMovements.Where(
-				x =>
-				x.TypeOfMovement == USMove.MovementTypes.BasicMovements
-			).ToList();
-			var lio = (USMove)Moves.GetMovement(USMoveIDs.B_LiberarPoder, Data.CurrentPlayerSheet.Archetype);
-			lio.PreCondition.Options = new List<string>();
 
-			if(Data.CurrentPlayerSheet.LIOs is null || Data.CurrentPlayerSheet.LIOs.Count == 0)
-			{
-				Data.CurrentPlayerSheet.LIOs = (from l in Moves.AllLio where l.Archetype == Data.CurrentPlayerSheet.Archetype select l.ID).ToList();
-				await Data.StoreCharacterSheet();
-			}
+	
 
-			foreach(var hab in Data.CurrentPlayerSheet.LIOs)
-			{
-				lio.PreCondition.Options.Add(Moves.AllLio.Find(x => x.ID == hab)?.Text ?? "");
-			}
-
-
-			MovesOnScreen.Add(lio);
-
-			foreach (var upgraded in Data.CurrentPlayerSheet.UpgradedMoves)
-			{
-				var m = MovesOnScreen.Find(x => x.ID == upgraded);
-				if (m is not null) m.IsImproved = true;
-			}
-
-		}
-		else if (section == Sections.Cricle)
-		{
-			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.FactionMovement).ToList();
-		}
-		else if (section == Sections.Debt)
-		{
-			MovesOnScreen = Moves.AllMovements.Where(x => x.TypeOfMovement == USMove.MovementTypes.DebtMovements).ToList();
-			DebtsToPay.Clear();
-			DebtsToPay = Data.AllDebts.Where(x => x.PayingID == Data.CurrentCharacter.ID).ToList();
-		}
-		else if (section == Sections.Drama)
-		{
-			MovesOnScreen = Moves.AllMovements.Where(x =>
-				x.TypeOfMovement == USMove.MovementTypes.DramaticMovement &&
-				x.Archetipe == Data.CurrentPlayerSheet.Archetype
-			).ToList();
-			SelectedMovement = MovesOnScreen[0];
-		}
-		else if (section == Sections.Book)
-		{
-			MovesOnScreen.Clear();
-			foreach (var m in Data.CurrentPlayerSheet.SelectedArchetypeMoves)
-			{
-				MovesOnScreen.Add((USMove)Moves.GetMovement(m));
-			}
-
-			foreach (var m in from mov in Moves.AllMovements where 
-								mov.TypeOfMovement == USMove.MovementTypes.UniqueMove && 
-								mov.Archetipe == Data.CurrentPlayerSheet.Archetype 
-									select mov.ID)
-			{
-				UniqueMovesOnScreen.Add((USMove)Moves.GetMovement(m));				
-			}
-		}
-		else if (section == Sections.Corruption)
-		{
-			MovesOnScreen.Clear();
-			foreach (var m in Data.CurrentPlayerSheet.SelectedCorruptionMoves)
-			{
-				MovesOnScreen.Add((USMove)Moves.GetMovement(m));
-			}
-		}
-	}
-
-	private void Select(USMove mov)
-	{
-		if (mov == SelectedMovement) 
-			SelectedMovement = null;
-		else
-			SelectedMovement = mov;
-	}
-
-	private bool IsThisMoveSelected(USMove mov) => SelectedMovement == mov;
-
-	private async Task CreateSheet()
-	{
-		Data.CurrentPlayerSheet.SelectedArchetypeMoves = Moves.GetInitialMovesIDsByArchetype(Data.CurrentPlayerSheet.Archetype);
-		Data.CurrentPlayerSheet.LIOs = (from lio in Moves.AllLio where lio.Archetype == Data.CurrentPlayerSheet.Archetype select lio.ID).ToList();
-		Data.CurrentPlayerSheet.ID = Guid.NewGuid();
-		await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
-		Data.CurrentCharacter.SheetID = Data.CurrentPlayerSheet.ID;
-		await Data.StoreCharacter(Data.CurrentCharacter);
-		await Data.ForceDataRefresh();
-		IsSheetReady = true;
-		StateHasChanged();
-	}
-
-
-
-	private bool IsShowingMoveSelector = false;
 	private bool IsShowingArmor = false;
 	private bool IsShowingScars = false;
 	private bool IsShowingAdvances = false;
 	private bool IsShowingUnique1 = false;
 	private bool IsShowingUnique2 = false;
 	private bool IsShowingCorruptionAdvances = false;
-	private List<MovesPack> MovesToChooseFrom = new();
-	private MovesPack SelectedPack = new();
 
-	private class MovesPack
-	{
-		public string Tittle;
-		public List<USMove> Moves;
-	}
-
-	private void OpenMovesSelectorForBooks()
-	{
-		MovesToChooseFrom.Clear();
-
-		MovesPack pack = new();
-		pack.Tittle = Data.CurrentPlayerSheet.Archetype.ToUI();
-		pack.Moves = Moves.AllMovements.Where(x => x.Archetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement).ToList();
-		MovesToChooseFrom.Add(pack);
-		SelectedPack = pack;
-
-		foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)).Cast<AvailableArchetypes>())
-		{
-			if(arc != AvailableArchetypes.All && arc != AvailableArchetypes.NotSet && arc != Data.CurrentPlayerSheet.Archetype)
-			{
-				var debug = arc.ToUI();
-				MovesToChooseFrom.Add(new MovesPack
-					{
-						Tittle = arc.ToUI(),
-						Moves = Moves.AllMovements.Where(x=>x.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement && x.Archetipe == arc).ToList()
-					});
-			}
-		}
-
-		IsShowingMoveSelector = true;
-	}
-
-
-
-	private void OpenMovesSelectorForCorruption()
-	{
-		MovesToChooseFrom.Clear();
-
-		MovesPack pack = new();
-		pack.Tittle = Data.CurrentPlayerSheet.Archetype.ToUI();
-		pack.Moves = Moves.AllMovements.Where(x => x.Archetipe == Data.CurrentPlayerSheet.Archetype && x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement).ToList();
-		MovesToChooseFrom.Add(pack);
-		SelectedPack = pack;
-
-		foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)).Cast<AvailableArchetypes>())
-		{
-			if (arc != AvailableArchetypes.All && arc != AvailableArchetypes.NotSet && arc != Data.CurrentPlayerSheet.Archetype)
-			{
-				var debug = arc.ToUI();
-				MovesToChooseFrom.Add(new MovesPack
-					{
-						Tittle = arc.ToUI(),
-						Moves = Moves.AllMovements.Where(x => 
-							x.TypeOfMovement == USMove.MovementTypes.CorruptionMovement && 
-							x.Archetipe == arc).ToList()
-					});
-			}
-		}
-
-		IsShowingMoveSelector = true;
-	}
-
-	private void CloseMovesSelector()
-	{
-		IsShowingMoveSelector = false;
-	}
-
-	private async Task ToggleMove(USMove mov)
-	{
-		var sheet = Data.CurrentPlayerSheet;
-
-		if (mov.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement)
-		{
-			if (sheet.SelectedArchetypeMoves.Contains(mov.ID))
-				sheet.SelectedArchetypeMoves.Remove(mov.ID);
-			else
-				sheet.SelectedArchetypeMoves.Add(mov.ID);
-		}
-		else if (mov.TypeOfMovement == USMove.MovementTypes.CorruptionMovement)
-		{	
-			if (sheet.SelectedCorruptionMoves.Contains(mov.ID))
-				sheet.SelectedCorruptionMoves.Remove(mov.ID);
-			else
-				sheet.SelectedCorruptionMoves.Add(mov.ID);
-		}
-		await Data.StoreCharacterSheet(Data.CurrentPlayerSheet);
-
-		IsShowingMoveSelector = false;
-		SectionSelected(CurrentlyShowing);
-	}
 
 	void ShowArmorEditor() => IsShowingArmor = true;
 	void HideArmorEditor() => IsShowingArmor = false;
@@ -721,7 +297,7 @@ else
 	void HideCorruptionAdvances() => IsShowingCorruptionAdvances = false;
 
 	void ShowUnique1() => IsShowingUnique1 = true;
-	void HideUnique1(){ IsShowingUnique1 = false; IsEditingUnique1 = false;	}
+	void HideUnique1() { IsShowingUnique1 = false; IsEditingUnique1 = false; }
 
 	void ShowUnique2() => IsShowingUnique2 = true;
 	void HideUnique2() { IsShowingUnique2 = false; IsEditingUnique2 = false; }
@@ -754,15 +330,27 @@ else
 		Toaster.ShowInfo("Se ha marcado la cicatriz, se ha bajado el atributo y se han limpiado las heridas");
 	}
 
+
+	async Task ArmorPlus()
+	{
+		Data.CurrentPlayerSheet.Armor++;
+		await Data.StoreCharacterSheet();
+	}
+	async Task ArmorMinus()
+	{
+		Data.CurrentPlayerSheet.Armor--;
+		await Data.StoreCharacterSheet();
+	}
+
 	async Task ToggleAdvance(Advance adv, KindsOfAdvance kind)
 	{
 
-		if(kind == KindsOfAdvance.Normal)
+		if (kind == KindsOfAdvance.Normal)
 		{
 			adv.IsUsed = !adv.IsUsed;
 			Data.CurrentPlayerSheet.AdvancesNormalBools[adv.ID] = adv.IsUsed;
 		}
-		else if(kind == KindsOfAdvance.Extra)
+		else if (kind == KindsOfAdvance.Extra)
 		{
 			int count = Data.CurrentPlayerSheet.AdvancesNormalBools.Count(x => x == true);
 			if (count < 5)
@@ -773,7 +361,7 @@ else
 				Data.CurrentPlayerSheet.AdvancesExtraBools[adv.ID] = adv.IsUsed;
 			}
 		}
-		else if(kind == KindsOfAdvance.Corruption)
+		else if (kind == KindsOfAdvance.Corruption)
 		{
 			adv.IsUsed = !adv.IsUsed;
 			Data.CurrentPlayerSheet.AdvancesCorruptionBools[adv.ID] = adv.IsUsed;
@@ -781,18 +369,7 @@ else
 
 		await Data.StoreCharacterSheet();
 	}
-	
 
-	async Task ArmorPlus()
-	{
-		Data.CurrentPlayerSheet.Armor ++;
-		await Data.StoreCharacterSheet();
-	}
-	async Task ArmorMinus()
-	{
-		Data.CurrentPlayerSheet.Armor--;
-		await Data.StoreCharacterSheet();
-	}
 
 	Random rnd = new();
 
@@ -812,5 +389,4 @@ else
 				Message = $"{d1} + {d2}"
 			});
 	}
-
 }
