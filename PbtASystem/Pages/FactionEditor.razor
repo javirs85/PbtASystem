@@ -1,4 +1,4 @@
-﻿@page "/EditFaction/{IDString}"
+﻿@page "/EditFaction/"
 
 @inject FirebaseData Data
 @inject FirebaseAuth Auth
@@ -116,15 +116,13 @@
 </div>
 
 @code {
-	[Parameter] public string IDString { get; set; } = "";
+	[Parameter] public EventCallback Exit { get; set; }
 	Faction Backup = new();
 
 	protected async override Task OnParametersSetAsync()
 	{
 		if (await Data.CheckIfNeedToLoad()) StateHasChanged();
 
-		Guid ID = new Guid(IDString);
-		Data.CurrentFaction = Data.GetFaction(ID) ?? new Faction() ;
 		Backup = Data.CurrentFaction.Duplicate();
 
 		StateHasChanged();
@@ -134,13 +132,13 @@
 	{
 		await Data.StoreFaction(Data.CurrentFaction);
 		await Data.ForceDataRefresh();
-		Navigation.NavigateTo($"Faction/{Data.CurrentFaction.ID}");
+		await Exit.InvokeAsync();
 	}
 
-	private void Dismiss()
+	private async Task Dismiss()
 	{
 		Data.CurrentFaction = Backup.Duplicate();
-		Navigation.NavigateTo($"Faction/{Data.CurrentFaction.ID}");
+		await Exit.InvokeAsync();
 	}
 
 	private void ChangeStatus(FactionStatuses newStatus)

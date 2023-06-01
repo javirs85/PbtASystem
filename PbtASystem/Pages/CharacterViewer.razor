@@ -13,24 +13,30 @@
 			
 			@if(Data.CurrentCharacter is null && Data.CurrentFaction is null)
 			{
-				<div class="">
+				<div class="p-0">
 					<CharacterFactionSelector CharacterSelected="CharacterSelected" FactionSelected="FactionSelected"/>
 				</div>
 			}
 			else
 			{
-				<div class="d-none d-md-block col-4 col-xl-3">
+				<div class="d-none d-md-block col-4 col-xl-3 p-0">
 					<CharacterFactionSelector CharacterSelected="CharacterSelected" FactionSelected="FactionSelected" />
 				</div>
 			}
-			@if(Data.CurrentCharacter is not null)
+			@if (Data.CurrentCharacter is not null)
 			{
-				<div class="flex-grow-1 col">
+				@if(IsEditingCharacter)
+				{
+					<CharacterEditor Exit="@(_ => IsEditingCharacter = false)" />
+				}
+				else
+				{
+					<div class="flex-grow-1 col">
 					<div class="d-flex flex-column">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-12 col-sm-6 col-xl-4  col-xxl-3 d-flex flex-column" style="padding:0">
-									<div class="ImageCanvas" style="@(Data.CurrentCharacter.IsDead?"filter: contrast(0.5) brightness(1.5) grayscale(1) sepia(1) hue-rotate(311deg) brightness(0.5) saturate(2.5);":"")">
+									<div class="ImageCanvas mt-4" style="@(Data.CurrentCharacter.IsDead?"filter: contrast(0.5) brightness(1.5) grayscale(1) sepia(1) hue-rotate(311deg) brightness(0.5) saturate(2.5);":"")">
 										<img src="@Image64"/>
 										<div class="UpperButtons d-flex w-100 justify-content-between flex-row-reverse">
 											<div class="d-flex gap-2">
@@ -130,19 +136,27 @@
 									</div>
 								</div>
 							</div>
-						
+
 						</div>
 					</div>
 				</div>
+				}
 			}
-			else if(Data.CurrentFaction is not null)
+			else if (Data.CurrentFaction is not null)
 			{
 				<div class="flex-grow-1 col">
 					<div class="d-flex flex-column">
 						<div class="container-fluid">
 							<div class="row">
 								<div class="col-12 col-sm-6 col-xl-4  col-xxl-3 d-flex flex-column" style="padding:0">
-									<FactionViewer />
+									@if(IsEditingFaction)
+									{
+										<FactionEditor Exit="@(_ => IsEditingFaction = false)"  />
+									}
+									else
+									{
+										<FactionViewer UnSelected="UnSelect" EditRequested="@(_ => IsEditingFaction = true)"/>
+									}
 								</div>
 							</div>
 						</div>
@@ -157,10 +171,12 @@
 @code {
 	string Image64 = "";
 	string CharFactionString = "";
+	bool IsEditingFaction = false;
+	bool IsEditingCharacter = false;
 
 	private void Edit()
 	{
-		Navigation.NavigateTo($"EditCharacter/{Data.CurrentCharacter.ID}");
+		IsEditingCharacter = true;
 	}
 
 	private async Task UnSelect()
@@ -175,8 +191,7 @@
 		var Confirmed = await Confirm.AskUserForConfirmation("Deseas borrar a " + Data.CurrentCharacter.Name + " de la base de datos", $"Borrar a {Data.CurrentCharacter.Name}", $"Borrar a {Data.CurrentCharacter.Name}");
 		if (Confirmed)
 		{
-			var friend = await Data.DeleteCharacter(Data.CurrentCharacter);
-			Navigation.NavigateTo($"Character/{friend.ID}");
+		    Data.CurrentCharacter = await Data.DeleteCharacter(Data.CurrentCharacter);
 		}
 	}
 

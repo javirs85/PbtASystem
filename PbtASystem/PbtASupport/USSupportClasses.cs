@@ -1,5 +1,6 @@
 ﻿using MQTTnet.Client;
 using PbtASystem.Services.Moves;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace PbtASystem.PbtASupport;
@@ -30,13 +31,21 @@ public class Character
 	public string FinalGoal { get; set; } = "";
 	public string CurrentGoal { get; set; } = "";
 	public string MasterSeeds { get; set; } = "";
-	public Guid? SheetID { get; set; } = null;
+	public Guid? SheetID { get; set; } = new Guid();
 
 	public Character Duplicate()
 	{
 		string str = System.Text.Json.JsonSerializer.Serialize(this);
 		return System.Text.Json.JsonSerializer.Deserialize<Character>(str);
 	}
+}
+
+public static class GuidExtensions
+{
+	public static bool IsZero(this Guid id) => id.ToString() == "00000000-0000-0000-0000-000000000000";
+	public static bool IsNotZero(this Guid id) => !IsZero(id);
+	public static bool IsZero(this Guid? id) => id.ToString() == "00000000-0000-0000-0000-000000000000";
+	public static bool IsNotZero(this Guid? id) => !IsZero(id);
 }
 
 public class Faction

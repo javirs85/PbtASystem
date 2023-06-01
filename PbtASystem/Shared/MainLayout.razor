@@ -1,7 +1,6 @@
 ﻿@using Blazored.Toast
 @using PbtASystem.Pages
 @inherits LayoutComponentBase
-@inject NavigationManager Navigation
 @implements IDisposable
 
 
@@ -12,7 +11,22 @@
 @if(WaitingForConnection)
 {
 	<div class="w-100 d-flex h-100 justify-content-center align-items-center" style="min-height: 200px;">
-		Comprovando credenciales ... 
+		@debug
+		@if(IsLoadingFromDatabase)
+		{
+			<div>Negociando con la base de datos ...</div>
+		}
+		else
+		{
+			<div>Comprovando credenciales ...</div>
+		}
+		
+	</div>
+}
+else if (IsLoadingFromDatabase)
+{
+	<div class="w-100 d-flex h-100 justify-content-center align-items-center" style="min-height: 200px;">
+		Negociando con la base de datos ...
 	</div>
 }
 else
@@ -22,8 +36,15 @@ else
 		{
 			<div class="w-100 d-flex Darker TopMenu gap-1">
 				<div class="d-flex flex-grow-1 gap-1">
-					<div class="TopMenuButton @(CurrentlyViewing == Views.Sheet?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Sheet);}) >Ficha</div>
-					<div class="TopMenuButton @(CurrentlyViewing == Views.Moves?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Moves);})>Movs</div>
+					@if(Auth.IsMaster)
+					{
+						<div class="TopMenuButton @(CurrentlyViewing == Views.Master?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Master);})>Master</div>
+					}
+					else
+					{
+						<div class="TopMenuButton @(CurrentlyViewing == Views.Sheet?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Sheet);}) >@Ficha</div>
+						<div class="TopMenuButton @(CurrentlyViewing == Views.Moves?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Moves);})>Movs</div>
+					}					
 					<div class="TopMenuButton @(CurrentlyViewing == Views.Campaign?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.Campaign);})>Campaña</div>
 					<div class="TopMenuButton @(CurrentlyViewing == Views.FactionPhase?"TopMenuButtonActive":"")" @onclick=@(_=>{ChangeViewTo(Views.FactionPhase);})>T.Facción</div>
 				</div>
@@ -40,29 +61,32 @@ else
 				USUARIO NO CONECTADO
 			</div>
 		}
-
 		@if(CurrentlyViewing == Views.Sheet)
 		{
 			<Playing />
 		}
 		else if(CurrentlyViewing == Views.Settings)
 		{
-			<Meta />
+			<Meta ForceUpdate="ForceUpdate"/>
 		}
 		else if(CurrentlyViewing == Views.Moves)
 		{
-			<PlayingMoves />
+			<PlayingMoves GoToCampaign="GoToCampaign"/>
 		}
 		else if(CurrentlyViewing == Views.Campaign)
 		{
 			<CharacterViewer/>
+		}
+		else if(CurrentlyViewing == Views.Master)
+		{
+			<Master />
 		}
 	</div>
 }
 
 
 @code{
-	enum Views {Sheet, Moves, Campaign, FactionPhase, Settings};
+	enum Views {Sheet, Moves, Campaign, FactionPhase, Settings, Master, Clocks};
 	Views CurrentlyViewing = Views.Settings;
 
 	IJSObjectReference FirebaseJSRef;
@@ -77,10 +101,42 @@ else
 
 	private bool WaitingForConnection = true;
 
+	private void GoToCampaign()
+	{
+		CurrentlyViewing = Views.Campaign;
+	}
+
+	private bool IsLoadingFromDatabase = false;
+
+
+	private string debug = "";
+
+	private string Ficha
+	{
+		get
+		{
+			if (Data.CurrentCharacter is not null) return Data.CurrentCharacter.Name;
+			else return "Ficha";
+		}
+	}
+
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
+			if (MainLayout.Reference == null)
+				MainLayout.Reference = this;
+
+			Data.ShowLoadingCover += (o,e) => { 
+				IsLoadingFromDatabase = true;
+				StateHasChanged();
+			};
+			Data.HideLoadingCover += (o,e) => { 
+				IsLoadingFromDatabase = false;
+				StateHasChanged();
+			};
+
+
 			Auth.UserChanged += async (o, name) =>
 			{
 				WaitingForConnection = false;
@@ -90,12 +146,18 @@ else
 				}
 				else
 				{
+					debug += "Loading all - ";
+					StateHasChanged();
 					if (Data != null && Data.AllCharacters != null && Data.AllCharacters.Count == 0)
 						await Data.LoadAllAsync();
 
+					debug += "Loaded -  Storing chronicle";
+					StateHasChanged();
 					Chronicle test = new Chronicle { Name = "test" };
 					await Data.StoreChronicle(test);
 
+					debug += "Storing chronicle - ";
+					StateHasChanged();
 
 					if (Data != null && Data.Chronicle.Name == "")
 						await Data.GetChronicle(new Guid("6210b905-e706-477a-bfc9-8d6528fe6e19"));
@@ -105,29 +167,22 @@ else
 						await AllowPlayerToChooseCharacter();
 					}
 					await Messaging.CheckIfReConnnectionNeeded();
+					MainLayout.ForceUpdate();
 				}
-				
+
 				StateHasChanged();
 			};
 		}
 	}
 
+	public static MainLayout? Reference;
+	public static void ForceUpdate(){
+		MainLayout.Reference?.StateHasChanged();
+	}
+
 	private async Task AllowPlayerToChooseCharacter()
 	{
 		await Auth.AllowPlayerToChooseCharacter();
-
-		await Data.StoreMapPlayerCharacter(Auth.ConnectedUserName, Data.PlayerCharacter.ID);
-
-
-		Data.CurrentCharacter = Data.PlayerCharacter;
-		if (Data.CurrentCharacter.SheetID is not null)
-		{
-			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID((Guid)Data.CurrentCharacter.SheetID);
-		}
-		else
-		{
-			Data.CurrentPlayerSheet = new CharacterSheet();
-		}
 
 		StateHasChanged();
 	}

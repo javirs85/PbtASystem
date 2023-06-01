@@ -261,16 +261,20 @@ else
 
 	private void ShowInitialQuestions() { }
 
-	private void CorruptionClicked(int n)
+	private async Task CorruptionClicked(int n)
 	{
 		if (n > Data.CurrentPlayerSheet.Corruption) Data.CurrentPlayerSheet.Corruption++;
 		else Data.CurrentPlayerSheet.Corruption--;
+
+		await Data.StoreCharacterSheet();
 	}
 
-	private void WoundClicked(int n)
+	private async Task WoundClicked(int n)
 	{
 		if (n > Data.CurrentPlayerSheet.Damage) Data.CurrentPlayerSheet.Damage++;
 		else Data.CurrentPlayerSheet.Damage--;
+
+		await Data.StoreCharacterSheet();
 	}
 
 

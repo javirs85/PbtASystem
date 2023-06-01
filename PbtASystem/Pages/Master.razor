@@ -9,26 +9,11 @@
 @inject USMovesService Moves
 @inject IJSRuntime JS
 
-<div class="d-flex flex-column">
+<div class="MasterContainer">
 	
-	@if (LastMoveMsg != null)
-	{
-		<div class="LastMove p-2">
-			<div class="d-flex w-100 pb-2 px-4 justify-content-between">
-				<div class="d-flex flex-column">
-					<div>@LastRollName</div>
-					<div>@LastRollTxt</div>
-				</div>
-				<div class="RolledValue d-flex align-items-center">@LastMoveMsg.RollValue</div>
-			</div>
-			
-			<MoveViewer IsSelected=true MasterView=true MasterRolledValue=@LastMoveMsg.RollValue ID=LastMove.ID />
-		</div>
-	}
-		
-	<div class="Item" id="MainAccordeon">
+	<div class="MasterItem">
 		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack1">Movimientos</h1>
-		<div class="Pack collapse" id="Pack1" data-bs-parent="#MainAccordeon">
+		<div class="Pack collapse" id="Pack1" data-bs-parent="">
 			<h4>Movimientos del MC</h4>
 			@foreach (var mov in Movimientos.OrderBy(x=>x.Usage))
 			{
@@ -56,18 +41,18 @@
 			}
 		</div>
 	</div>
-	<div class="Item">
+	<div class="MasterItem">
 		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack2">Princípios</h1>
-		<div class="Pack collapse" id="Pack2" data-bs-parent="#MainAccordeon">
+		<div class="Pack collapse" id="Pack2" data-bs-parent="">
 			@foreach (var mov in Princípios.OrderBy(x => x.Usage))
 			{
 				<div class="@(mov.Usage == 0 ? "Used2" : "") @(mov.Usage == 1 ? "Used1" : "") @(mov.Usage == 2 ? "Used0" : "")" @onclick="@(_ => {@mov.Use();})">@mov.Tittle</div>
 			}
 		</div>
 	</div>
-	<div class="Item">
+	<div class="MasterItem">
 		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Pack3">Relojes</h1>
-		<div class="Pack collapse" id="Pack3" data-bs-parent="#MainAccordeon">
+		<div class="Pack collapse" id="Pack3" data-bs-parent="">
 			@foreach(var clock in Data.Chronicle.Clocks)
 			{
 				<ClockWidgetr Clock="clock"/>
@@ -75,8 +60,36 @@
 			<button class="btn btn-outline-light" @onclick=AddClock>Añadir reloj</button>
 		</div>
 	</div>
-</div>
+	<div class="MasterItem">
+		<h1 class="headerbutton" data-bs-toggle="collapse" data-bs-target="#Log">Log</h1>
+		<div class="Pack collapse LogCollection" id="Log" data-bs-parent="">
+			@if (LastMoveMsg != null)
+			{
+				<div class=" LastMove p-2">
+					<div class="d-flex w-100 pb-2 px-4 justify-content-between align-items-center	">
+						<div class="d-flex flex-column">
+							<div>@LastRollName</div>
+							<div>@LastRollTxt</div>
+						</div>
+						<div class="RolledValue d-flex align-items-center">@LastMoveMsg.RollValue</div>
+						<div class="CloseButton" @onclick=@(_ => {LastMoveMsg = null;})></div>
+					</div>
+			
+					<MoveViewer IsSelected=true MasterView=true MasterRolledValue=@LastMoveMsg.RollValue ID=LastMove.ID />
+				</div>
+			}
 
+			@foreach (var msg in Log)
+			{
+				<div class="LogItem">
+					<div>@getLogHeader(msg)</div>
+					<div>@msg.Message = @msg.RollValue</div>
+					<div></div>
+				</div>
+			}
+		</div>
+	</div>
+</div>
 @code {
 
 	string LastRollName => LastMoveMsg?.SenderName ?? "No hay ningúna tirada";
@@ -85,6 +98,8 @@
 
 	RollMessage? LastMoveMsg;
 	USMove? LastMove;
+
+	private string getLogHeader(RollMessage msg) => $"{msg.SenderName} : {Moves.GetMovement(msg.MoveID).Tittle} ({(Moves.GetMovement(msg.MoveID) as USMove).Roll.ToUI()})";
 
 
 	private class MasterMovement
@@ -170,10 +185,15 @@
 		StateHasChanged();
 	}
 
+	private List<RollMessage> Log = new();
+
 	private void NewRoll(object? sender, RollMessage msg)
 	{
 		LastMoveMsg = msg;
 		LastMove = Moves.GetMovement(msg.MoveID) as USMove;
+
+		Log.Add(LastMoveMsg);
+
 		StateHasChanged();
 	}
 

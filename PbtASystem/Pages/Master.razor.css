@@ -13,6 +13,17 @@
     background-color: var(--Darker) !important;
 }
 
+.CloseButton {
+    width: 30px;
+    height: 30px;
+    background-image: url('imgs/Icons/Close.svg');
+    cursor: pointer;
+    opacity: 0.7;
+}
+.CloseButton:hover{
+    opacity: 1;
+}
+
 .headerbutton{
     cursor: pointer
 }
@@ -51,4 +62,20 @@
 }
 .RolledValue{
     font-size: 24px;
+}
+
+.MasterContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.MasterItem {
+    width: 350px;
+}
+
+.LogCollection{
+
+}
+.LogItem{
+
 }

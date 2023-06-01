@@ -1,4 +1,4 @@
-﻿@page "/DebEdit/{DebID}"
+﻿@page "/DebEdit/"
 
 @using System.Text.Json
 @inject IToastService Toaster
@@ -29,15 +29,13 @@
 </div>
 
 @code {
-	[Parameter] public string DebID { get; set; } = "";
-	[Parameter] public string CharID { get; set; } = "";
-	public Debt Debt { get; set; } = new();
+	[Parameter] public Debt Debt { get; set; }
+	[Parameter] public EventCallback Exit { get; set; }
 	DebtViewer.PayingMode Mode = DebtViewer.PayingMode.ToBePaid;
 	private Debt Original { get; set; } = new();
 
 	protected override void OnParametersSet()
 	{
-		Debt = Data.AllDebts.Find(x => x.ID == new Guid(DebID));
 		SetMode();
 		BackUp();
 		base.OnParametersSet();
@@ -49,7 +47,16 @@
 	}
 	private void Plus() => Debt.Amount++;
 
-	string DudeName = "";
+	string DudeName
+	{
+		get
+		{
+			if (Mode == DebtViewer.PayingMode.ToPay)
+				return Data.GetCharacterByID(Debt.ReceivingID).Name;
+			else
+				return Data.GetCharacterByID(Debt.PayingID).Name;
+		}
+	}
 
 	private void SetMode()
 	{
@@ -58,10 +65,6 @@
 		else
 			Mode = DebtViewer.PayingMode.ToBePaid;
 
-		if (Mode == DebtViewer.PayingMode.ToPay)
-			DudeName = Data.GetCharacterByID(Debt.ReceivingID).Name;
-		else
-			DudeName = Data.GetCharacterByID(Debt.PayingID).Name;
 	}
 	private void BackUp()
 	{
@@ -74,17 +77,19 @@
 			Debt.ReceivingID = (await Selector.SelectViaSelector()).ID;
 		else
 			Debt.PayingID = (await Selector.SelectViaSelector()).ID;
+		
+		StateHasChanged();
 	}
 
-	private void Cancel()
+	private async Task Cancel()
 	{
-		Debt = Original;
-		Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");
+		Debt = JsonSerializer.Deserialize<Debt>(JsonSerializer.Serialize(Original)); 
+		await Exit.InvokeAsync();
 	}
 
 	private async Task Submit()
 	{
 		await Data.StoreDebt(Debt);
-		Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");
+		await Exit.InvokeAsync();
 	}
 }

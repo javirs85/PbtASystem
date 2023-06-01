@@ -30,9 +30,9 @@ public class FirebaseData : USBDbase
     }
     public CharacterSheet CurrentPlayerSheet = new CharacterSheet {ID = new Guid()};
 	public bool IsCharacterSheetReady => PlayerCharacter is not null &&
-									     PlayerCharacter.SheetID is not null &&
+									     PlayerCharacter.SheetID.IsNotZero() &&
 									     CurrentPlayerSheet != null && 
-										 CurrentPlayerSheet.ID.ToString() != "00000000-0000-0000-0000-000000000000" &&
+										 CurrentPlayerSheet.ID.IsNotZero()	&&
 										 CurrentPlayerSheet.ID == PlayerCharacter.SheetID;
 
 	public Chronicle Chronicle { get; set; } = new Chronicle();
@@ -51,6 +51,8 @@ public class FirebaseData : USBDbase
 		Toaster = toaster;
 		LocalStorage = _localStorage;
 	}
+	public event EventHandler ShowLoadingCover;
+	public event EventHandler HideLoadingCover;
 
 	public bool IsConnectorSet => Firebase != null;
 
@@ -75,11 +77,19 @@ public class FirebaseData : USBDbase
 
 	public override async Task LoadAllAsync()
 	{
-		AllCharacters = await LocalStorage.GetItemAsync<List<Character>>("AllCharacters");
-		AllFactions = await LocalStorage.GetItemAsync<List<Faction>>("AllFactions");
-		AllDebts = await LocalStorage.GetItemAsync<List<Debt>>("AllDebts");
-		await LocalStorage.RemoveItemAsync("AllImages");
-		AllImages = await LocalStorage.GetItemAsync<List<Image64>>("AllImages");
+		ShowLoadingCover.Invoke(this, EventArgs.Empty);
+
+		try
+		{
+			AllCharacters = await LocalStorage.GetItemAsync<List<Character>>("AllCharacters");
+			AllFactions = await LocalStorage.GetItemAsync<List<Faction>>("AllFactions");
+			AllDebts = await LocalStorage.GetItemAsync<List<Debt>>("AllDebts");
+			await LocalStorage.RemoveItemAsync("AllImages");
+			AllImages = await LocalStorage.GetItemAsync<List<Image64>>("AllImages");
+		}catch (Exception ex)
+		{
+			await LocalStorage.RemoveItemAsync("AllCharacters");
+		}
 
 		if (AllImages == null)
 		{
@@ -112,7 +122,7 @@ public class FirebaseData : USBDbase
 			if (await IsDefaultCharacterIDSet())
 			{
 				PlayerCharacter = GetCharacterByID(await GetDefaultCharacterID());
-				if(PlayerCharacter.SheetID is not null && PlayerCharacter.SheetID.ToString() != new Guid().ToString())
+				if(PlayerCharacter.SheetID.IsNotZero() && PlayerCharacter.SheetID.ToString() != new Guid().ToString())
 				{
 					if(await CheckIfSheetExists((Guid)PlayerCharacter.SheetID))
 						CurrentPlayerSheet = await GetCharacterSheetByID((Guid)PlayerCharacter.SheetID);
@@ -122,7 +132,7 @@ public class FirebaseData : USBDbase
 			IsDataReady = true;
 			DataIsReady?.Invoke(this, EventArgs.Empty);
 
-			var velo = AllCharacters.FindAll(x => x.Circle == Circles.Velo);
+			HideLoadingCover.Invoke(this, EventArgs.Empty);
 		}
 	}
 	public async Task<bool> CheckIfNeedToLoad()
@@ -137,6 +147,7 @@ public class FirebaseData : USBDbase
 	}
 	public override async Task ForceDataRefresh()
 	{
+		ShowLoadingCover.Invoke(this, EventArgs.Empty);
 		AllCharacters = await Firebase.InvokeAsync<List<Character>>("GetCharactersFromDB");
 		AllFactions = await Firebase.InvokeAsync<List<Faction>>("GetFactionsFromDB");
 		AllDebts = await Firebase.InvokeAsync<List<Debt>>("GetDebtsFromDB");
@@ -159,6 +170,8 @@ public class FirebaseData : USBDbase
 
 		DataIsReady?.Invoke(this, EventArgs.Empty);
 		CurrentCharacter = CurrentCharacter;
+
+		HideLoadingCover.Invoke(this, EventArgs.Empty);	
 	}
 
 
@@ -169,7 +182,11 @@ public class FirebaseData : USBDbase
 		else return new Character();
 	}
 
-	internal async Task StoreDefaultCharacter(Character selected) => await LocalStorage.SetItemAsync<Guid>("DefaultCharacter", selected.ID);
+	internal async Task StoreDefaultCharacter(Character selected)
+	{
+		await LocalStorage.SetItemAsync<Guid>("DefaultCharacter", selected.ID);
+	}
+
 	internal async Task<Guid> GetDefaultCharacterID() => await LocalStorage.GetItemAsync<Guid>("DefaultCharacter");
 	internal async Task<bool> IsDefaultCharacterIDSet() => await LocalStorage.ContainKeyAsync("DefaultCharacter");
 	internal async Task ClearDefaultCharacter()

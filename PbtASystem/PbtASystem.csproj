@@ -7,7 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Shared\Menu.razor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Pages\FactionsPhase.razor" />
+    <Content Remove="Pages\SheetCreation.razor" />
+    <Content Remove="Shared\Menu.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\SheetCreation.razor.css" />
+    <None Remove="Shared\Menu.razor.css" />
   </ItemGroup>
 
   <ItemGroup>

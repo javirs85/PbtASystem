@@ -63,7 +63,7 @@
 			<div class="ms-3">@debt.Amount de @Data.GetCharacterByID(debt.PayingID).Name</div>
 		}
 		<div class="w-100 d-flex justify-content-center p-1 px-3 mt-2">
-			<button class="btn btn-outline-light align-items-center RoundButton" @onclick=@(()=>{/*Navigation.NavigateTo($"Character/{Data.CurrentCharacter.ID}");*/})>Gestonar deudas</button>
+			<button class="btn btn-outline-light align-items-center RoundButton" @onclick=GoToCampaign>Gestionar deudas</button>
 		</div>
 	}
 	
@@ -158,7 +158,9 @@
 	private List<Debt> DebtsToBePaid = new();
 
 	USMove LIO;
-	
+
+	[Parameter] public EventCallback GoToCampaign { get; set; }
+
 
 	public class MovesPack
 	{
@@ -290,8 +292,10 @@
 	private async Task ToggleMove(USMove mov)
 	{
 		var sheet = Data.CurrentPlayerSheet;
-
-		if (mov.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement)
+		
+		if (mov.TypeOfMovement == USMove.MovementTypes.ArchetipeMovement ||
+			mov.TypeOfMovement == USMove.MovementTypes.FaeMagic ||
+			mov.TypeOfMovement == USMove.MovementTypes.MageMagic)
 		{
 			if (sheet.SelectedArchetypeMoves.Contains(mov.ID))
 				sheet.SelectedArchetypeMoves.Remove(mov.ID);

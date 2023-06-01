@@ -1,5 +1,8 @@
 ﻿using Microsoft.JSInterop;
 using Blazored.Toast.Services;
+using PbtASystem.PbtASupport;
+using PbtASystem.Services.Moves;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PbtASystem.Services;
 
@@ -48,21 +51,9 @@ public class FirebaseAuth
     public async Task TryLogin()
     {
         await Firebase.InvokeVoidAsync("GoogleLogIn");
-    }
 
-    public async Task LoginWithoutLogin()
-    {
-        if(await DB.IsDefaultCharacterIDSet())
-        {
-            DB.PlayerCharacter = DB.GetCharacterByID(await DB.GetDefaultCharacterID());
-        }
-        else
-        {
-            await AllowPlayerToChooseCharacter();
-        }
-
-        IsUserConnected = true;
-        IsConnectedViaGoogle = false;
+		if (ConnectedUserName == DB.Chronicle.MasterPlayerID)
+			IsMaster = true;
 	}
 
     public async Task LoginUserPass(string mail, string pass)
@@ -75,12 +66,33 @@ public class FirebaseAuth
 	}
 
 
-	public async Task AllowPlayerToChooseCharacter()
+	public async Task<bool> AllowPlayerToChooseCharacter()
     {
         var Selected = await CharacterSelectionService.SelectViaSelector("Debes seleccionar un personaje con el que jugar", false);
-        await DB.StoreDefaultCharacter(Selected);
-        DB.PlayerCharacter = Selected;
-    }
+		await DB.StoreDefaultCharacter(Selected);
+		DB.PlayerCharacter = Selected;
+        bool NeedToCreateSheet = false;
+
+		await DB.StoreMapPlayerCharacter(ConnectedUserName, DB.PlayerCharacter.ID);
+
+
+		DB.CurrentCharacter = DB.PlayerCharacter;
+		if (DB.CurrentCharacter.SheetID.IsZero() == false)
+		{
+			DB.CurrentPlayerSheet = await DB.GetCharacterSheetByID((Guid)DB.CurrentCharacter.SheetID);
+		}
+		else
+		{
+			DB.CurrentPlayerSheet = new CharacterSheet
+			{
+				Archetype = AvailableArchetypes.NotSet,
+				ID = new Guid()
+			};
+			NeedToCreateSheet = true;
+		}
+
+        return NeedToCreateSheet;
+	}
 
     public async Task TryLogout()
     {

@@ -1,15 +1,22 @@
-﻿<div class="PbtASystemContainer DebtContainer">
-	<div class="FirstColumn d-flex flex-column">
-		<div class="TheOther" @onclick=ChooseCharacter>@TheOtherName</div>
-		<div class="Amount d-flex justify-content-center" @onclick=AddOneToDebt>@Debt.Amount</div>
+﻿@if (!IsEditing)
+{
+	<div class="PbtASystemContainer DebtContainer">
+		<div class="FirstColumn d-flex flex-column">
+			<div class="TheOther" @onclick=ChooseCharacter>@TheOtherName</div>
+			<div class="Amount d-flex justify-content-center" @onclick=AddOneToDebt>@Debt.Amount</div>
+		</div>
+		<div class="DebtMain flex-grow-1" @onclick=@(()=>{IsEditing = true;})>
+			@Debt.Reason
+		</div>
+		<div class="ClossingButton" @onclick=RemoveOneDebt>
+			<i class="bi bi-x-lg"/>
+		</div>
 	</div>
-	<div class="DebtMain flex-grow-1" @onclick=@(()=>{Navigation.NavigateTo($"DebEdit/{Debt.ID}");})>
-		@Debt.Reason
-	</div>
-	<div class="ClossingButton" @onclick=RemoveOneDebt>
-		<i class="bi bi-x-lg"/>
-	</div>
-</div>
+}
+else
+{
+	<PbtASystem.Pages.DebEditor Exit="@(_=> {IsEditing = false; StateHasChanged();})" Debt="Debt"/>
+}
 
 @code {
 	[Inject] IToastService Toaster { get; set; }
@@ -17,6 +24,8 @@
 	[Inject] CharacterSelectionService Selector { get; set; }
 	[Inject] ConfirmationModalService Confirmator { get; set; }
 	[Inject] NavigationManager Navigation { get; set; }
+
+	private bool IsEditing = false;
 
 	public enum PayingMode {ToPay, ToBePaid};
 

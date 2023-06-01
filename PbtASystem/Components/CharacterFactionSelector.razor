@@ -77,7 +77,6 @@
 	{
 		var ch = await DB.CreatePlayerAtFaction(fac);
 		await CharacterSelected.InvokeAsync(ch);
-		Navigation.NavigateTo($"Character/{ch.ID}");
 	}
 
 	async Task CreateFaction()

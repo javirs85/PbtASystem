@@ -4,61 +4,7 @@
 @inject FirebaseMessaging Messaging
 @inject USMovesService Moves
 
-@if(Auth.IsUserConnected && Data.IsCharacterSheetReady)
-{
-	<div class="d-flex flex-column w-100 p-4">
-		<div><span class="opacity-75">Cronica:</span> @Data.Chronicle.Name</div>
-		<div><span class="opacity-75">Personajes:</span> @Data.AllCharacters.Count</div>
-		<div><span class="opacity-75">Antiguedad:</span> @Data.LocalDataAgeInDays dias</div>
-		<div><span class="opacity-75">Personaje:</span> @Data.PlayerCharacter.Name</div>
-		<div><span class="opacity-75">Usuario:</span> @Auth.ConnectedUserName</div>
-		<div class="ButtonsPack w-100 d-flex flex-column justify-content-center gap-1 mt-4">
-			<div class="btn btn-primary" @onclick=Data.ForceDataRefresh>Force Update</div>
-			<div class="btn btn-primary" @onclick=Data.ClearDefaultCharacter>Forget default character</div>
-			<div class="btn btn-primary" @onclick=Auth.TryLogout>LogOut</div>
-			<div class="btn btn-primary" @onclick=TestMessage>TestMessg</div>
-			<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
-		</div>
-	</div>
-}
-else if (!Data.IsCharacterSheetReady)
-{
-	<div class="d-flex flex-column align-items-center">
-
-		@if (Data.CurrentPlayerSheet is not null && 
-			 Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && 
-			 Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
-		{
-			<button @onclick=CreateSheet class="btn btn-primary w-75 p-2 d-flex align-items-center">
-				<div class="d-flex flex-coxlumn align-content-center">
-					<div>Crear Ficha de personaje para</div>
-					<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
-					<div>controlada por @Auth.ConnectedUserName</div>
-				</div>
-			</button>
-		}
-		else
-		{
-			<EditForm Model="Data.PlayerCharacter">
-				<label for="body">El personaje @Data.PlayerCharacter.Name no tiene ficha asociada. Elige un arquetipo para la ficha:</label>
-				<InputSelect @bind-Value=Data.CurrentPlayerSheet.Archetype>
-					@foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)))
-					{
-						@if ((AvailableArchetypes)arc != AvailableArchetypes.All && (AvailableArchetypes)arc != AvailableArchetypes.NotSet)
-						{
-							<option value="@arc">
-								@(
-							((AvailableArchetypes)arc).ToUI()
-							)
-							</option>
-						}
-					}
-				</InputSelect>
-			</EditForm>
-		}
-	</div>
-}
-else
+@if(!Auth.IsUserConnected)
 {
 	<div class="d-flex flex-column w-100 p-4">
 		<div>Personajes cargados: @Data?.AllCharacters?.Count</div>
@@ -70,14 +16,6 @@ else
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.createLogin;})>Create new user password</div>
 			<div class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick=@(()=>{CurrentMode = Mode.DoLogin;})>Login with user password</div>
 			<div class="btn btn-primary" @onclick=ForgetDefaultCharacter>Forget default character</div>
-			@if (isDefaultIDSet)
-			{
-				<div class="btn btn-primary" @onclick=Auth.LoginWithoutLogin>Start without login</div>
-			}
-			else
-			{
-				<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Choose character</div>
-			}
 		</div>
 	</div>
 
@@ -86,7 +24,7 @@ else
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-body">
-					
+
 					<EditForm Model="Model">
 						<!-- Email input -->
 						<div class="d-flex flex-column mb-3">
@@ -109,11 +47,87 @@ else
 		</div>
 	</div>
 }
+else if(Auth.IsUserConnected && Data.IsCharacterSheetReady)
+{
+	<div class="d-flex flex-column w-100 p-4">
+		<div><span class="opacity-75">Cronica:</span> @Data.Chronicle.Name</div>
+		<div><span class="opacity-75">Personajes:</span> @Data.AllCharacters.Count</div>
+		<div><span class="opacity-75">Antiguedad:</span> @Data.LocalDataAgeInDays dias</div>
+		<div><span class="opacity-75">Personaje:</span> @Data.PlayerCharacter.Name</div>
+		<div><span class="opacity-75">Usuario:</span> @Auth.ConnectedUserName</div>
+		<div class="ButtonsPack w-100 d-flex flex-column justify-content-center gap-1 mt-4">
+			<div class="btn btn-primary" @onclick=Data.ForceDataRefresh>Force Update</div>
+			<div class="btn btn-primary" @onclick=Data.ClearDefaultCharacter>Forget default character</div>
+			<div class="btn btn-primary" @onclick=Auth.TryLogout>LogOut</div>
+			<div class="btn btn-primary" @onclick=TestMessage>TestMessg</div>
+			<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
+			<div class="btn btn-primary" @onclick=CheckIfMaster>@MasterQuestion</div>
+		</div>
+	</div>
+}
+else if (!Data.IsCharacterSheetReady)
+{
+	<div class="d-flex flex-column align-items-center">
+
+		@if (Data.CurrentPlayerSheet is not null && 
+			 Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.NotSet && 
+			 Data.CurrentPlayerSheet.Archetype != AvailableArchetypes.All)
+		{
+			<div>
+				@((MarkupString)debug)
+			</div>
+
+			<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
+			<div class="btn btn-primary" @onclick=@(async ()=>{await ForceSheetReload();})>Re-cargar ficha de PJ</div>
+			<div class="btn btn-primary" @onclick=@(async ()=>{await Data.ForceDataRefresh();})>Re-cargar todo</div>
+
+			<button @onclick=CreateSheet class="btn btn-primary w-75 p-2 d-flex align-items-center">
+				<div class="d-flex flex-coxlumn align-content-center">
+					<div>Crear Ficha de personaje para</div>
+					<div> @Data.PlayerCharacter.Name (@Data.CurrentPlayerSheet.Archetype.ToUI()) </div>
+				</div>
+			</button>
+		}
+		else
+		{
+			<div>
+				@((MarkupString)debug)
+			</div>
+
+			<EditForm Model="Data.PlayerCharacter">
+				<div class="btn btn-primary" @onclick=AllowPlayerToChooseCharacter>Change player</div>
+				<div class="btn btn-primary" @onclick=@(async ()=>{await ForceSheetReload();})>Re-cargar ficha de PJ</div>
+				<div class="btn btn-primary" @onclick=@(async ()=>{await Data.ForceDataRefresh();})>Re-cargar todo</div>
+				<div class="mt-2"></div>
+				<label for="body">El personaje @Data.PlayerCharacter.Name no tiene ficha asociada. Elige un arquetipo para la ficha:</label>
+				<InputSelect @bind-Value=Data.CurrentPlayerSheet.Archetype>
+					@foreach (var arc in Enum.GetValues(typeof(AvailableArchetypes)))
+					{
+						@if ((AvailableArchetypes)arc != AvailableArchetypes.All && (AvailableArchetypes)arc != AvailableArchetypes.NotSet)
+						{
+							<option value="@arc">
+								@(
+							((AvailableArchetypes)arc).ToUI()
+							)
+							</option>
+						}
+					}
+				</InputSelect>
+			</EditForm>
+		}
+	</div>
+}
+else
+{
+	<div>something went wrong 00010</div>
+}
 
 @code {
 	enum Mode {createLogin, DoLogin};
 	Mode CurrentMode = Mode.createLogin;
 	bool NeedToCreateSheet = false;
+
+	[Parameter] public EventCallback ForceUpdate{ get; set; }
 
 	private class LoginModel
 	{
@@ -140,6 +154,30 @@ else
 		await Data.ClearDefaultCharacter();
 		StateHasChanged();
 	}
+	private string debug = "";
+	private async Task ForceSheetReload()
+	{
+		try{
+			if(Data.CurrentCharacter is not null)
+			{
+				if ((bool)Data.CurrentCharacter?.SheetID.IsNotZero())
+					Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID((Guid)Data.CurrentCharacter.SheetID);
+
+				debug = $"CurrentCharacter ID: {Data.CurrentCharacter.ID.ToString()} <br/>" 
+						+ $"arch: {Data.CurrentPlayerSheet.Archetype.ToUI()} <br/>"
+						+ $"Sheet ID: {Data.CurrentCharacter.SheetID} <br/>"
+						+ $"CurrentCharacter.ID.SheetID: {Data.CurrentCharacter.SheetID.ToString()}"
+						+ $"PlayerCharacter.SheetID.IsNotZero() : {Data.PlayerCharacter.SheetID.IsNotZero()}";
+
+				await Data.GetCharacterSheetByID(Data.CurrentCharacter.ID);
+				StateHasChanged();
+			}			
+		}
+		catch(Exception e)
+		{
+			debug = e.Message + " ++ " + e.InnerException?.Message;
+		}
+	}
 
 	protected override void OnAfterRender(bool firstRender)
 	{
@@ -162,25 +200,7 @@ else
 
 	private async Task AllowPlayerToChooseCharacter()
 	{
-		await Auth.AllowPlayerToChooseCharacter();
-
-		await Data.StoreMapPlayerCharacter(Auth.ConnectedUserName, Data.PlayerCharacter.ID);
-
-
-		Data.CurrentCharacter = Data.PlayerCharacter;
-		if(Data.CurrentCharacter.SheetID is not null)
-		{
-			Data.CurrentPlayerSheet = await Data.GetCharacterSheetByID((Guid)Data.CurrentCharacter.SheetID);
-		}
-		else
-		{
-			Data.CurrentPlayerSheet = new CharacterSheet
-				{
-					Archetype = AvailableArchetypes.NotSet,
-					ID = new Guid()
-				};
-			NeedToCreateSheet = true;
-		}
+		NeedToCreateSheet = await Auth.AllowPlayerToChooseCharacter();
 
 		StateHasChanged();
 	}
@@ -196,5 +216,19 @@ else
 		await Data.ForceDataRefresh();
 		NeedToCreateSheet = false;
 		StateHasChanged();
+	}
+
+	private string MasterQuestion = "I'm the master";
+	private async Task CheckIfMaster()
+	{
+		Auth.IsMaster = (Data.Chronicle.MasterPlayerID == Auth.ConnectedUserName);
+		if(Auth.IsMaster)
+		{
+			await ForceUpdate.InvokeAsync();
+		}
+		else
+		{
+			MasterQuestion = "No, you are not";
+		}
 	}
 }

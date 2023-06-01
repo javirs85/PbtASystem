@@ -3,88 +3,100 @@
 @inject FirebaseAuth Auth;
 @inject ConfirmationModalService Confirm;
 
-<div class="PbtASystemContainer">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-xl-6">
-							<div class="d-flex gap-1">
-								<div class="Title">@Data.CurrentFaction.Name</div>
-								<img src="imgs/Icons/Edit.svg" class="EditButton" @onclick=@(()=>{/*Navigation.NavigateTo($"/EditFaction/{Data.CurrentFaction.ID}");*/}) />
+<div class="flex-grow-1 col">
+	<div class="d-flex flex-column">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12 p-0">
+					@if (Data.CurrentFaction is not null)
+					{
+						<div class="d-flex align-items-center justify-content-between">
+							<div class="d-block d-md-none" @onclick=UnSelect>
+								<img src="imgs/Icons/Back.svg" class="EditButton" @onclick=UnSelect/>
 							</div>
-							
+							<div class="Title">
+								@Data.CurrentFaction.Name
+							</div>
+							<img src="imgs/Icons/Edit.svg" class="EditButton" @onclick=RequestEdit />
+						</div>
+
+						<div class="d-flex gap-2">
+							<div class="SubTitle">
+								@Data.CurrentFaction.Kind (@Data.CurrentCircle.ToString())
+							</div>
+							<div>
+								@if (Data.CurrentFaction.Status == FactionStatuses.Menguando)
+								{
+									<img src="imgs/Icons/DownCircle.svg" width="40"  />
+								}
+								else if (Data.CurrentFaction.Status == FactionStatuses.Creciendo)
+								{
+									<img src="imgs/Icons/UpCircle.svg" width="40"/>
+								}
+								else
+								{
+									<img src="imgs/Icons/EqualCircle.svg" width="40"/>
+								}
+							</div>
+						</div>
+
+						<div class="d-flex flex-column mt-4">
 							<div class="d-flex gap-2">
-								<div class="SubTitle">@Data.CurrentFaction.Kind (@Data.CurrentCircle.ToString())</div>
-								<div>
-									@if (Data.CurrentFaction.Status == FactionStatuses.Menguando)
-									{
-										<img src="imgs/Icons/DownCircle.svg" width="40"  />
-									}
-									else if (Data.CurrentFaction.Status == FactionStatuses.Creciendo)
-									{
-										<img src="imgs/Icons/UpCircle.svg" width="40"/>
-									}
-									else
-									{
-										<img src="imgs/Icons/EqualCircle.svg" width="40"/>
-									}
-								</div>
+								Fuerza:@Data.CurrentFaction.Strength
+								<Track @bind-Value="@Data.CurrentFaction.StrengthTemp"/>
 							</div>
-
-							<div class="d-flex flex-column">
-								<div class="d-flex gap-2">
-									Fuerza:@Data.CurrentFaction.Strength
-									<Track @bind-Value="@Data.CurrentFaction.StrengthTemp"/>
-								</div>
-								<div class="Explanation"> @Data.CurrentFaction.StrengthExplanation</div>
-							</div>
-							<div class="d-flex flex-column mt-3">
-								<div class="d-flex gap-2">
-									Tamaño:@Data.CurrentFaction.Size
-									<Track @bind-Value="@Data.CurrentFaction.SizeTemp" />
-								</div>
-								<div class="Explanation"> @Data.CurrentFaction.SizeExplanation</div>
-							</div>
-
-							<div class="Entry">
-								<div class="EntryTitlte">Trabajando en ...</div>
-								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.CurrentlyWorkingOn /> </div>
-							</div>
-							<div class="Entry">
-								<div class="EntryTitlte">Descripción</div>
-								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.Description /> </div>
-							</div>
-							<div class="Entry">
-								<div class="EntryTitlte">Assets</div>
-								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.Assets /> </div>
-							</div>
-							@if (Auth.IsMaster)
-							{
-								<div class="Entry">
-									<div class="EntryTitlte">Master seeds</div>
-									<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.MasterSeeds /> </div>
-								</div>
-							}
-							else
-							{
-								<div>Las notas para el master han sido deshabilitadas</div>
-							}
-
+							<div class="Explanation"> @Data.CurrentFaction.StrengthExplanation</div>
 						</div>
-						<div class="col-xl-6 ">
-							actions here
+						<div class="d-flex flex-column mt-3">
+							<div class="d-flex gap-2">
+								Tamaño:@Data.CurrentFaction.Size
+								<Track @bind-Value="@Data.CurrentFaction.SizeTemp" />
+							</div>
+							<div class="Explanation"> @Data.CurrentFaction.SizeExplanation</div>
 						</div>
-					</div>
+
+						<div class="Entry">
+							<div class="EntryTitlte">Trabajando en ...</div>
+							<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.CurrentlyWorkingOn /> </div>
+						</div>
+						<div class="Entry">
+							<div class="EntryTitlte">Descripción</div>
+							<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.Description /> </div>
+						</div>
+						<div class="Entry">
+							<div class="EntryTitlte">Assets</div>
+							<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.Assets /> </div>
+						</div>
+						@if (Auth.IsMaster)
+						{
+							<div class="Entry">
+								<div class="EntryTitlte">Master seeds</div>
+								<div class="EntryBody"> <DecodedString Value=@Data.CurrentFaction.MasterSeeds /> </div>
+							</div>
+						}
+						else
+						{
+							<div>Las notas para el master han sido deshabilitadas</div>
+						}
+					}
 				</div>
-			</div>		
+			</div>
 		</div>
 	</div>
 </div>
 
 
 @code {
+	[Parameter] public EventCallback UnSelected { get; set; }
+	[Parameter] public EventCallback EditRequested { get; set; }
 
+	private async Task UnSelect()
+	{
+		await UnSelected.InvokeAsync();
+	}
 
+	private async Task RequestEdit()
+	{
+		await EditRequested.InvokeAsync();	
+	}
 }
